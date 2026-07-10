@@ -1,0 +1,59 @@
+{
+  "common": {
+    "siteName": "בית לחתול",
+    "siteSubtitle": "לכל חתול מגיע בית",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "edit": "עריכה",
+    "delete": "מחיקה",
+    "loading": "טוען...",
+    "success": "הפעולה הצליחה",
+    "requiredField": "שדה חובה",
+    "errorOccurred": "אירעה שגיאה. אנא נסה שנית.",
+    "logout": "התנתק"
+  },
+  "nav": {
+    "home": "דף הבית",
+    "catalog": "חתולים לאימוץ",
+    "publish": "למסירת חתול",
+    "requests": "הבקשות שלי",
+    "admin": "איזור מנהל",
+    "login": "התחברות",
+    "signup": "הרשמה"
+  },
+  "auth": {
+    "loginTitle": "התחברות לחשבון",
+    "signupTitle": "יצירת חשבון חדש",
+    "emailLabel": "אימייל",
+    "passwordLabel": "סיסמה",
+    "fullNameLabel": "שם מלא",
+    "phoneLabel": "מספר טלפון",
+    "emailPlaceholder": "example@domain.com",
+    "passwordPlaceholder": "לפחות 6 תווים",
+    "fullNamePlaceholder": "ישראל ישראלי",
+    "phonePlaceholder": "050-1234567",
+    "loginSubmitBtn": "התחבר",
+    "signupSubmitBtn": "הרשם כעת",
+    "noAccountPrompt": "אין לך חשבון עדיין?",
+    "hasAccountPrompt": "כבר יש לך חשבון?",
+    "signupSuccessMsg": "ההרשמה בוצעה בהצלחה! אנא התחבר.",
+    "authFailedMsg": "פרטי הזיהוי אינם נכונים או שחלה שגיאה.",
+    "weakPassword": "הסיסמה חלשה מדי. נדרשים לפחות 6 תווים.",
+    "invalidEmail": "כתובת האימייל אינה תקינה.",
+    "invalidPhone": "מספר הטלפון חייב להכיל ספרות בלבד ולהיות תקין."
+  },
+  "badges": {
+    "adopted": "אומץ! 🎉",
+    "pending": "ממתין לאישור 🕒",
+    "published": "פורסם 🟢",
+    "rejected": "נדחה ❌",
+    "draft": "טיוטה 📝",
+    "archived": "בארכיון 📦"
+  },
+  "mascot": {
+    "peeking": "חתול מציץ",
+    "sleeping": "חתול ישן",
+    "celebrating": "חתול חוגג",
+    "sitting": "חתול יושב"
+  }
+}

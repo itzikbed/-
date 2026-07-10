@@ -1,0 +1,13 @@
+.isolate-bidi {
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+/* RTL layout helpers */
+.rtl-flip {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(1);
+}

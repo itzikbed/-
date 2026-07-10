@@ -1,0 +1,50 @@
+:root {
+  /* Paper — 60% */
+  --paper:          oklch(97.2% 0.006 95);   /* ≈ #F7F5F0 warm paper bg */
+  --surface:        oklch(99.3% 0.003 95);   /* ≈ #FDFCFA cards, inputs */
+  --border:         oklch(90%   0.010 100);  /* ≈ #E3E0D7 hairlines */
+  /* Ink — 30% */
+  --ink:            oklch(25%   0.020 170);  /* ≈ #1E2B25 pine-charcoal text */
+  --ink-soft:       oklch(45%   0.020 170);  /* ≈ #55645C secondary text */
+  /* Brand — 10% */
+  --pine:           oklch(40%   0.080 168);  /* ≈ #1C6650 links, focus, secondary btn */
+  --pine-soft:      oklch(93%   0.030 165);  /* ≈ #DFF0E7 chips, success tint */
+  --marmalade:      oklch(75%   0.130 75);   /* ≈ #EBAF56 primary CTA bg (ink text!) */
+  --marmalade-dp:   oklch(69%   0.140 70);   /* ≈ #DD9C3D CTA hover */
+  --marmalade-sf:   oklch(95%   0.040 80);   /* ≈ #FBEFD8 highlight tint */
+  /* Status */
+  --success:        var(--pine);
+  --warning:        oklch(62%   0.130 70);   /* deep amber, ink text */
+  --danger:         oklch(52%   0.160 30);   /* ≈ #B0432F clay red, white text */
+
+  /* Shadows (warm, pine-tinted) */
+  --shadow-resting: 0 1px 2px oklch(25% 0.02 170 / 0.06), 0 4px 16px oklch(25% 0.02 170 / 0.06);
+  --shadow-hover:   0 2px 4px oklch(25% 0.02 170 / 0.08), 0 12px 24px oklch(25% 0.02 170 / 0.10);
+}
+
+@theme {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-pine: var(--pine);
+  --color-pine-soft: var(--pine-soft);
+  --color-marmalade: var(--marmalade);
+  --color-marmalade-dp: var(--marmalade-dp);
+  --color-marmalade-sf: var(--marmalade-sf);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --font-display: var(--font-rubik), system-ui;
+  --font-sans: var(--font-assistant), system-ui;
+
+  --radius-card: 20px;
+  --radius-btn: 9999px;
+  --radius-input: 12px;
+  --radius-photo: 14px;
+
+  --shadow-resting: var(--shadow-resting);
+  --shadow-hover: var(--shadow-hover);
+}

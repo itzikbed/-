@@ -1,0 +1,25 @@
+@layer utilities {
+  .app-container {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .app-container {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Section spacing */
+  .section-spacing {
+    margin-block: 2.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .section-spacing {
+      margin-block: 5rem;
+    }
+  }
+}

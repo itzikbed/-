@@ -4,11 +4,6 @@
 create extension if not exists pgcrypto;
 
 -- ============ helpers ============
-create or replace function public.is_admin()
-returns boolean language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
-$$;
-
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
 begin new.updated_at = now(); return new; end; $$;
@@ -31,6 +26,11 @@ create table public.profiles (
 alter table public.profiles enable row level security;
 create trigger trg_profiles_updated before update on public.profiles
   for each row execute function public.set_updated_at();
+
+create or replace function public.is_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
+$$;
 
 -- privilege-escalation guard: only admins change role / publisher_status
 create or replace function public.guard_profile_privileges()

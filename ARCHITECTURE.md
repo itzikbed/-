@@ -27,29 +27,30 @@ client/server) · Resend transactional email · Deploy: Vercel · Fonts/tokens: 
 
 ```
 app/
-  layout.tsx              # <html lang="he" dir="rtl">, fonts, header/footer
-  page.tsx                # landing: two-door hero + latest cats strip
+  layout.tsx              # ✅ <html lang="he" dir="rtl">, fonts, header/footer
+  page.tsx                # ✅ landing: two-door hero + latest cats strip
   cats/page.tsx           # public catalog; filters via searchParams
   cats/[id]/page.tsx      # cat detail, gallery, request CTA
   adopt/questionnaire/    # adopter wizard → adopter_profiles (saved, reusable)
   publish/                # publisher application, cat upload wizard, my-cats list
   requests/               # adopter's own requests + statuses
   admin/                  # layout.tsx role gate + queues: publishers/cats/requests + log
-  (auth)/login, signup    # Supabase auth (email+password v1)
+  (auth)/login, signup    # ✅ Supabase auth (email+password v1)
+  dev/ui/page.tsx         # ✅ dev UI kit playground
 lib/
-  supabase/{client,server,middleware}.ts
-  schemas/                # ALL zod schemas (one per form) + he-errors.ts error map
-  constants.ts            # REGIONS (5), AGE_BUCKETS (5), HEALTH_LEVELS, status enums — single source
-  strings.ts              # every Hebrew UI string, flat keys; no literals in JSX
+  supabase/{client,server,middleware}.ts # ✅ typed clients
+  schemas/                # ALL zod schemas (one per form) + he-errors.ts error map ✅
+  constants.ts            # ✅ REGIONS (5), AGE_BUCKETS (5), HEALTH_LEVELS, status enums — single source
+  strings.ts              # ✅ every Hebrew UI string, flat keys; no literals in JSX
   emails/send.ts          # Resend helpers (fire-and-log, never throw to user)
 components/
-  ui/                     # Button, Input, Badge, Chip, Dialog — per DESIGN.md
+  ui/                     # ✅ Button, Input, Badge, Chip, Dialog, Skeleton — per DESIGN.md
   cats/                   # CatCard, CatGrid, Filters, Gallery, PhotoUploader
   admin/                  # QueueTable, DecisionDialog (reject requires reason)
-  mascot/                 # Peeking Cat SVG set (see DESIGN.md §1)
+  mascot/                 # ✅ Peeking Cat SVG set (see DESIGN.md §1)
 emails/                   # react-email templates (see rtl-transactional-email skill)
 supabase/
-  migrations/0001_init.sql  # full schema + RLS — never edit applied migrations
+  migrations/0001_init.sql  # ✅ full schema + RLS — never edit applied migrations
   seed.sql                # dev: 1 admin, 2 publishers, ~12 published cats
 ```
 
@@ -133,7 +134,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Client sign-off on §10 decisions | ☐ |
-| 1 | Repo, RTL shell, migration 0001, auth, ui/ kit | ☐ |
+| 1 | Repo, RTL shell, migration 0001, auth, ui/ kit | ☑ |
 | 2 | Catalog + filters + cat page | ☐ |
 | 3 | Questionnaire wizard · upload wizard · request flow | ☐ |
 | 4 | Admin queues + emails | ☐ |

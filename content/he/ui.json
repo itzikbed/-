@@ -60,7 +60,74 @@
     "latestTitle": "חתולים חדשים שמחפשים בית",
     "latestDesc": "חתולים חמודים שנקלטו במערכת לאחרונה וממתינים למשפחה אוהבת.",
     "viewAllBtn": "צפה בכל החתולים לאימוץ ←",
-    "heroImageAlt": "חתול ג'ינג'י יפהפה בבית חם"
+    "heroImageAlt": "חתול ג'ינג'י יפהפה בבית חם",
+    "howItWorksTitle": "איך זה עובד?",
+    "howItWorksDesc": "תהליך פשוט, שקוף ומפוקח שנועד להבטיח את שלומם של החתולים ואת שביעות רצון המאמצים.",
+    "adopterStepsTitle": "לרוצים לאמץ",
+    "publisherStepsTitle": "לרוצים למסור",
+    "adopterSteps": [
+      { "title": "בוחרים חתול", "desc": "דפדפו במאגר ומצאו את החתול שמתאים לביתכם." },
+      { "title": "ממלאים שאלון", "desc": "עונים על שאלון קצר שיסייע לוודא התאמה מלאה." },
+      { "title": "מתחברים ומאמצים", "desc": "מנהלי המערכת יאשרו את הפנייה ויחברו ביניכם." }
+    ],
+    "publisherSteps": [
+      { "title": "מגישים בקשה", "desc": "נרשמים ומגישים בקשה לפתיחת חשבון מוסר מורשה." },
+      { "title": "מפרסמים פרטים", "desc": "ממלאים את פרטי החתול ומעלים תמונות ברורות." },
+      { "title": "מוצאים בית חם", "desc": "הבקשה עוברת אישור ולאחר מכן מפורסמת לציבור." }
+    ]
+  },
+  "catalog": {
+    "filterTitle": "סינון חתולים",
+    "clearAll": "נקה הכל",
+    "foundCount": "נמצאו {count} חתולים",
+    "genderAll": "כל המינים",
+    "genderMale": "זכר",
+    "genderFemale": "נקבה",
+    "genderUnknown": "לא ידוע",
+    "specialOnly": "מיוחדים בלבד 💙",
+    "specialBadge": "מיוחד 💙",
+    "genderLabel": "מין",
+    "regionLabel": "אזור",
+    "ageLabel": "גיל",
+    "healthLabel": "מצב בריאותי",
+    "goodWithLabel": "מסתדר עם",
+    "showResultsBtn": "הצג תוצאות ({count})",
+    "openFiltersBtn": "סינון חתולים",
+    "pagePrev": "הקודם",
+    "pageNext": "הבא",
+    "goodWithCats": "מסתדר עם חתולים",
+    "goodWithDogs": "מסתדר עם כלבים",
+    "goodWithNeither": "לא מסתדר עם חתולים/כלבים",
+    "cardImageAlt": "{name}, חתול לאימוץ",
+    "noPhotos": "אין תמונות זמינות",
+    "photoAlt": "{name} - תמונה {index}",
+    "prevPhoto": "תמונה קודמת",
+    "nextPhoto": "תמונה הבאה",
+    "thumbAlt": "תצוגה מקדימה {index}",
+    "noCatsFiltered": "לא מצאנו חתולים שמתאימים לסינון",
+    "noCatsTrue": "החתולים בדרך!",
+    "noCatsFilteredDesc": "מומלץ לנסות להסיר חלק מהמסננים או לשנות את בחירותיך כדי למצוא חתול מתאים.",
+    "noCatsTrueDesc": "כרגע אין מודעות פעילות לאימוץ. מגדלים מוזמנים לפרסם חתול חדש למסירה.",
+    "clearFilterBtn": "נקה סינון",
+    "publishCta": "פרסם מודעת מסירה",
+    "breadcrumbsTitle": "מאגר החתולים",
+    "feeLabel": "סל אימוץ:",
+    "noFee": "ללא עלות סל אימוץ",
+    "attributes": "מאפיינים",
+    "neuteredTrue": "מעוקר/מסורס",
+    "neuteredFalse": "לא מעוקר/מסורס",
+    "vaccinesNone": "לא מחוסן",
+    "vaccinesOne": "חוסן חיסון 1",
+    "vaccinesMultiple": "מחוסן ({count} חיסונים)",
+    "aboutCat": "על החתול",
+    "healthAndNeeds": "בריאות וצרכים מיוחדים",
+    "specialNeedsLabel": "צרכים מיוחדים:",
+    "healthNotesLabel": "הערות בריאותיות:",
+    "adoptCta": "רוצה לאמץ את {name}",
+    "healthFull": "מחוסן לגמרי ומעוקר",
+    "healthPartial": "חיסון אחד בלבד",
+    "healthNone": "לא מחוסן",
+    "specialChip": "מיוחדים בלבד 💙"
   },
   "badges": {
     "adopted": "אומץ! 🎉",
@@ -75,5 +142,15 @@
     "sleeping": "חתול ישן",
     "celebrating": "חתול חוגג",
     "sitting": "חתול יושב"
+  },
+  "error": {
+    "title": "אופס, משהו השתבש...",
+    "desc": "אירעה שגיאה בטעינת מאגר החתולים. אל דאגה, המערכת מנסה להתאושש.",
+    "retryBtn": "נסה שנית"
+  },
+  "notFound": {
+    "title": "העמוד לא נמצא",
+    "desc": "הגעת למקום שקט ושלו, אך לצערי העמוד שחיפשת אינו קיים במערכת.",
+    "backBtn": "חזרה למאגר החתולים"
   }
 }

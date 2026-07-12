@@ -31,7 +31,7 @@ const supabaseAnon = createClient(supabaseUrl, supabaseAnonKey)
 async function run() {
   console.log("--- STARTING RLS SMOKE TEST ---")
 
-  // TEST 1: Anon sees 0 cats
+  // TEST 1: Anon sees only published cats, and exactly the published count (12)
   const { data: anonCats, error: anonCatsError } = await supabaseAnon
     .from('cats')
     .select('*')
@@ -39,9 +39,20 @@ async function run() {
   if (anonCatsError) {
     console.error("TEST 1 FAILED (error):", anonCatsError.message)
     process.exit(1)
-  } else {
-    console.log(`TEST 1 SUCCESS: Anon sees ${anonCats.length} cats (expected 0)`)
   }
+  
+  const nonPublished = anonCats.filter(c => c.status !== 'published')
+  if (nonPublished.length > 0) {
+    console.error(`TEST 1 FAILED: Anon can see non-published cats! Mismatched rows:`, nonPublished)
+    process.exit(1)
+  }
+  
+  if (anonCats.length !== 12) {
+    console.error(`TEST 1 FAILED: Anon sees ${anonCats.length} cats (expected 12)`)
+    process.exit(1)
+  }
+  
+  console.log(`TEST 1 SUCCESS: Anon sees only published cats, and exactly 12 of them.`)
 
   // Generate a random user
   const email = `test_${Date.now()}@example.com`

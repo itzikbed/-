@@ -129,6 +129,8 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-10 · Client field-spec v2 integrated (supersedes 9-region list): 5 regions (north/south/center/jerusalem/yosh) · 5 age buckets (0–3m/3–6m/6–12m/1–8y/8y+) · `vaccinations` count 0–3 replaces boolean · `is_special`+`special_needs` for the "מיוחדים" filter · `fee_amount` (סל אימוץ) · publisher fields age/city/publisher_type on profiles · adopter questionnaire rewritten to her exact question list.
 - 2026-07-10 · Landing hero must feel alive: real-cat photo or short muted video loop per DESIGN.md §6a — not optional, part of DoD for the landing page.
 - 2026-07-12 · Bumped stack versions to Next.js 16, React 19, Tailwind CSS v4, and Zod v4 to leverage modern features and clean validation APIs.
+- 2026-07-12 · Added sharp as devDependency for processing openly-licensed cat images into card/full WebP variants client-side and in seeds.
+- 2026-07-12 · Added vitest as devDependency to run unit tests on complex, bug-prone filter parsing/serialization and query building.
 
 
 ## 12. Now / Next (update every session)
@@ -137,7 +139,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 |---|---|---|
 | 0 | Client sign-off on §10 decisions | ☐ |
 | 1 | Repo, RTL shell, migration 0001, auth, ui/ kit | ☑ |
-| 2 | Catalog + filters + cat page | ☐ |
+| 2 | Catalog + filters + cat page | ☑ |
 | 3 | Questionnaire wizard · upload wizard · request flow | ☐ |
 | 4 | Admin queues + emails | ☐ |
 | 5 | Polish: SEO/OG, a11y audit, privacy page | ☐ |

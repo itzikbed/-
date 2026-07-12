@@ -1,0 +1,3 @@
+-- seed.sql
+-- All data seeding is performed dynamically by scripts/seed-data.mjs
+-- because user creation requires the Supabase Admin API and images must be processed.

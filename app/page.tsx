@@ -25,13 +25,18 @@ export default async function HomePage() {
         {/* Background Video Loop (Optimized 8s, 1280px width, no audio, WebM/MP4) */}
         {/* Source URL: https://mixkit.co/free-stock-video/white-blue-eyed-cat-1538/ */}
         <div className="absolute inset-0 z-0 bg-paper">
+          {/* Static poster fallback for reduced motion */}
+          <div
+            className="hidden motion-reduce:block absolute inset-0 w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: "url('/hero/hero_poster.jpg')" }}
+          />
           <video
             autoPlay
             muted
             loop
             playsInline
             poster="/hero/hero_poster.jpg"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover motion-reduce:hidden"
           >
             <source src="/hero/hero_cat.webm" type="video/webm" />
             <source src="/hero/hero_cat.mp4" type="video/mp4" />

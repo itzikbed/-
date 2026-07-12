@@ -120,4 +120,21 @@ describe('applyFiltersToQuery', () => {
     // Check good_with conditions OR'ed (cats, neither)
     expect(mockQuery.or).toHaveBeenCalledWith('good_with_cats.eq.true,and(good_with_cats.eq.false,good_with_dogs.eq.false)')
   })
+
+  it('should ignore invalid enum values and clamp page numbers', () => {
+    const parsed = parseFilters({
+      region: 'north,invalid_region,south',
+      age: '0-3m,invalid_age',
+      health: 'full,invalid_health',
+      good_with: 'cats,invalid_good_with',
+      sex: 'invalid_sex',
+      page: '-5'
+    })
+    expect(parsed.region).toEqual(['north', 'south'])
+    expect(parsed.age).toEqual(['0-3m'])
+    expect(parsed.health).toEqual(['full'])
+    expect(parsed.good_with).toEqual(['cats'])
+    expect(parsed.sex).toBe('all')
+    expect(parsed.page).toBe(1)
+  })
 })

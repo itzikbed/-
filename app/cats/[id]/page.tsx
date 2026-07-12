@@ -6,7 +6,7 @@ import { getAgeBucketLabel } from '@/lib/utils/filters'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/Badge'
 import { strings } from '@/lib/strings'
-import { Info, DollarSign, Stethoscope, Compass } from 'lucide-react'
+import { Info, Coins, Stethoscope, Compass, ChevronLeft } from 'lucide-react'
 
 interface CatDetailPageProps {
   params: Promise<{ id: string }>
@@ -33,9 +33,31 @@ export async function generateMetadata({ params }: CatDetailPageProps) {
     ? `${supabaseUrl}/storage/v1/object/public/cat-photos/${coverPhoto.path_full}`
     : undefined
 
+  const sexLabel = cat.sex === 'male' 
+    ? strings.catalog.genderMale 
+    : cat.sex === 'female' 
+    ? strings.catalog.genderFemale 
+    : strings.catalog.genderUnknown
+
+  let title = strings.catalog.detailTitleUnknown.replace('{name}', cat.name)
+  if (cat.sex === 'male') {
+    title = strings.catalog.detailTitleMale.replace('{name}', cat.name)
+  } else if (cat.sex === 'female') {
+    title = strings.catalog.detailTitleFemale.replace('{name}', cat.name)
+  }
+
+  const regionObj = REGIONS.find((r) => r.id === cat.region as RegionId)
+  const regionLabel = regionObj ? regionObj.label : cat.region
+
+  const description = strings.catalog.detailDescription
+    .replace('{name}', cat.name)
+    .replace('{sexLabel}', sexLabel)
+    .replace('{regionLabel}', regionLabel)
+    .replace('{description}', cat.description.substring(0, 120))
+
   return {
-    title: strings.catalog.photoAlt.replace('{name}', cat.name).replace('{index}', strings.common.siteName),
-    description: `${cat.name}, ${cat.description.substring(0, 100)}...`,
+    title,
+    description,
     openGraph: ogImageUrl
       ? {
           images: [{ url: ogImageUrl }]
@@ -48,10 +70,10 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
   const { id } = await params
   const supabase = await createClient()
 
-  // Fetch cat details with photos and owner profile
+  // Fetch cat details with photos
   const { data: cat } = await supabase
     .from('cats')
-    .select('*, cat_photos(*), owner:profiles(*)')
+    .select('*, cat_photos(*)')
     .eq('id', id)
     .single()
 
@@ -94,7 +116,7 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
           <Link href="/cats" className="hover:text-pine hover:underline">
             {strings.catalog.breadcrumbsTitle}
           </Link>
-          <span>&gt;</span>
+          <ChevronLeft className="w-4 h-4 text-ink-soft/60" />
           <span className="text-ink">{cat.name}</span>
         </nav>
 
@@ -135,10 +157,9 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
               </div>
             </div>
 
-            {/* Fee Callout */}
             <div className="rounded-input p-4 flex items-center justify-between bg-marmalade-sf border border-marmalade/20">
               <div className="flex items-center gap-2 text-ink">
-                <DollarSign className="w-5 h-5 text-marmalade-dp" />
+                <Coins className="w-5 h-5 text-marmalade-dp" />
                 <span className="text-base font-bold">{strings.catalog.feeLabel}</span>
               </div>
               <span className="text-lg font-display font-extrabold text-ink">
@@ -203,7 +224,7 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
                 </h3>
                 
                 {cat.is_special && cat.special_needs && (
-                  <div className="bg-marmalade-sf/40 border-r-4 border-marmalade p-3.5 rounded text-sm text-ink font-semibold">
+                  <div className="bg-marmalade-sf/40 border-s-4 border-marmalade p-3.5 rounded text-sm text-ink font-semibold">
                     <strong className="block mb-1 text-ink">{strings.catalog.specialNeedsLabel}</strong>
                     {cat.special_needs}
                   </div>

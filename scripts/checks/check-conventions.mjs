@@ -46,6 +46,8 @@ const BANNED_PHYSICAL = [
   /(?<![-\w])text-(left|right)(?![-\w])/,
   /(?<![-\w])(left|right)-(?!1\/2)(\d|\[|full|auto|px)/,
   /\bflex-row-reverse\b/,
+  /(?<![-\w])(border|rounded)-[lr]-/,          // physical border/rounded — use -s/-e
+  /\binset-inline(-start|-end)?-/,             // NOT a Tailwind utility — use start-*/end-*
 ]
 const isComment = (l) => /^\s*(\/\/|\/?\*)/.test(l)
 

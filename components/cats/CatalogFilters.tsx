@@ -1,8 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
-import { Filters, serializeFilters } from '@/lib/utils/filters'
+import { Filters } from '@/lib/utils/filters'
 import { REGIONS, AGE_BUCKETS } from '@/lib/constants'
 import { strings } from '@/lib/strings'
 import { Checkbox } from '@/components/ui/Checkbox'
@@ -11,20 +10,20 @@ import { Radio } from '@/components/ui/Radio'
 interface CatalogFiltersProps {
   filters: Filters
   totalCount: number
+  onFiltersChange: (newFilters: Filters) => void
   onCloseMobile?: () => void
 }
 
 export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
   filters,
   totalCount,
+  onFiltersChange,
   onCloseMobile
 }) => {
-  const router = useRouter()
 
   const handleSingleChange = (key: keyof Filters, value: unknown) => {
     const newFilters = { ...filters, [key]: value, page: 1 }
-    const queryString = serializeFilters(newFilters)
-    router.replace(`/cats?${queryString}`, { scroll: false })
+    onFiltersChange(newFilters)
   }
 
   const handleArrayChange = (
@@ -47,6 +46,18 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
     filters.special ||
     filters.sex !== 'all'
 
+  const handleClear = () => {
+    onFiltersChange({
+      region: [],
+      age: [],
+      health: [],
+      good_with: [],
+      special: false,
+      sex: 'all',
+      page: 1
+    })
+  }
+
   return (
     <div className="flex flex-col gap-8 h-full">
       {/* Header */}
@@ -56,7 +67,7 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
         </h3>
         {hasActiveFilters && (
           <button
-            onClick={() => router.replace('/cats', { scroll: false })}
+            onClick={handleClear}
             className="text-sm font-semibold text-pine hover:underline cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
           >
             {strings.catalog.clearAll}

@@ -100,6 +100,7 @@
     "goodWithNeither": "לא מסתדר עם חתולים/כלבים",
     "cardImageAlt": "{name}, חתול לאימוץ",
     "noPhotos": "אין תמונות זמינות",
+    "galleryAriaLabel": "גלריית תמונות",
     "photoAlt": "{name} - תמונה {index}",
     "prevPhoto": "תמונה קודמת",
     "nextPhoto": "תמונה הבאה",
@@ -127,7 +128,11 @@
     "healthFull": "מחוסן לגמרי ומעוקר",
     "healthPartial": "חיסון אחד בלבד",
     "healthNone": "לא מחוסן",
-    "specialChip": "מיוחדים בלבד 💙"
+    "specialChip": "מיוחדים בלבד 💙",
+    "detailTitleMale": "{name} מחפש בית חם — בית לחתול",
+    "detailTitleFemale": "{name} מחפשת בית חם — בית לחתול",
+    "detailTitleUnknown": "{name} מחפש/ת בית חם — בית לחתול",
+    "detailDescription": "{name}, {sexLabel} מתוק/ה לאימוץ באזור {regionLabel}. {description}"
   },
   "badges": {
     "adopted": "אומץ! 🎉",

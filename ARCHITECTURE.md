@@ -29,8 +29,8 @@ client/server) · Resend transactional email · Deploy: Vercel · Fonts/tokens: 
 app/
   layout.tsx              # ✅ <html lang="he" dir="rtl">, fonts, header/footer
   page.tsx                # ✅ landing: two-door hero + latest cats strip
-  cats/page.tsx           # public catalog; filters via searchParams
-  cats/[id]/page.tsx      # cat detail, gallery, request CTA
+  cats/page.tsx           # ✅ public catalog; filters via searchParams
+  cats/[id]/page.tsx      # ✅ cat detail, gallery, request CTA
   adopt/questionnaire/    # adopter wizard → adopter_profiles (saved, reusable)
   publish/                # publisher application, cat upload wizard, my-cats list
   requests/               # adopter's own requests + statuses
@@ -45,7 +45,7 @@ lib/
   emails/send.ts          # Resend helpers (fire-and-log, never throw to user)
 components/
   ui/                     # ✅ Button, Input, Badge, Chip, Dialog, Skeleton — per DESIGN.md
-  cats/                   # CatCard, CatGrid, Filters, Gallery, PhotoUploader
+  cats/                   # ✅ CatCard, CatGrid, Filters, Gallery, PhotoUploader
   admin/                  # QueueTable, DecisionDialog (reject requires reason)
   mascot/                 # ✅ Peeking Cat SVG set (see DESIGN.md §1)
 emails/                   # react-email templates (see rtl-transactional-email skill)
@@ -131,6 +131,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-12 · Bumped stack versions to Next.js 16, React 19, Tailwind CSS v4, and Zod v4 to leverage modern features and clean validation APIs.
 - 2026-07-12 · Added sharp as devDependency for processing openly-licensed cat images into card/full WebP variants client-side and in seeds.
 - 2026-07-12 · Added vitest as devDependency to run unit tests on complex, bug-prone filter parsing/serialization and query building.
+- 2026-07-12 · Added migration 0002 to allow service_role to bypass the profile role privilege guard, enabling user seeding through auth.admin APIs.
 
 
 ## 12. Now / Next (update every session)

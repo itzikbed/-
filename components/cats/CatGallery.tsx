@@ -18,6 +18,7 @@ interface CatGalleryProps {
 
 export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName }) => {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
 
   if (!photos || photos.length === 0) {
     return (
@@ -37,13 +38,47 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName }) => {
     setActiveIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1))
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStart === null) return
+    const touchEnd = e.targetTouches[0].clientX
+    const diff = touchStart - touchEnd
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        nextPhoto()
+      } else {
+        prevPhoto()
+      }
+      setTouchStart(null)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      nextPhoto()
+    } else if (e.key === 'ArrowRight') {
+      prevPhoto()
+    }
+  }
+
   const activePhoto = photos[activeIndex]
   const mainImageUrl = `${supabaseUrl}/storage/v1/object/public/cat-photos/${activePhoto.path_full}`
 
   return (
     <div className="space-y-4">
       {/* Main Image Viewport */}
-      <div className="relative w-full aspect-[4/3] bg-paper rounded-card border border-border overflow-hidden shadow-resting group">
+      <div 
+        className="relative w-full aspect-[4/3] bg-paper rounded-card border border-border overflow-hidden shadow-resting group focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        aria-label={strings.catalog.galleryAriaLabel}
+      >
         <Image
           src={mainImageUrl}
           alt={strings.catalog.photoAlt.replace('{name}', catName).replace('{index}', (activeIndex + 1).toString())}

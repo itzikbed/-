@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Filters, serializeFilters } from '@/lib/utils/filters'
 import { CatalogFilters } from './CatalogFilters'
@@ -39,15 +39,25 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
 }) => {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const limit = 24
   const totalPages = Math.ceil(totalCount / limit) || 1
+
+  const handleFiltersChange = (newFilters: Filters) => {
+    const queryString = serializeFilters(newFilters)
+    startTransition(() => {
+      router.replace(`/cats?${queryString}`, { scroll: false })
+    })
+  }
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return
     const newFilters = { ...filters, page }
     const queryString = serializeFilters(newFilters)
-    router.replace(`/cats?${queryString}`, { scroll: true })
+    startTransition(() => {
+      router.replace(`/cats?${queryString}`, { scroll: true })
+    })
   }
 
   // Remove a specific array item from filter
@@ -58,20 +68,20 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
     const currentArray = filters[key] as string[]
     const newArray = currentArray.filter((x) => x !== item)
     const newFilters = { ...filters, [key]: newArray, page: 1 }
-    const queryString = serializeFilters(newFilters)
-    router.replace(`/cats?${queryString}`, { scroll: false })
+    handleFiltersChange(newFilters)
   }
 
   // Remove single values
   const removeSingleFilter = (key: 'sex' | 'special') => {
     const value = key === 'sex' ? 'all' : false
     const newFilters = { ...filters, [key]: value, page: 1 }
-    const queryString = serializeFilters(newFilters)
-    router.replace(`/cats?${queryString}`, { scroll: false })
+    handleFiltersChange(newFilters)
   }
 
   const handleClearAll = () => {
-    router.replace('/cats', { scroll: false })
+    startTransition(() => {
+      router.replace('/cats', { scroll: false })
+    })
   }
 
   const isFiltered =
@@ -110,7 +120,11 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
           {/* Desktop Sidebar Filters */}
           <aside className="hidden md:block md:col-span-1 bg-surface border border-border rounded-card p-6 shadow-resting sticky top-20">
-            <CatalogFilters filters={filters} totalCount={totalCount} />
+            <CatalogFilters 
+              filters={filters} 
+              totalCount={totalCount} 
+              onFiltersChange={handleFiltersChange} 
+            />
           </aside>
 
           {/* Catalog grid area */}
@@ -124,7 +138,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
               onClearAll={handleClearAll}
             />
 
-            <CatGrid cats={cats} isFiltered={isFiltered} />
+            <CatGrid cats={cats} isFiltered={isFiltered} loading={isPending} />
 
             {/* Pagination Footer */}
             <CatalogPagination
@@ -147,6 +161,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
             <CatalogFilters
               filters={filters}
               totalCount={totalCount}
+              onFiltersChange={handleFiltersChange}
               onCloseMobile={() => setMobileOpen(false)}
             />
           </div>

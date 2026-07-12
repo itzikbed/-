@@ -62,14 +62,14 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
           src={imageUrl}
           alt={strings.catalog.cardImageAlt.replace('{name}', cat.name)}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className={`object-cover object-center transition-all duration-200 group-hover:scale-102 ${
             isAdopted ? 'grayscale-[30%]' : ''
           }`}
         />
         
         {/* Floating Badges */}
-        <div className="absolute top-3 inset-inline-start-3 flex flex-col gap-2 z-10">
+        <div className="absolute top-3 start-3 flex flex-col gap-2 z-10">
           {isAdopted && (
             <Badge variant="adopted" className="shadow-md">
               {strings.badges.adopted}

@@ -22,10 +22,11 @@ Definition of Done on every track.
    checkmarks, §11 decision log, §12 phase table). A session that changes structure but
    not the file is unfinished.
 4. Definition of Done for every task: `npm run gate` passes (it chains the conventions
-   script → `tsc --noEmit` → lint, and lint enforces `max-lines` at 220 — a failing
-   file gets SPLIT, never a raised limit or a disable comment) → `npm run build` passes
-   at milestones → the relevant skill's "Done checklist" all checked. Paste the full
-   `npm run gate` output in your report; a report without it is unfinished.
+   script → `tsc --noEmit` → lint → `vitest run`; lint enforces `max-lines` at 220 — a
+   failing file gets SPLIT, never a raised limit or a disable comment) → `npm run build`
+   passes at milestones → the relevant skill's "Done checklist" all checked → the work is
+   COMMITTED (uncommitted work = phase not done). Paste the full `npm run gate` output
+   in your report; a report without it is unfinished.
 5. **PROTECTED, READ-ONLY FILES — never edit, rename, delete, or add siblings:**
    everything under `prompts/`, `skills/`, and `scripts/checks/`. These are the
    architect's rulebook and gates. An out-of-repo integrity check hashes them against

@@ -23,15 +23,27 @@ export function parseFilters(params: Record<string, string | string[] | undefine
     return []
   }
 
-  const region = getArray(params.region)
-  const age = getArray(params.age)
-  const health = getArray(params.health)
-  const good_with = getArray(params.good_with)
-  const special = params.special === 'true'
-  const sex = (params.sex === 'male' || params.sex === 'female') ? params.sex : 'all'
-  const page = params.page ? parseInt(params.page as string, 10) || 1 : 1
+  const validRegions = ['north', 'south', 'center', 'jerusalem', 'yosh']
+  const validAges = ['0-3m', '3-6m', '6-12m', '1-8y', '8y+']
+  const validHealth = ['full', 'partial', 'none']
+  const validGoodWith = ['cats', 'dogs', 'neither']
 
-  return filterSchema.parse({
+  const region = getArray(params.region).filter(v => validRegions.includes(v)) as Filters['region']
+  const age = getArray(params.age).filter(v => validAges.includes(v)) as Filters['age']
+  const health = getArray(params.health).filter(v => validHealth.includes(v)) as Filters['health']
+  const good_with = getArray(params.good_with).filter(v => validGoodWith.includes(v)) as Filters['good_with']
+  const special = params.special === 'true'
+  const sex = (params.sex === 'male' || params.sex === 'female' || params.sex === 'all') ? params.sex : 'all'
+  
+  let page = 1
+  if (params.page) {
+    const parsedPage = parseInt(params.page as string, 10)
+    if (!isNaN(parsedPage) && parsedPage > 0) {
+      page = parsedPage
+    }
+  }
+
+  const result = filterSchema.safeParse({
     region,
     age,
     health,
@@ -40,6 +52,13 @@ export function parseFilters(params: Record<string, string | string[] | undefine
     sex,
     page
   })
+
+  if (result.success) {
+    return result.data
+  }
+
+  // fallback to defaults
+  return filterSchema.parse({})
 }
 
 export function serializeFilters(filters: Partial<Filters>): string {

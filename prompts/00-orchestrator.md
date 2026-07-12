@@ -21,10 +21,19 @@ Definition of Done on every track.
 3. **Update ARCHITECTURE.md in the same session** as any structural change (§3 file map
    checkmarks, §11 decision log, §12 phase table). A session that changes structure but
    not the file is unfinished.
-4. Definition of Done for every task: `npx tsc --noEmit` clean → `npm run lint` clean →
-   `npm run build` passes → RTL grep clean (no `ml- mr- pl- pr- left- right- text-left
-   text-right` classes) → the relevant skill's "Done checklist" all checked.
-5. **Design is a functional requirement, not decoration.** A screen that works but looks
+4. Definition of Done for every task: `npm run gate` passes (it chains the conventions
+   script → `tsc --noEmit` → lint, and lint enforces `max-lines` at 220 — a failing
+   file gets SPLIT, never a raised limit or a disable comment) → `npm run build` passes
+   at milestones → the relevant skill's "Done checklist" all checked. Paste the full
+   `npm run gate` output in your report; a report without it is unfinished.
+5. **PROTECTED, READ-ONLY FILES — never edit, rename, delete, or add siblings:**
+   everything under `prompts/`, `skills/`, and `scripts/checks/`. These are the
+   architect's rulebook and gates. An out-of-repo integrity check hashes them against
+   canonical copies you cannot reach at every review — ANY drift fails the whole phase
+   regardless of how good the code is. If a rule blocks you or seems wrong, write the
+   problem in your report and STOP that task; never "fix" the rule. (`scripts/` outside
+   `checks/` — e.g. an RLS smoke test — is yours to create and extend.)
+6. **Design is a functional requirement, not decoration.** A screen that works but looks
    flat/generic FAILS review. Every screen must visibly follow DESIGN.md: warm paper
    background, pine+marmalade accents, 20px card radius, pill buttons, warm shadows,
    hover lifts, the Peeking Cat in empty states. The landing hero MUST have real media

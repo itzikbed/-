@@ -41,7 +41,7 @@ type ActionResult<T> =
 - **Never create parallel versions** (`page-new.tsx`, `CatCardV2`) — edit in place. Two versions of a component = a bug factory.
 - **New dependency = justify first**: check `package.json` for an existing equivalent, then add one line to ARCHITECTURE §11 explaining why.
 - Delete dead code immediately. No commented-out blocks, no unused exports, no leftover TODOs — an open question becomes a line in ARCHITECTURE §10/§12, not a comment.
-- Files growing past ~200 lines: split by responsibility before continuing.
+- Files growing past ~200 lines: split by responsibility before continuing. This is enforced MECHANICALLY: ESLint `max-lines` at 220 (skipBlankLines + skipComments, generated files like `database.types.ts` excluded). Never raise the limit or add per-file disables to "make lint pass" — split the file.
 
 ## Conventions
 - Component files PascalCase matching their export (`CatCard.tsx`); everything else per Next defaults. Path alias `@/` for all internal imports — no `../../..`.

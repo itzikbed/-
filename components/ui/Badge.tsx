@@ -11,7 +11,7 @@ export const Badge: React.FC<BadgeProps> = ({ variant = 'draft', children, class
     adopted: 'bg-pine-soft text-pine font-semibold',
     published: 'bg-pine-soft text-pine font-semibold',
     pending: 'bg-marmalade-sf text-warning font-semibold',
-    rejected: 'bg-opacity-10 bg-danger text-danger font-semibold',
+    rejected: 'bg-danger/10 text-danger font-semibold',
     draft: 'bg-surface border border-border text-ink-soft',
     archived: 'bg-surface border border-border text-ink-soft'
   }

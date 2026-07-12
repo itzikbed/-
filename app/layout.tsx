@@ -24,8 +24,8 @@ const assistant = Assistant({
 })
 
 export const metadata: Metadata = {
-  title: "בית לחתול — אימוץ חתולים בישראל",
-  description: "לכל חתול מגיע בית. פלטפורמה מפוקחת לאימוץ ומסירת חתולים בישראל.",
+  title: strings.common.metaTitle,
+  description: strings.common.metaDesc,
 }
 
 export default async function RootLayout({

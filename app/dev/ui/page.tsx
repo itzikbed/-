@@ -1,16 +1,16 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Radio } from '@/components/ui/radio'
-import { Badge } from '@/components/ui/badge'
-import { Chip } from '@/components/ui/chip'
-import { Dialog } from '@/components/ui/dialog'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Mascot } from '@/components/mascot/mascot'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
+import { Checkbox } from '@/components/ui/Checkbox'
+import { Radio } from '@/components/ui/Radio'
+import { Badge } from '@/components/ui/Badge'
+import { Chip } from '@/components/ui/Chip'
+import { Dialog } from '@/components/ui/Dialog'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { Mascot } from '@/components/mascot/Mascot'
 
 export default function DevUiPlayground() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)

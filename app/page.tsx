@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Mascot } from '@/components/mascot/mascot'
+import { Mascot } from '@/components/mascot/Mascot'
 import { strings } from '@/lib/strings'
 
 export default function HomePage() {
@@ -12,7 +12,7 @@ export default function HomePage() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero_cat.png"
-            alt="חתול ג'ינג'י יפהפה בבית חם"
+            alt={strings.home.heroImageAlt}
             fill
             priority
             className="object-cover object-center"

@@ -5,6 +5,16 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    rules: {
+      "max-lines": ["error", { max: 220, skipBlankLines: true, skipComments: true }]
+    }
+  },
+  {
+    ignores: [
+      "lib/supabase/database.types.ts"
+    ]
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

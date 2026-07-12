@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:conventions": "node scripts/checks/check-conventions.mjs",
+    "check:rls": "node scripts/rls-smoke.mjs",
+    "gate": "npm run check:conventions && npx tsc --noEmit && npm run lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

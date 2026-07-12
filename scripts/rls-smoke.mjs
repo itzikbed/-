@@ -1,0 +1,154 @@
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { createClient } from '@supabase/supabase-js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Read .env.local manually
+const envPath = path.join(__dirname, '../.env.local')
+const envContent = fs.readFileSync(envPath, 'utf8')
+const env = {}
+envContent.split(/\r?\n/).forEach(line => {
+  const parts = line.split('=')
+  if (parts.length >= 2) {
+    env[parts[0].trim()] = parts.slice(1).join('=').trim()
+  }
+})
+
+const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+  console.error("Missing environment variables in .env.local!")
+  process.exit(1)
+}
+
+const supabaseAnon = createClient(supabaseUrl, supabaseAnonKey)
+
+async function run() {
+  console.log("--- STARTING RLS SMOKE TEST ---")
+
+  // TEST 1: Anon sees 0 cats
+  const { data: anonCats, error: anonCatsError } = await supabaseAnon
+    .from('cats')
+    .select('*')
+  
+  if (anonCatsError) {
+    console.error("TEST 1 FAILED (error):", anonCatsError.message)
+    process.exit(1)
+  } else {
+    console.log(`TEST 1 SUCCESS: Anon sees ${anonCats.length} cats (expected 0)`)
+  }
+
+  // Generate a random user
+  const email = `test_${Date.now()}@example.com`
+  const password = "password123"
+  const fullName = "ישראל ישראלי"
+  const phone = "050-1234567"
+
+  console.log(`Creating test user: ${email}...`)
+  // 2. Signup new user
+  const { data: authData, error: signupError } = await supabaseAnon.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        phone
+      }
+    }
+  })
+
+  if (signupError) {
+    console.error("Signup failed:", signupError.message)
+    process.exit(1)
+  }
+
+  const userId = authData.user.id
+  console.log(`User created successfully with ID: ${userId}`)
+
+  // Create user authenticated client
+  const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  })
+  await supabaseUser.auth.setSession(authData.session)
+
+  // TEST 2: Check profile row auto-created on signup
+  const { data: profileRow, error: profileError } = await supabaseUser
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (profileError) {
+    console.error("TEST 2 FAILED: Profile row was not auto-created:", profileError.message)
+    process.exit(1)
+  } else {
+    console.log("TEST 2 SUCCESS: Profile row auto-created:", JSON.stringify(profileRow, null, 2))
+    if (profileRow.full_name === fullName && profileRow.phone === phone && profileRow.role === 'user') {
+      console.log("TEST 2b SUCCESS: Profile fields correctly populated")
+    } else {
+      console.error("TEST 2b FAILED: Profile fields mismatch", profileRow)
+      process.exit(1)
+    }
+  }
+
+  // TEST 3: User can upsert own adopter_profile
+  const { data: upsertData, error: upsertError } = await supabaseUser
+    .from('adopter_profiles')
+    .upsert({
+      user_id: userId,
+      age: 25,
+      city: 'תל אביב',
+      household_desc: 'גר לבד בדירה',
+      has_other_pets: false,
+      has_cat_experience: true,
+      vet_clinic: 'מרפאה עירונית',
+      adoption_reason: 'אוהב חתולים',
+      surrender_circumstances: 'אף פעם לא',
+      floor_type: 'floor_2',
+      has_window_screens: true
+    })
+    .select()
+
+  if (upsertError) {
+    console.error("TEST 3 FAILED: Cannot upsert own adopter_profile:", upsertError.message)
+    process.exit(1)
+  } else {
+    console.log("TEST 3 SUCCESS: Upserted own adopter_profile successfully:", JSON.stringify(upsertData, null, 2))
+  }
+
+  // TEST 4: User cannot change own role to 'admin' (trigger blocks)
+  console.log("Attempting privilege escalation (changing role to admin)...")
+  const { error: escalateError } = await supabaseUser
+    .from('profiles')
+    .update({ role: 'admin' })
+    .eq('id', userId)
+
+  if (escalateError) {
+    console.log("TEST 4 SUCCESS: Privilege escalation blocked as expected with error:", escalateError.message)
+  } else {
+    console.error("TEST 4 FAILED: Escalation succeeded! This is a vulnerability.")
+    process.exit(1)
+  }
+
+  // Clean up user using service role client
+  console.log("Cleaning up test user...")
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+  const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+  if (deleteError) {
+    console.error("Cleanup failed:", deleteError.message)
+  } else {
+    console.log("Cleanup succeeded.")
+  }
+
+  console.log("--- RLS SMOKE TEST COMPLETED ---")
+}
+
+run()

@@ -3,44 +3,38 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Mascot } from '@/components/mascot/mascot'
 import { loginAction } from '../actions'
+import { loginSchema, LoginInput } from '@/lib/schemas/auth'
 import { strings } from '@/lib/strings'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [errors, setErrors] = useState<{ form?: string; email?: string; password?: string }>({})
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrors({})
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors }
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema)
+  })
+
+  const onSubmit = async (data: LoginInput) => {
     setLoading(true)
-
-    // Client-side simple validation first
-    const clientErrors: typeof errors = {}
-    if (!email) clientErrors.email = strings.common.requiredField
-    if (!password) clientErrors.password = strings.common.requiredField
-    
-    if (Object.keys(clientErrors).length > 0) {
-      setErrors(clientErrors)
-      setLoading(false)
-      return
-    }
-
     try {
-      const res = await loginAction({ email, password })
+      const res = await loginAction(data)
       if (!res.ok) {
         if (res.formError) {
-          setErrors({ form: res.formError })
+          setError('root.serverError', { message: res.formError })
         } else if (res.fieldErrors) {
-          setErrors({
-            email: res.fieldErrors.email?.[0],
-            password: res.fieldErrors.password?.[0]
+          Object.entries(res.fieldErrors).forEach(([field, messages]) => {
+            setError(field as keyof LoginInput, { message: messages?.[0] })
           })
         }
       } else {
@@ -48,53 +42,51 @@ export default function LoginPage() {
         router.refresh()
       }
     } catch {
-      setErrors({ form: strings.common.errorOccurred })
+      setError('root.serverError', { message: strings.common.errorOccurred })
     } finally {
       setLoading(false)
     }
   }
 
+  const serverError = errors.root?.serverError?.message
+
   return (
     <div className="flex-grow flex flex-col items-center justify-center px-4 py-16 bg-paper">
       <div className="w-full max-w-md relative mt-12 group">
         {/* Mascot Peeking over the Card on Hover */}
-        <div className="absolute bottom-full inset-inline-start-1/2 -translate-x-1/2 translate-y-2 pointer-events-none transition-transform duration-200 ease-out group-hover:-translate-y-4">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 translate-y-2 pointer-events-none transition-transform duration-200 ease-out group-hover:-translate-y-4">
           <Mascot pose="peek" />
         </div>
 
         {/* Card */}
         <div className="bg-surface rounded-card border border-border shadow-resting p-8 relative z-10">
-          <h2 className="text-2xl font-display font-extrabold text-ink mb-6 text-center">
+          <h2 className="text-2xl font-display font-extrabold text-ink mb-6 text-center select-none">
             {strings.auth.loginTitle}
           </h2>
 
-          {errors.form && (
+          {serverError && (
             <div role="alert" className="mb-4 p-3 bg-danger/10 text-danger rounded-input text-sm font-semibold">
-              {errors.form}
+              {serverError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input
               type="email"
               label={strings.auth.emailLabel}
               placeholder={strings.auth.emailPlaceholder}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={errors.email}
+              error={errors.email?.message}
               disabled={loading}
-              required
+              {...register('email')}
             />
 
             <Input
               type="password"
               label={strings.auth.passwordLabel}
               placeholder={strings.auth.passwordPlaceholder}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={errors.password}
+              error={errors.password?.message}
               disabled={loading}
-              required
+              {...register('password')}
             />
 
             <Button type="submit" variant="primary" loading={loading} className="w-full mt-2">
@@ -102,9 +94,12 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm">
+          <div className="mt-6 text-center text-sm select-none">
             <span className="text-ink-soft">{strings.auth.noAccountPrompt} </span>
-            <Link href="/signup" className="text-pine font-semibold hover:underline">
+            <Link 
+              href="/signup" 
+              className="text-pine font-semibold hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
+            >
               {strings.nav.signup}
             </Link>
           </div>

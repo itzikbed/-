@@ -13,7 +13,7 @@ export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
           <input
             type="radio"
             ref={ref}
-            className={`w-5 h-5 rounded-full border border-border text-pine focus:ring-2 focus:ring-pine bg-surface cursor-pointer transition-all ${className}`}
+            className={`w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all ${className}`}
             {...props}
           />
           <span>{label}</span>

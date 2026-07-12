@@ -10,7 +10,7 @@ export interface MascotProps {
 export const Mascot: React.FC<MascotProps> = ({ pose, className = '', width, height }) => {
   const strokeColor = 'currentColor'
   const strokeWidth = 2
-  const marmaladeColor = 'oklch(75% 0.130 75)' // --marmalade
+  const marmaladeColor = 'var(--marmalade)' // --marmalade
 
   // Default dimensions
   const dims = {

@@ -57,7 +57,7 @@ export default async function RootLayout({
         <header className="bg-surface border-b border-border shadow-resting sticky top-0 z-40 select-none">
           <div className="app-container h-16 flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 focus-visible:outline-none">
+            <Link href="/" className="flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
               <span className="font-display font-extrabold text-2xl text-pine tracking-tight">
                 {strings.common.siteName}
               </span>
@@ -65,19 +65,19 @@ export default async function RootLayout({
 
             {/* Navigation links */}
             <nav className="hidden md:flex items-center gap-6 font-semibold">
-              <Link href="/cats" className="text-ink-soft hover:text-pine transition-colors">
+              <Link href="/cats" className="text-ink-soft hover:text-pine transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
                 {strings.nav.catalog}
               </Link>
-              <Link href="/publish" className="text-ink-soft hover:text-pine transition-colors">
+              <Link href="/publish" className="text-ink-soft hover:text-pine transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
                 {strings.nav.publish}
               </Link>
               {user && (
-                <Link href="/requests" className="text-ink-soft hover:text-pine transition-colors">
+                <Link href="/requests" className="text-ink-soft hover:text-pine transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
                   {strings.nav.requests}
                 </Link>
               )}
               {profile?.role === 'admin' && (
-                <Link href="/admin" className="text-ink hover:text-pine transition-colors font-bold text-pine border-s border-border ps-6">
+                <Link href="/admin" className="text-ink hover:text-pine transition-colors font-bold text-pine border-s border-border ps-6 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
                   {strings.nav.admin}
                 </Link>
               )}
@@ -88,14 +88,14 @@ export default async function RootLayout({
               {user ? (
                 <div className="flex items-center gap-4">
                   <span className="text-sm font-semibold text-ink-soft hidden sm:inline">
-                    שלום, <bdi>{profile?.full_name || user.email}</bdi>
+                    {strings.nav.greeting} <bdi>{profile?.full_name || user.email}</bdi>
                   </span>
                   
                   {/* Logout Button */}
                   <form action="/api/auth/signout" method="POST">
                     <button
                       type="submit"
-                      className="text-pine hover:underline text-sm font-semibold cursor-pointer focus-visible:outline-none"
+                      className="text-pine hover:underline text-sm font-semibold cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
                     >
                       {strings.common.logout}
                     </button>
@@ -105,13 +105,13 @@ export default async function RootLayout({
                 <div className="flex items-center gap-3">
                   <Link
                     href="/login"
-                    className="text-pine hover:underline text-sm font-semibold px-3 py-2"
+                    className="text-pine hover:underline text-sm font-semibold px-3 py-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
                   >
                     {strings.nav.login}
                   </Link>
                   <Link
                     href="/signup"
-                    className="bg-marmalade text-ink hover:bg-marmalade-dp text-sm font-bold px-4 py-2 rounded-btn shadow-resting transition-all active:scale-98"
+                    className="bg-marmalade text-ink hover:bg-marmalade-dp text-sm font-bold px-4 py-2 rounded-btn shadow-resting transition-all active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
                   >
                     {strings.nav.signup}
                   </Link>
@@ -130,17 +130,17 @@ export default async function RootLayout({
         <footer className="bg-surface border-t border-border py-8 mt-auto select-none">
           <div className="app-container flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-ink-soft font-sans">
             <div>
-              &copy; {new Date().getFullYear()} {strings.common.siteName}. כל הזכויות שמורות.
+              &copy; {new Date().getFullYear()} {strings.common.siteName}. {strings.nav.allRightsReserved}
             </div>
             
             {/* Regulatory Compliance Links */}
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="hover:text-pine hover:underline">
-                מדיניות פרטיות
+              <Link href="/privacy" className="hover:text-pine hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
+                {strings.nav.privacyPolicy}
               </Link>
               <span className="text-border">|</span>
-              <Link href="/accessibility" className="hover:text-pine hover:underline">
-                הצהרת נגישות
+              <Link href="/accessibility" className="hover:text-pine hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
+                {strings.nav.accessibilityDeclaration}
               </Link>
             </div>
           </div>

@@ -19,8 +19,8 @@ approved) · **Admin** (works three queues, decisions are logged and emailed).
 
 ## 2. Stack
 
-Next.js 14 App Router · React 18 · TypeScript · Tailwind (logical properties only) ·
-Supabase: Postgres + Auth + Storage, RLS-first · react-hook-form + zod (schemas shared
+Next.js 16.2.10 App Router · React 19 · TypeScript · Tailwind CSS v4 (logical properties only) ·
+Supabase: Postgres + Auth + Storage, RLS-first · react-hook-form + zod v4 (schemas shared
 client/server) · Resend transactional email · Deploy: Vercel · Fonts/tokens: `DESIGN.md`.
 
 ## 3. File map — target structure (update as built; mark ✅ when a path exists)
@@ -128,6 +128,8 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-10 · code-quality skill added; DoD = tsc/lint/build gates, typed Supabase client, ActionResult pattern.
 - 2026-07-10 · Client field-spec v2 integrated (supersedes 9-region list): 5 regions (north/south/center/jerusalem/yosh) · 5 age buckets (0–3m/3–6m/6–12m/1–8y/8y+) · `vaccinations` count 0–3 replaces boolean · `is_special`+`special_needs` for the "מיוחדים" filter · `fee_amount` (סל אימוץ) · publisher fields age/city/publisher_type on profiles · adopter questionnaire rewritten to her exact question list.
 - 2026-07-10 · Landing hero must feel alive: real-cat photo or short muted video loop per DESIGN.md §6a — not optional, part of DoD for the landing page.
+- 2026-07-12 · Bumped stack versions to Next.js 16, React 19, Tailwind CSS v4, and Zod v4 to leverage modern features and clean validation APIs.
+
 
 ## 12. Now / Next (update every session)
 

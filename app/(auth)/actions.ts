@@ -3,10 +3,22 @@
 import { createClient } from '@/lib/supabase/server'
 import { loginSchema, signupSchema, LoginInput, SignupInput } from '@/lib/schemas/auth'
 import { revalidatePath } from 'next/cache'
+import uiStrings from '@/content/he/ui.json'
 
 export type ActionResult<T = unknown> =
   | { ok: true; data: T }
   | { ok: false; formError?: string; fieldErrors?: Record<string, string[]> }
+
+function mapAuthError(message: string): string {
+  const msg = message.toLowerCase()
+  if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('email already in use')) {
+    return uiStrings.auth.emailExists
+  }
+  if (msg.includes('weak password') || msg.includes('should be at least') || msg.includes('password should be')) {
+    return uiStrings.auth.weakPassword
+  }
+  return uiStrings.auth.authFailedMsg
+}
 
 export async function loginAction(formData: LoginInput): Promise<ActionResult> {
   const result = loginSchema.safeParse(formData)
@@ -24,7 +36,7 @@ export async function loginAction(formData: LoginInput): Promise<ActionResult> {
   })
 
   if (error) {
-    return { ok: false, formError: 'פרטי ההתחברות אינם נכונים' }
+    return { ok: false, formError: mapAuthError(error.message) }
   }
 
   revalidatePath('/', 'layout')
@@ -53,7 +65,7 @@ export async function signupAction(formData: SignupInput): Promise<ActionResult>
   })
 
   if (error) {
-    return { ok: false, formError: error.message || 'לא ניתן היה לבצע הרשמה' }
+    return { ok: false, formError: mapAuthError(error.message) }
   }
 
   return { ok: true, data: { success: true } }

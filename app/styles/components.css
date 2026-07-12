@@ -17,15 +17,7 @@
     overflow: visible;
   }
 
-  .mascot-peeking-svg {
-    position: absolute;
-    bottom: 100%;
-    inset-inline-start: 50%;
-    transform: translate(-50% in RTL, 10px); /* fallback */
-    transition: transform 200ms ease-out;
-    pointer-events: none;
-    z-index: 10;
-  }
+
 
   /* Button active scale effect */
   .btn-active-press:active {

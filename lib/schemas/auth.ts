@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { initHebrewValidation } from './he-errors'
+
+initHebrewValidation()
 
 export const loginSchema = z.object({
   email: z.string().email({ message: 'כתובת אימייל לא תקינה' }),

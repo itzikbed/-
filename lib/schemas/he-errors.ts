@@ -1,48 +1,54 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod'
 
-export const hebrewErrorMap = (issue: any, ctx: any) => {
-  let message = ctx.defaultError
+type CustomErrorIssue = Parameters<NonNullable<NonNullable<Parameters<typeof z.config>[0]>['customError']>>[0]
 
-  if (issue.code === 'invalid_type') {
-    if (
-      ctx.defaultError?.includes('required') || 
-      ctx.defaultError?.includes('undefined') || 
-      ctx.defaultError?.includes('received undefined') ||
-      issue.message?.includes('received undefined')
-    ) {
-      message = 'שדה חובה'
-    } else {
-      message = 'ערך לא תקין'
-    }
-  } else if (issue.code === 'too_small') {
-    const origin = issue.origin || issue.type
-    if (origin === 'string') {
-      if (issue.minimum === 1) {
+export const hebrewErrorMap = (issue: CustomErrorIssue): { message: string } | undefined => {
+  let message: string | undefined
+
+  switch (issue.code) {
+    case 'invalid_type':
+      if (issue.input === undefined || issue.input === null) {
         message = 'שדה חובה'
       } else {
-        message = `נדרשים לפחות ${issue.minimum} תווים`
+        message = 'ערך לא תקין'
       }
-    } else if (origin === 'number') {
-      message = `הערך חייב להיות לפחות ${issue.minimum}`
-    }
-  } else if (issue.code === 'too_big') {
-    const origin = issue.origin || issue.type
-    if (origin === 'string') {
-      message = `מותרים לכל היותר ${issue.maximum} תווים`
-    } else if (origin === 'number') {
-      message = `הערך חייב להיות לכל היותר ${issue.maximum}`
-    }
-  } else if (issue.code === 'invalid_format') {
-    if (issue.format === 'email') {
-      message = 'כתובת אימייל לא תקינה'
-    }
+      break
+
+    case 'too_small':
+      if (issue.origin === 'string') {
+        if (issue.minimum === 1) {
+          message = 'שדה חובה'
+        } else {
+          message = `נדרשים לפחות ${issue.minimum} תווים`
+        }
+      } else if (issue.origin === 'number') {
+        message = `הערך חייב להיות לפחות ${issue.minimum}`
+      }
+      break
+
+    case 'too_big':
+      if (issue.origin === 'string') {
+        message = `מותרים לכל היותר ${issue.maximum} תווים`
+      } else if (issue.origin === 'number') {
+        message = `הערך חייב להיות לכל היותר ${issue.maximum}`
+      }
+      break
+
+    case 'invalid_format':
+      if (issue.format === 'email') {
+        message = 'כתובת אימייל לא תקינה'
+      }
+      break
+
+    default:
+      break
   }
 
-  return { message }
+  return message ? { message } : undefined
 }
 
-// Helper to set map globally (call in layout/app startup)
 export function initHebrewValidation() {
-  z.setErrorMap(hebrewErrorMap as any)
+  z.config({
+    customError: hebrewErrorMap
+  })
 }

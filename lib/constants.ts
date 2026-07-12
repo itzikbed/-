@@ -63,3 +63,11 @@ export const REQUEST_STATUSES = {
 } as const
 
 export type RequestStatus = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES]
+
+export const HEALTH_LEVELS = [
+  { id: 'full', label: 'מלא (מעוקר/מסורס ולפחות 2 חיסונים)' },
+  { id: 'partial', label: 'חלקי (חיסון 1)' },
+  { id: 'none', label: 'ללא (0 חיסונים)' }
+] as const
+
+export type HealthLevelId = typeof HEALTH_LEVELS[number]['id']

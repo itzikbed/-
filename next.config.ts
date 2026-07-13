@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: process.env.NODE_ENV === "development",
+    unoptimized: process.env.NODE_ENV === "development" || 
+                 process.env.NEXT_IMAGE_UNOPTIMIZED?.trim() === "true",
     remotePatterns: [
       {
         protocol: 'http',
@@ -11,9 +12,6 @@ const nextConfig: NextConfig = {
         pathname: '/storage/v1/object/public/**',
       },
     ],
-  },
-  experimental: {
-    viewTransition: true,
   },
 };
 

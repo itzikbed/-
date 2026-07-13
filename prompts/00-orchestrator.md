@@ -27,6 +27,10 @@ Definition of Done on every track.
    passes at milestones → the relevant skill's "Done checklist" all checked → the work is
    COMMITTED (uncommitted work = phase not done). Paste the full `npm run gate` output
    in your report; a report without it is unfinished.
+   **Milestone verification runs against the PRODUCTION build** (`npm run build` +
+   `npm run start`), never only the dev server: dev hides hydration failures, image
+   optimizer behavior, and experimental-flag breakage. Screenshots and behavioral
+   checks (clicks, playback, transitions) must come from the production server.
 5. **PROTECTED, READ-ONLY FILES — never edit, rename, delete, or add siblings:**
    everything under `prompts/`, `skills/`, and `scripts/checks/`. These are the
    architect's rulebook and gates. An out-of-repo integrity check hashes them against

@@ -115,6 +115,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - [ ] Should the cat's owner see the adopter's questionnaire directly? Current: admin-only, relayed on approval.
 - [ ] Site name + domain. Privacy-policy page text (personal data is collected — mandatory).
 - [ ] Re-verify image optimization against the cloud Supabase URL before launch.
+- [ ] NEXT_IMAGE_UNOPTIMIZED is a LOCAL-testing flag only — the cloud deployment must never set it, and must add the https://*.supabase.co remotePattern.
 
 ## 11. Decision log (append one line per decision, newest last)
 
@@ -134,6 +135,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-12 · Added vitest as devDependency to run unit tests on complex, bug-prone filter parsing/serialization and query building.
 - 2026-07-12 · Added migration 0002 to allow service_role to bypass the profile role privilege guard, enabling user seeding through auth.admin APIs.
 - 2026-07-12 · Design-v2 decision: living cat cards, hero film sequence, and self-drawing mascot approved by architect.
+- 2026-07-13 · View Transition production workaround: replaced Next.js experimental.viewTransition with custom promise-based document.startViewTransition wrapper synchronized with route rendering.
 
 ## 12. Now / Next (update every session)
 

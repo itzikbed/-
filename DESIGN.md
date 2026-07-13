@@ -125,6 +125,20 @@ Desktop: wake on hover/focus. Clip spec: ≤ 3s · 480px longest edge · WebM+MP
 first frame == cover crop so the swap is seamless. Cards without video stay photos —
 never fake it.
 
+**1a. Video affordance (required on every video card).** Idle state ALWAYS shows the
+cover photo, plus a small pill badge at the photo's bottom-start: play glyph + "סרטון"
+(surface/85 bg, backdrop-blur, ink text, Assistant 600 small). The badge fades out
+(150ms) while the clip plays and returns on pause; it stays visible when video is
+disabled (saveData / reduced-motion) — the promise is kept on the detail page.
+`aria-label`: "לחצו לצפייה בסרטון של {name}". Strings live in ui.json.
+
+**1b. Clip on the detail page.** A cat with a clip shows it in the gallery as the item
+after the cover: cover-photo poster + centered play button, tap toggles play/pause
+(muted, loop, no native controls). Explicit user tap MAY fetch the clip even under
+saveData (opt-in); reduced-motion still gets poster + tap-to-play, nothing autoplays.
+This is what makes the card badge truthful — clicking a card always leads somewhere the
+video can actually be watched.
+
 **2. Card → detail morph.** Navigating card→cat page uses the View Transitions API:
 the card photo morphs into the detail hero (shared element). 250–300ms, transform/opacity
 only. Zero bytes; this is the "feels like an app" moment on mobile. Falls back to a normal

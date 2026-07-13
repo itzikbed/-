@@ -1,9 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { strings } from '@/lib/strings'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { shouldDisableVideo } from '@/lib/utils/video-playback'
+import { GalleryVideoPlayer } from './GalleryVideoPlayer'
 
 interface Photo {
   path_card: string
@@ -15,11 +17,33 @@ interface CatGalleryProps {
   photos: Photo[]
   catName: string
   catId?: string
+  videoPath?: string | null
 }
 
-export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }) => {
+interface Slide {
+  type: 'photo' | 'video'
+  photo?: Photo
+  index: number
+}
+
+export const CatGallery: React.FC<CatGalleryProps> = ({ 
+  photos, 
+  catName, 
+  catId, 
+  videoPath = null 
+}) => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [disableVideo, setDisableVideo] = useState(true)
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
+
+  useEffect(() => {
+    const checkVideoSettings = () => {
+      setDisableVideo(shouldDisableVideo())
+    }
+    requestAnimationFrame(checkVideoSettings)
+  }, [])
 
   if (!photos || photos.length === 0) {
     return (
@@ -29,14 +53,26 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }
     )
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
+  // Construct virtual slides: cover photo, then video (if present), then remaining photos
+  const slides: Slide[] = []
+  if (photos.length > 0) {
+    slides.push({ type: 'photo', photo: photos[0], index: 0 })
+    
+    if (videoPath) {
+      slides.push({ type: 'video', index: -1 })
+    }
+    
+    for (let i = 1; i < photos.length; i++) {
+      slides.push({ type: 'photo', photo: photos[i], index: i })
+    }
+  }
 
   const nextPhoto = () => {
-    setActiveIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1))
+    setActiveIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1))
   }
 
   const prevPhoto = () => {
-    setActiveIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1))
+    setActiveIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -66,12 +102,11 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }
     }
   }
 
-  const activePhoto = photos[activeIndex]
-  const mainImageUrl = `${supabaseUrl}/storage/v1/object/public/cat-photos/${activePhoto.path_full}`
+  const activeSlide = slides[activeIndex]
 
   return (
     <div className="space-y-4">
-      {/* Main Image Viewport */}
+      {/* Main Slide Viewport */}
       <div 
         className="relative w-full aspect-[4/3] bg-paper rounded-card border border-border overflow-hidden shadow-resting group focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
         tabIndex={0}
@@ -80,20 +115,28 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }
         onTouchMove={handleTouchMove}
         aria-label={strings.catalog.galleryAriaLabel}
       >
-        <Image
-          src={mainImageUrl}
-          alt={strings.catalog.photoAlt.replace('{name}', catName).replace('{index}', (activeIndex + 1).toString())}
-          fill
-          priority={activeIndex === 0}
-          sizes="(max-width: 768px) 100vw, 50vw"
-          style={activeIndex === 0 && catId ? { viewTransitionName: `cat-photo-${catId}` } : undefined}
-          className="object-cover object-center transition-all duration-300"
-        />
+        {activeSlide.type === 'photo' ? (
+          <Image
+            src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${activeSlide.photo!.path_full}`}
+            alt={strings.catalog.photoAlt.replace('{name}', catName).replace('{index}', (activeSlide.index + 1).toString())}
+            fill
+            priority={activeIndex === 0}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            style={activeIndex === 0 && catId ? { viewTransitionName: `cat-photo-${catId}` } : undefined}
+            className="object-cover object-center transition-all duration-300"
+          />
+        ) : (
+          <GalleryVideoPlayer
+            videoPath={videoPath!}
+            catName={catName}
+            coverPhotoUrl={`${supabaseUrl}/storage/v1/object/public/cat-photos/${photos[0].path_full}`}
+            disableVideo={disableVideo}
+          />
+        )}
 
         {/* Side Navigation Arrows (Visible on Hover / Touch) */}
-        {photos.length > 1 && (
+        {slides.length > 1 && (
           <>
-            {/* Right arrow - Previous photo in RTL */}
             <button
               onClick={prevPhoto}
               className="absolute inset-y-0 end-3 my-auto w-10 h-10 rounded-full bg-surface/80 hover:bg-surface text-ink flex items-center justify-center shadow-resting transition-all active:scale-95 cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100 z-10"
@@ -102,7 +145,6 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }
               <ChevronRight className="w-6 h-6" />
             </button>
 
-            {/* Left arrow - Next photo in RTL */}
             <button
               onClick={nextPhoto}
               className="absolute inset-y-0 start-3 my-auto w-10 h-10 rounded-full bg-surface/80 hover:bg-surface text-ink flex items-center justify-center shadow-resting transition-all active:scale-95 cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100 z-10"
@@ -115,14 +157,18 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }
       </div>
 
       {/* Thumbnail indicators */}
-      {photos.length > 1 && (
+      {slides.length > 1 && (
         <div className="flex items-center gap-2 overflow-x-auto py-1">
-          {photos.map((photo, idx) => {
-            const thumbUrl = `${supabaseUrl}/storage/v1/object/public/cat-photos/${photo.path_card}`
+          {slides.map((slide, idx) => {
+            const isVideo = slide.type === 'video'
+            const thumbUrl = isVideo 
+              ? `${supabaseUrl}/storage/v1/object/public/cat-photos/${photos[0].path_card}`
+              : `${supabaseUrl}/storage/v1/object/public/cat-photos/${slide.photo!.path_card}`
             const isActive = idx === activeIndex
+            
             return (
               <button
-                key={photo.path_card}
+                key={isVideo ? 'gallery-video-thumb' : slide.photo!.path_card}
                 onClick={() => setActiveIndex(idx)}
                 className={`relative w-20 aspect-[4/3] rounded-photo overflow-hidden border-2 transition-all cursor-pointer ${
                   isActive ? 'border-pine shadow-resting' : 'border-transparent opacity-70 hover:opacity-100'
@@ -130,11 +176,18 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }
               >
                 <Image
                   src={thumbUrl}
-                  alt={strings.catalog.thumbAlt.replace('{index}', (idx + 1).toString())}
+                  alt={isVideo ? strings.catalog.videoThumbAlt : strings.catalog.thumbAlt.replace('{index}', (slide.index + 1).toString())}
                   fill
                   sizes="80px"
                   className="object-cover object-center"
                 />
+                {isVideo && (
+                  <div className="absolute inset-0 bg-black/35 flex items-center justify-center z-10">
+                    <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                )}
               </button>
             )
           })}

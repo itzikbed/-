@@ -125,7 +125,7 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
           
           {/* Gallery Column (6 cols on md) */}
           <div className="md:col-span-6 space-y-6">
-            <CatGallery photos={cat.cat_photos || []} catName={cat.name} catId={cat.id} />
+            <CatGallery photos={cat.cat_photos || []} catName={cat.name} catId={cat.id} videoPath={cat.video_path} />
           </div>
 
           {/* Details Column (6 cols on md) */}

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { strings } from "@/lib/strings"
 import { initHebrewValidation } from "@/lib/schemas/he-errors"
+import { RouteTransitionTrigger } from "@/lib/utils/view-transition-navigation"
 
 // Initialize Hebrew Error maps globally for validation
 initHebrewValidation()
@@ -53,6 +54,7 @@ export default async function RootLayout({
       className={`${rubik.variable} ${assistant.variable}`}
     >
       <body className="min-h-screen flex flex-col bg-paper text-ink font-sans">
+        <RouteTransitionTrigger />
         {/* Header App Shell */}
         <header className="bg-surface border-b border-border shadow-resting sticky top-0 z-40 select-none">
           <div className="app-container h-16 flex items-center justify-between">

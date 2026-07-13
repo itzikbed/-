@@ -57,10 +57,45 @@ export default async function RootLayout({
         <header className="bg-surface border-b border-border shadow-resting sticky top-0 z-40 select-none">
           <div className="app-container h-16 flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-              <span className="font-display font-extrabold text-2xl text-pine tracking-tight">
-                {strings.common.siteName}
+            <Link 
+              href="/" 
+              className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
+              aria-label={`${strings.common.siteName} — ${strings.nav.home}`}
+            >
+              <span className="font-display font-extrabold text-2xl text-pine tracking-tight flex items-center select-none" aria-hidden="true">
+                <span>{strings.common.siteName.slice(0, 5)}</span>
+                <span className="inline-flex items-center mx-[0.02em] relative top-[0.03em]">
+                  <svg
+                    className="w-[0.72em] h-[0.85em] inline-block"
+                    viewBox="0 0 24 28"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {/* Left Ear */}
+                    <path
+                      d="M4.5 9L1.5 2.5L7 5.5Z"
+                      fill="currentColor"
+                      className="logo-left-ear"
+                    />
+                    {/* Right Ear */}
+                    <path
+                      d="M19.5 9L22.5 2.5L17 5.5Z"
+                      fill="currentColor"
+                      className="logo-right-ear"
+                    />
+                    {/* Outline for Het */}
+                    <path
+                      d="M5 26V9.5C5 7 7 5.5 9.5 5.5H14.5C17 5.5 19 7 19 9.5V26"
+                      stroke="currentColor"
+                      strokeWidth="3.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <span>{strings.common.siteName.slice(6)}</span>
               </span>
+              <span className="sr-only">{strings.common.siteName}</span>
             </Link>
 
             {/* Navigation links */}

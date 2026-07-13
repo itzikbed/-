@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Mascot } from '@/components/mascot/Mascot'
 import { CatGrid } from '@/components/cats/CatGrid'
+import { HeroFilm } from '@/components/ui/HeroFilm'
 import { strings } from '@/lib/strings'
 import { Heart, Sparkles } from 'lucide-react'
 
@@ -22,28 +23,7 @@ export default async function HomePage() {
     <div className="flex flex-col flex-grow select-none">
       {/* Full-bleed Hero Section */}
       <section className="relative min-h-[85vh] flex items-center justify-center py-20 overflow-hidden">
-        {/* Background Video Loop (Optimized 8s, 1280px width, no audio, WebM/MP4) */}
-        {/* Source URL: https://mixkit.co/free-stock-video/white-blue-eyed-cat-1538/ */}
-        <div className="absolute inset-0 z-0 bg-paper">
-          {/* Static poster fallback for reduced motion */}
-          <div
-            className="hidden motion-reduce:block absolute inset-0 w-full h-full bg-cover bg-center"
-            style={{ backgroundImage: "url('/hero/hero_poster.jpg')" }}
-          />
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/hero/hero_poster.jpg"
-            className="w-full h-full object-cover motion-reduce:hidden"
-          >
-            <source src="/hero/hero_cat.webm" type="video/webm" />
-            <source src="/hero/hero_cat.mp4" type="video/mp4" />
-          </video>
-          {/* Gradient Overlay for Text Contrast (bottom->top in RTL reading flow) */}
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/40 to-transparent" />
-        </div>
+        <HeroFilm />
 
         {/* Hero Content Container */}
         <div className="app-container relative z-10 w-full flex flex-col items-center text-center gap-12 mt-8">
@@ -108,7 +88,7 @@ export default async function HomePage() {
       </section>
 
       {/* Latest Cats Section */}
-      <section className="py-16 md:py-24 bg-paper relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-paper sunbeam-bg relative overflow-hidden">
         <div className="app-container text-start relative z-10">
           <div className="relative flex flex-col gap-2 mb-10 max-w-xl">
             {/* Alive touch: organic background blob shape behind heading */}
@@ -142,6 +122,9 @@ export default async function HomePage() {
           <div className="relative flex flex-col items-center text-center gap-2 mb-16 max-w-xl mx-auto">
             {/* Alive touch: organic background blob shape behind section heading */}
             <div className="absolute -z-10 w-44 h-44 bg-marmalade-sf rounded-full opacity-40 blur-xl pointer-events-none translate-x-12 -translate-y-6" />
+            
+            {/* Draw-on Mascot sitting next to/above title */}
+            <Mascot pose="sitting" animateOnScroll={true} className="mb-2" />
             
             <h2 className="text-3xl font-display font-extrabold text-ink">
               {strings.home.howItWorksTitle}

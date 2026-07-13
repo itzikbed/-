@@ -14,9 +14,10 @@ interface Photo {
 interface CatGalleryProps {
   photos: Photo[]
   catName: string
+  catId?: string
 }
 
-export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName }) => {
+export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName, catId }) => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
 
@@ -85,6 +86,7 @@ export const CatGallery: React.FC<CatGalleryProps> = ({ photos, catName }) => {
           fill
           priority={activeIndex === 0}
           sizes="(max-width: 768px) 100vw, 50vw"
+          style={activeIndex === 0 && catId ? { viewTransitionName: `cat-photo-${catId}` } : undefined}
           className="object-cover object-center transition-all duration-300"
         />
 

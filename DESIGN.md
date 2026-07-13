@@ -112,9 +112,47 @@ on the landing · Peeking Cat hover rise on the two doors · subtle `--pine-soft
 blob shapes behind section headings (max 2 per page, opacity ≤ .5) · hero H1 fade+rise-in
 once on load (300ms, respects reduced-motion).
 
+### 6b. Motion & Video System v2 — "החתול החי" (MOBILE-FIRST)
+
+The site's signature: **cats move.** Every rule below is designed for a 6-inch screen on
+cellular data first; desktop inherits and may enhance.
+
+**1. Living cat cards (flagship).** A cat may have one short clip (`cats.video_path`,
+nullable — new migration). Card behavior: photo cover by default; the clip plays muted,
+looped, WITHOUT controls when the card "wakes". Mobile: the card closest to viewport
+center wakes — exactly ONE plays at any moment (IntersectionObserver picks the winner);
+Desktop: wake on hover/focus. Clip spec: ≤ 3s · 480px longest edge · WebM+MP4 · ≤ 1MB ·
+first frame == cover crop so the swap is seamless. Cards without video stay photos —
+never fake it.
+
+**2. Card → detail morph.** Navigating card→cat page uses the View Transitions API:
+the card photo morphs into the detail hero (shared element). 250–300ms, transform/opacity
+only. Zero bytes; this is the "feels like an app" moment on mobile. Falls back to a normal
+navigation on unsupported browsers — never polyfill.
+
+**3. Hero film sequence.** 3 warm clips crossfading (6–8s each, 1.5s fade). Only clip #1
+loads eagerly; #2–#3 lazy after `load`. Each ≤ 1.2MB, 960px is enough. Poster-first always.
+
+**4. Self-drawing mascot.** Peeking Cat ink strokes draw themselves (CSS
+`stroke-dashoffset`, ~700ms) when their section enters the viewport — used in
+how-it-works and empty states. Zero data cost.
+
+**5. Micro-life.** Logo ח-ears twitch once every ~20s (SVG transform) · slow CSS sunbeam
+gradient drifting on paper sections (≥ 60s cycle, opacity ≤ .06).
+
+**Hard budgets (gate items, verify in DevTools mobile throttling):**
+- Above-the-fold transfer on mobile ≤ 2.5MB total, including clip #1.
+- Only ONE video element playing at any time, site-wide. Off-screen ⇒ `pause()`.
+- `document.hidden` ⇒ pause everything. `navigator.connection.saveData` ⇒ posters only,
+  no video requests at all.
+- `prefers-reduced-motion` ⇒ posters/static ink everywhere: no autoplay, no draw-on,
+  no morph (instant navigation), no twitch, no sunbeam.
+- Ambient/stock video ships from `/public` (Vercel bandwidth), NEVER from Supabase
+  storage; publisher cat clips live in Supabase, playback poster-first.
+
 ## 7. Motion
 
-150–200ms `ease-out` micro-interactions only: card lift, button press (scale .98), heart/save pop (scale 1 → 1.25 → 1), Peeking Cat rise, filter drawer slide. No page-transition animations, no parallax, no scroll-jacking. Everything transform/opacity only, and fully disabled under `prefers-reduced-motion` (mascot appears static, no lifts).
+150–200ms `ease-out` micro-interactions only: card lift, button press (scale .98), heart/save pop (scale 1 → 1.25 → 1), Peeking Cat rise, filter drawer slide. **One exception to "no page transitions": the card→detail shared-element morph defined in §6b.** Still banned: parallax, scroll-jacking, scroll-scrubbed video. Everything transform/opacity only, and fully disabled under `prefers-reduced-motion` (mascot appears static, no lifts, no morph).
 
 ## 8. Accessibility floor
 

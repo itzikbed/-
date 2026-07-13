@@ -114,6 +114,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - [ ] Questionnaire timing — implemented default: free browsing, required only before first request (differs from client's original "at entry"). Confirm.
 - [ ] Should the cat's owner see the adopter's questionnaire directly? Current: admin-only, relayed on approval.
 - [ ] Site name + domain. Privacy-policy page text (personal data is collected — mandatory).
+- [ ] Re-verify image optimization against the cloud Supabase URL before launch.
 
 ## 11. Decision log (append one line per decision, newest last)
 
@@ -132,7 +133,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-12 · Added sharp as devDependency for processing openly-licensed cat images into card/full WebP variants client-side and in seeds.
 - 2026-07-12 · Added vitest as devDependency to run unit tests on complex, bug-prone filter parsing/serialization and query building.
 - 2026-07-12 · Added migration 0002 to allow service_role to bypass the profile role privilege guard, enabling user seeding through auth.admin APIs.
-
+- 2026-07-12 · Design-v2 decision: living cat cards, hero film sequence, and self-drawing mascot approved by architect.
 
 ## 12. Now / Next (update every session)
 
@@ -141,6 +142,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 | 0 | Client sign-off on §10 decisions | ☐ |
 | 1 | Repo, RTL shell, migration 0001, auth, ui/ kit | ☑ |
 | 2 | Catalog + filters + cat page | ☑ |
+| 2.5 | Design elevation "החתול החי" | ☑ |
 | 3 | Questionnaire wizard · upload wizard · request flow | ☐ |
 | 4 | Admin queues + emails | ☐ |
 | 5 | Polish: SEO/OG, a11y audit, privacy page | ☐ |

@@ -22,7 +22,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   // 2. Data query
   let dataQuery = supabase
     .from('cats')
-    .select('id, name, sex, birth_est, region, city, is_special, status, cat_photos(path_card, path_full, sort_order)')
+    .select('id, name, sex, birth_est, region, city, is_special, status, video_path, cat_photos(path_card, path_full, sort_order)')
     .eq('status', 'published')
     .eq('cat_photos.sort_order', 0)
     .order('published_at', { ascending: false })

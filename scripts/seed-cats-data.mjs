@@ -22,28 +22,32 @@ export const catsData = [
     description: 'חתולה ג׳ינג׳ית קטנה ומתוקה, אוהבת לשחק ולהתכרבל. מחפשת בית חם ואוהב.',
     health_notes: 'בריאה לחלוטין, ללא בעיות מיוחדות.', neutered: false, vaccinations: 0,
     is_special: false, fee_amount: null, good_with_cats: true, good_with_dogs: true,
-    status: 'published', owner_key: 'pub1'
+    status: 'published', owner_key: 'pub1',
+    video_url: 'https://assets.mixkit.co/videos/1536/1536-720.mp4'
   },
   {
     name: 'שמשון', sex: 'male', birth_est: '2022-07-12', region: 'north', city: 'חיפה',
     description: 'חתול זכר גדול וידידותי מאוד, מחונך לארגז צרכים, רגוע ומפונק.',
     health_notes: 'עבר עיקור וכל החיסונים הנדרשים.', neutered: true, vaccinations: 3,
     is_special: false, fee_amount: null, good_with_cats: true, good_with_dogs: false,
-    status: 'published', owner_key: 'pub1'
+    status: 'published', owner_key: 'pub1',
+    video_url: 'https://assets.mixkit.co/videos/1537/1537-720.mp4'
   },
   {
     name: 'לונה', sex: 'female', birth_est: '2026-03-12', region: 'south', city: 'באר שבע',
     description: 'גורה קטנה ועדינה, קצת ביישנית בהתחלה אבל מתרגלת מהר והופכת למכונת גרגורים.',
     health_notes: 'חוסנה חיסון אחד, זקוקה להשלמת סדרת החיסונים ועיקור בהמשך.', neutered: false, vaccinations: 1,
     is_special: false, fee_amount: 150, good_with_cats: true, good_with_dogs: true,
-    status: 'published', owner_key: 'pub2'
+    status: 'published', owner_key: 'pub2',
+    video_url: 'https://assets.mixkit.co/videos/1540/1540-720.mp4'
   },
   {
     name: 'אוסקר', sex: 'male', birth_est: '2025-11-12', region: 'jerusalem', city: 'ירושלים',
     description: 'חתול שובב ואנרגטי, אוהב לרוץ ולשחק עם כדורים. מתאים למשפחה פעילה.',
     health_notes: 'עבר בדיקה כללית, בריא ואנרגטי.', neutered: false, vaccinations: 0,
     is_special: false, fee_amount: 200, good_with_cats: false, good_with_dogs: false,
-    status: 'published', owner_key: 'pub2'
+    status: 'published', owner_key: 'pub2',
+    video_url: 'https://assets.mixkit.co/videos/1545/1545-720.mp4'
   },
   {
     name: 'ג׳ינג׳י', sex: 'male', birth_est: '2016-07-12', region: 'yosh', city: 'אריאל',
@@ -51,7 +55,8 @@ export const catsData = [
     health_notes: 'עיוורון בעין אחת בעקבות פגיעה ישנה שנותחה וטופלה.', neutered: true, vaccinations: 3,
     is_special: true, special_needs: 'עיוור בעין אחת אך מתפקד באופן מלא ועצמאי לחלוטין.',
     fee_amount: null, good_with_cats: true, good_with_dogs: true,
-    status: 'published', owner_key: 'pub1'
+    status: 'published', owner_key: 'pub1',
+    video_url: 'https://assets.mixkit.co/videos/1543/1543-720.mp4'
   },
   {
     name: 'קיטי', sex: 'female', birth_est: '2026-05-20', region: 'center', city: 'חולון',

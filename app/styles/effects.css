@@ -13,6 +13,69 @@
   animation: fade-rise-in 300ms ease-out forwards;
 }
 
+/* Logo "ח" ears twitching */
+@keyframes ear-twitch-left {
+  0%, 90%, 94%, 98%, 100% {
+    transform: rotate(0deg);
+  }
+  92%, 96% {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes ear-twitch-right {
+  0%, 90%, 94%, 98%, 100% {
+    transform: rotate(0deg);
+  }
+  92%, 96% {
+    transform: rotate(12deg);
+  }
+}
+
+.logo-left-ear {
+  transform-origin: 6px 12px;
+  animation: ear-twitch-left 20s infinite ease-in-out;
+}
+
+.logo-right-ear {
+  transform-origin: 18px 12px;
+  animation: ear-twitch-right 20s infinite ease-in-out;
+}
+
+/* Sunbeam drift on paper sections */
+@keyframes sunbeam-drift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.sunbeam-bg {
+  background: linear-gradient(-45deg, rgba(235, 175, 86, 0.03), rgba(28, 102, 80, 0.02), rgba(247, 245, 240, 0.01), rgba(235, 175, 86, 0.02));
+  background-size: 400% 400%;
+  animation: sunbeam-drift 75s ease infinite;
+}
+
+/* Self-drawing mascot animation */
+@keyframes draw-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-draw path, 
+.animate-draw rect, 
+.animate-draw circle {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: draw-stroke 700ms ease-out forwards;
+}
+
 /* Reduced motion adjustments */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-rise {
@@ -32,6 +95,37 @@
 
   .mascot-peeking-svg {
     transform: translate(-50%, 0) !important;
+    transition: none !important;
+  }
+
+  .logo-left-ear, 
+  .logo-right-ear {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .sunbeam-bg {
+    animation: none !important;
+    background: none !important;
+  }
+
+  .animate-draw path, 
+  .animate-draw rect, 
+  .animate-draw circle {
+    animation: none !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  * {
+    view-transition-name: none !important;
+    animation: none !important;
     transition: none !important;
   }
 }

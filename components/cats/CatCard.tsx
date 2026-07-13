@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -5,6 +7,8 @@ import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/filters'
 import { Badge } from '@/components/ui/Badge'
 import { strings } from '@/lib/strings'
+import { shouldDisableVideo } from '@/lib/utils/video-playback'
+import { PlaybackDirector } from '@/lib/utils/playback-director'
 
 export interface CatCardProps {
   cat: {
@@ -16,6 +20,7 @@ export interface CatCardProps {
     city: string | null
     is_special: boolean
     status: string
+    video_path?: string | null
     cat_photos?: Array<{
       path_card: string
       path_full: string
@@ -49,9 +54,61 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
 
   const isAdopted = cat.status === 'adopted'
 
+  // Video state management
+  const [disableVideo, setDisableVideo] = React.useState(true)
+  const [isActive, setIsActive] = React.useState(false)
+  const videoRef = React.useRef<HTMLVideoElement>(null)
+
+  React.useEffect(() => {
+    // Defer state update to avoid synchronous cascades in effect body
+    const checkVideo = () => {
+      setDisableVideo(shouldDisableVideo())
+    }
+    requestAnimationFrame(checkVideo)
+  }, [])
+
+  React.useEffect(() => {
+    if (!videoRef.current || !cat.video_path || disableVideo) return
+
+    const video = videoRef.current
+    const play = async () => {
+      setIsActive(true)
+      try {
+        await video.play()
+      } catch (err) {
+        console.error("Card video playback failed", err)
+      }
+    }
+
+    const pause = () => {
+      setIsActive(false)
+      video.pause()
+    }
+
+    PlaybackDirector.register(cat.id, video, { play, pause })
+
+    return () => {
+      PlaybackDirector.unregister(cat.id)
+    }
+  }, [cat.id, cat.video_path, disableVideo])
+
   return (
     <Link
       href={`/cats/${cat.id}`}
+      data-cat-card
+      data-cat-card-id={cat.id}
+      onMouseEnter={() => {
+        if (cat.video_path && !disableVideo) PlaybackDirector.playSingle(cat.id)
+      }}
+      onMouseLeave={() => {
+        if (cat.video_path && !disableVideo) PlaybackDirector.pauseSingle(cat.id)
+      }}
+      onFocus={() => {
+        if (cat.video_path && !disableVideo) PlaybackDirector.playSingle(cat.id)
+      }}
+      onBlur={() => {
+        if (cat.video_path && !disableVideo) PlaybackDirector.pauseSingle(cat.id)
+      }}
       className={`group bg-surface rounded-card border border-border shadow-resting hover:shadow-hover hover:-translate-y-0.5 transition-all duration-150 flex flex-col overflow-hidden select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 ${
         isAdopted ? 'opacity-90' : ''
       }`}
@@ -63,10 +120,29 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
           alt={strings.catalog.cardImageAlt.replace('{name}', cat.name)}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          style={{ viewTransitionName: `cat-photo-${cat.id}` }}
           className={`object-cover object-center transition-all duration-200 group-hover:scale-102 ${
             isAdopted ? 'grayscale-[30%]' : ''
           }`}
         />
+
+        {/* Video Overlay with 150ms opacity transition */}
+        {cat.video_path && !disableVideo && (
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            loop
+            preload="none"
+            poster={imageUrl}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-150 ${
+              isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          >
+            <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${cat.video_path}.webm`} type="video/webm" />
+            <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${cat.video_path}.mp4`} type="video/mp4" />
+          </video>
+        )}
         
         {/* Floating Badges */}
         <div className="absolute top-3 start-3 flex flex-col gap-2 z-10">

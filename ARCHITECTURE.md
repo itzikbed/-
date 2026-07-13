@@ -117,6 +117,8 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - [ ] Re-verify image optimization against the cloud Supabase URL before launch.
 - [ ] NEXT_IMAGE_UNOPTIMIZED is a LOCAL-testing flag only — the cloud deployment must never set it, and must add the https://*.supabase.co remotePattern.
 
+- [ ] On the next Next.js upgrade: re-test whether a route-level `loading.tsx` for /cats still breaks production hydration (see 2026-07-13 architect decision); if fixed upstream, restore the route-level skeleton.
+
 ## 11. Decision log (append one line per decision, newest last)
 
 - 2026-07-10 · Stack fixed: Next.js 14 + Supabase (RLS-first) + Resend on Vercel · fits scale at free/low tier.
@@ -136,6 +138,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-12 · Added migration 0002 to allow service_role to bypass the profile role privilege guard, enabling user seeding through auth.admin APIs.
 - 2026-07-12 · Design-v2 decision: living cat cards, hero film sequence, and self-drawing mascot approved by architect.
 - 2026-07-13 · View Transition production workaround: replaced Next.js experimental.viewTransition with custom promise-based document.startViewTransition wrapper synchronized with route rendering.
+- 2026-07-13 · (architect) Removed `app/cats/loading.tsx`: its streamed Suspense boundary silently killed ALL client hydration on / and /cats in production builds (Next 16.2.10 bug — dev unaffected, zero console errors; bisected across commits and confirmed by removal). Filter-change skeletons still work via `useTransition` isPending → CatGrid `loading`. Do NOT reintroduce a route-level loading file (or a page-level Suspense around the catalog) until verified against a fixed Next version — verify hydration on a production build after any Next upgrade (§10).
 
 ## 12. Now / Next (update every session)
 

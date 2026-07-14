@@ -25,6 +25,13 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1)
 }
 
+// Refuse to run unless NEXT_PUBLIC_SUPABASE_URL is a localhost/127.* URL
+const urlObj = new URL(supabaseUrl)
+if (urlObj.hostname !== 'localhost' && urlObj.hostname !== '127.0.0.1') {
+  console.error("Refusing to run bootstrap-admin: Target URL must be localhost/127.0.0.1 to prevent accidental production overwrite.")
+  process.exit(1)
+}
+
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     persistSession: false,
@@ -70,18 +77,38 @@ async function run() {
 
   console.log(`Admin user created with ID: ${user.id}`)
 
-  // Wait briefly for trigger
-  await new Promise(r => setTimeout(r, 1000))
+  // Wait with a resilient retry loop for trigger to create profile row
+  console.log('Updating profile role to admin (with verification retry loop)...')
+  let retries = 10
+  let updated = false
+  while (retries > 0) {
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('id, role')
+      .eq('id', user.id)
+      .single()
 
-  // Update profile role to admin
-  console.log('Updating profile role to admin...')
-  const { error: updateError } = await supabaseAdmin
-    .from('profiles')
-    .update({ role: 'admin' })
-    .eq('id', user.id)
+    if (profile) {
+      const { data: updateData, error: updateError } = await supabaseAdmin
+        .from('profiles')
+        .update({ role: 'admin' })
+        .eq('id', user.id)
+        .select()
 
-  if (updateError) {
-    console.error("Failed to set profile role to admin:", updateError.message)
+      if (!updateError && updateData && updateData.length === 1 && updateData[0].role === 'admin') {
+        updated = true
+        console.log(`Success: role updated to admin and verified for profile ${user.id}`)
+        break
+      }
+    }
+
+    console.log(`Profile row not ready or update failed. Retrying in 500ms... (${retries} retries left)`)
+    await new Promise(r => setTimeout(r, 500))
+    retries--
+  }
+
+  if (!updated) {
+    console.error("BOOTSTRAP ERROR: Failed to update role. Exact 1 profile row verification failed.")
     process.exit(1)
   }
 

@@ -18,7 +18,7 @@ export async function approvePublisherAction(publisherId: string): Promise<Actio
       .from('profiles')
       .update({ publisher_status: 'approved' })
       .eq('id', publisherId)
-      .in('publisher_status', ['pending', 'none', 'blocked'])
+      .eq('publisher_status', 'pending')
       .select()
 
     if (error || !updated || updated.length === 0) {
@@ -68,7 +68,7 @@ export async function rejectPublisherAction(publisherId: string, reason: string)
       .from('profiles')
       .update({ publisher_status: 'blocked' })
       .eq('id', publisherId)
-      .in('publisher_status', ['pending', 'none', 'approved'])
+      .eq('publisher_status', 'pending')
       .select()
 
     if (error || !updated || updated.length === 0) {

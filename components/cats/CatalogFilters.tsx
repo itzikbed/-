@@ -5,7 +5,6 @@ import { Filters } from '@/lib/utils/filters'
 import { REGIONS, AGE_BUCKETS } from '@/lib/constants'
 import { strings } from '@/lib/strings'
 import { Checkbox } from '@/components/ui/Checkbox'
-import { Radio } from '@/components/ui/Radio'
 
 interface CatalogFiltersProps {
   filters: Filters
@@ -83,24 +82,39 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
             {strings.catalog.genderLabel}
           </h4>
           <div className="flex flex-col gap-2">
-            <Radio
-              name="sex"
-              label={strings.catalog.genderAll}
-              checked={filters.sex === 'all'}
-              onChange={() => handleSingleChange('sex', 'all')}
-            />
-            <Radio
-              name="sex"
-              label={strings.catalog.genderMale}
-              checked={filters.sex === 'male'}
-              onChange={() => handleSingleChange('sex', 'male')}
-            />
-            <Radio
-              name="sex"
-              label={strings.catalog.genderFemale}
-              checked={filters.sex === 'female'}
-              onChange={() => handleSingleChange('sex', 'female')}
-            />
+            <label className="flex items-center gap-3 cursor-pointer select-none text-base text-ink font-sans">
+              <input
+                type="radio"
+                name="sex"
+                value="all"
+                checked={filters.sex === 'all'}
+                onChange={() => handleSingleChange('sex', 'all')}
+                className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
+              />
+              <span>{strings.catalog.genderAll}</span>
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer select-none text-base text-ink font-sans">
+              <input
+                type="radio"
+                name="sex"
+                value="male"
+                checked={filters.sex === 'male'}
+                onChange={() => handleSingleChange('sex', 'male')}
+                className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
+              />
+              <span>{strings.catalog.genderMale}</span>
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer select-none text-base text-ink font-sans">
+              <input
+                type="radio"
+                name="sex"
+                value="female"
+                checked={filters.sex === 'female'}
+                onChange={() => handleSingleChange('sex', 'female')}
+                className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
+              />
+              <span>{strings.catalog.genderFemale}</span>
+            </label>
           </div>
         </div>
 

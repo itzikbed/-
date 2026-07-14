@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Checkbox } from '@/components/ui/Checkbox'
-import { Radio } from '@/components/ui/Radio'
 import { Badge } from '@/components/ui/Badge'
 import { Chip } from '@/components/ui/Chip'
 import { Dialog } from '@/components/ui/Dialog'
@@ -123,7 +122,6 @@ export default function DevUiPlayground() {
 
             <div className="flex gap-6 items-center pt-2">
               <Checkbox label="אני מסכים לתנאי השימוש באתר" />
-              <Radio label="בחירה אופציונלית" />
             </div>
 
             <Button variant="tertiary" onClick={toggleError} className="min-h-[36px] h-9 px-4 text-sm mt-2">

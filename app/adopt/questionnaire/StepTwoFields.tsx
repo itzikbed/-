@@ -33,6 +33,8 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
               <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
                 <input
                   type="radio"
+                  name="has_other_pets"
+                  value="true"
                   checked={field.value === true}
                   onChange={() => field.onChange(true)}
                   className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
@@ -42,6 +44,8 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
               <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
                 <input
                   type="radio"
+                  name="has_other_pets"
+                  value="false"
                   checked={field.value === false}
                   onChange={() => field.onChange(false)}
                   className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
@@ -96,6 +100,8 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
               <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
                 <input
                   type="radio"
+                  name="has_cat_experience"
+                  value="true"
                   checked={field.value === true}
                   onChange={() => field.onChange(true)}
                   className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
@@ -105,6 +111,8 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
               <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
                 <input
                   type="radio"
+                  name="has_cat_experience"
+                  value="false"
                   checked={field.value === false}
                   onChange={() => field.onChange(false)}
                   className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
@@ -150,6 +158,8 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
               <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
                 <input
                   type="radio"
+                  name="has_window_screens"
+                  value="true"
                   checked={field.value === true}
                   onChange={() => field.onChange(true)}
                   className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
@@ -159,6 +169,8 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
               <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
                 <input
                   type="radio"
+                  name="has_window_screens"
+                  value="false"
                   checked={field.value === false}
                   onChange={() => field.onChange(false)}
                   className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"

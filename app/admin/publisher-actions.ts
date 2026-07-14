@@ -34,12 +34,18 @@ export async function approvePublisherAction(publisherId: string): Promise<Actio
       action: 'approve'
     })
 
-    const email = await getUserEmail(publisherId)
-    void sendEmail({
-      to: email,
-      subject: getPubApprovedSub(),
-      react: React.createElement(PublisherApproved, { fullName: publisher.full_name })
-    }).catch(console.error)
+    void (async () => {
+      try {
+        const email = await getUserEmail(publisherId)
+        await sendEmail({
+          to: email,
+          subject: getPubApprovedSub(),
+          react: React.createElement(PublisherApproved, { fullName: publisher.full_name })
+        })
+      } catch (e) {
+        console.error('Failed to send publisher approval email:', e)
+      }
+    })()
 
     revalidatePath('/admin')
     return { ok: true }

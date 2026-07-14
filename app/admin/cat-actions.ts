@@ -35,13 +35,18 @@ export async function approveCatAction(catId: string): Promise<ActionResult> {
       action: 'approve'
     })
 
-    const email = await getUserEmail(cat.owner_id)
-
-    void sendEmail({
-      to: email,
-      subject: getCatApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-      react: React.createElement(CatApproved, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', catId: cat.id })
-    }).catch(console.error)
+    void (async () => {
+      try {
+        const email = await getUserEmail(cat.owner_id)
+        await sendEmail({
+          to: email,
+          subject: getCatApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+          react: React.createElement(CatApproved, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', catId: cat.id })
+        })
+      } catch (e) {
+        console.error('Failed to send cat approval email:', e)
+      }
+    })()
 
     revalidatePath('/cats')
     revalidatePath('/admin')
@@ -83,12 +88,18 @@ export async function rejectCatAction(catId: string, reason: string): Promise<Ac
       reason
     })
 
-    const email = await getUserEmail(cat.owner_id)
-    void sendEmail({
-      to: email,
-      subject: getCatRejectedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-      react: React.createElement(CatRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', catId: cat.id, reason })
-    }).catch(console.error)
+    void (async () => {
+      try {
+        const email = await getUserEmail(cat.owner_id)
+        await sendEmail({
+          to: email,
+          subject: getCatRejectedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+          react: React.createElement(CatRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', catId: cat.id, reason })
+        })
+      } catch (e) {
+        console.error('Failed to send cat rejection email:', e)
+      }
+    })()
 
     revalidatePath('/admin')
     return { ok: true }

@@ -10,6 +10,8 @@ import CatRejected, { getSubject as getCatRejectedSubject } from './CatRejected'
 import RequestReceived, { getSubject as getRequestReceivedSubject } from './RequestReceived'
 import RequestApproved, { getSubject as getRequestApprovedSubject } from './RequestApproved'
 import RequestRejected, { getSubject as getRequestRejectedSubject } from './RequestRejected'
+import CatArchivedByAdmin, { getSubject as getCatArchivedByAdminSubject } from './CatArchivedByAdmin'
+import RequestClosedCatAdopted, { getSubject as getRequestClosedCatAdoptedSubject } from './RequestClosedCatAdopted'
 
 describe('Email Templates Validation', () => {
   const catName = 'Mitzi'
@@ -136,5 +138,41 @@ describe('Email Templates Validation', () => {
     expect(html).toContain('dir="rtl"')
     expect(html).toContain(adminNote)
     expect(text.length).toBeGreaterThan(0)
+  })
+
+  it('checks CatArchivedByAdmin template rules', async () => {
+    const subject = getCatArchivedByAdminSubject(catName, 'male')
+    expect(subject.length).toBeLessThanOrEqual(45)
+
+    const element = <CatArchivedByAdmin catName={catName} catSex="male" reason="Unsuitable content" />
+    const html = await render(element)
+    const text = await render(element, { plainText: true })
+
+    expect(html).toContain('dir="rtl"')
+    expect(html).toContain('Unsuitable content')
+    expect(text).toContain(catName)
+    expect(text).toContain('Unsuitable content')
+  })
+
+  it('checks RequestClosedCatAdopted template rules (male and female)', async () => {
+    // Male
+    const subjectMale = getRequestClosedCatAdoptedSubject(catName, 'male')
+    expect(subjectMale.length).toBeLessThanOrEqual(45)
+    const elementMale = <RequestClosedCatAdopted catName={catName} catSex="male" />
+    const htmlMale = await render(elementMale)
+    const textMale = await render(elementMale, { plainText: true })
+
+    expect(htmlMale).toContain('dir="rtl"')
+    expect(textMale).toContain(catName)
+
+    // Female
+    const subjectFemale = getRequestClosedCatAdoptedSubject(catName, 'female')
+    expect(subjectFemale.length).toBeLessThanOrEqual(45)
+    const elementFemale = <RequestClosedCatAdopted catName={catName} catSex="female" />
+    const htmlFemale = await render(elementFemale)
+    const textFemale = await render(elementFemale, { plainText: true })
+
+    expect(htmlFemale).toContain('dir="rtl"')
+    expect(textFemale).toContain(catName)
   })
 })

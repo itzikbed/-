@@ -94,7 +94,7 @@ export async function rejectCatAction(catId: string, reason: string): Promise<Ac
         await sendEmail({
           to: email,
           subject: getCatRejectedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-          react: React.createElement(CatRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', catId: cat.id, reason })
+          react: React.createElement(CatRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', reason })
         })
       } catch (e) {
         console.error('Failed to send cat rejection email:', e)

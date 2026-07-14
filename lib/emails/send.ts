@@ -27,10 +27,13 @@ export async function sendEmail({ to, subject, react, text }: SendEmailOptions) 
         fs.mkdirSync(outboxDir, { recursive: true })
       }
       const cleanSubject = subject.replace(/[^a-zA-Z0-9א-ת_-\s]/g, '').replace(/\s+/g, '_')
-      const filename = `${timestamp}-${cleanSubject}.html`
-      const filepath = path.join(outboxDir, filename)
-      fs.writeFileSync(filepath, html, 'utf8')
-      console.error(`[MOCK EMAIL SENT] to: ${JSON.stringify(to)} | subject: ${subject} | saved to: ${filepath}`)
+      const htmlFilename = `${timestamp}-${cleanSubject}.html`
+      const txtFilename = `${timestamp}-${cleanSubject}.txt`
+      const htmlFilepath = path.join(outboxDir, htmlFilename)
+      const txtFilepath = path.join(outboxDir, txtFilename)
+      fs.writeFileSync(htmlFilepath, html, 'utf8')
+      fs.writeFileSync(txtFilepath, plainText, 'utf8')
+      console.error(`[MOCK EMAIL SENT] to: ${JSON.stringify(to)} | subject: ${subject} | saved to: ${htmlFilepath} and ${txtFilepath}`)
       return { data: { id: `mock-${Date.now()}` }, error: null }
     }
 

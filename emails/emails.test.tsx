@@ -51,7 +51,7 @@ describe('Email Templates Validation', () => {
     const subject = getCatRejectedSubject(catName, 'female')
     expect(subject.length).toBeLessThanOrEqual(45)
 
-    const element = <CatRejected catName={catName} catSex="female" catId="123" reason={reason} />
+    const element = <CatRejected catName={catName} catSex="female" reason={reason} />
     const html = await render(element)
     const text = await render(element, { plainText: true })
 
@@ -82,6 +82,7 @@ describe('Email Templates Validation', () => {
     const counterpartName = 'Moshe Cohen'
     const counterpartPhone = '052-1234567'
 
+    // Adopter Role Verification
     const element = (
       <RequestApproved
         catName={catName}
@@ -96,9 +97,32 @@ describe('Email Templates Validation', () => {
 
     expect(html).toContain('dir="rtl"')
     expect(html).toContain('dir="ltr"') // Phone span direction
+    expect(html).toContain(`dir="ltr"`)
+    expect(html).toContain(`>${counterpartPhone}</span>`)
     expect(html).toContain(counterpartName)
-    expect(html).toContain(counterpartPhone)
-    expect(text.length).toBeGreaterThan(0)
+    expect(text).toContain(counterpartName)
+    expect(text).toContain(counterpartPhone)
+
+    // Publisher Role Verification
+    const publisherElement = (
+      <RequestApproved
+        catName={catName}
+        catSex="female"
+        recipientRole="publisher"
+        counterpartName={counterpartName}
+        counterpartPhone={counterpartPhone}
+      />
+    )
+    const pubHtml = await render(publisherElement)
+    const pubText = await render(publisherElement, { plainText: true })
+
+    expect(pubHtml).toContain('dir="rtl"')
+    expect(pubHtml).toContain('dir="ltr"')
+    expect(pubHtml).toContain(`dir="ltr"`)
+    expect(pubHtml).toContain(`>${counterpartPhone}</span>`)
+    expect(pubHtml).toContain(counterpartName)
+    expect(pubText).toContain(counterpartName)
+    expect(pubText).toContain(counterpartPhone)
   })
 
   it('checks RequestRejected template rules', async () => {

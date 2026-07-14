@@ -5,7 +5,6 @@ import { gendered, strings } from '../lib/strings'
 export interface CatRejectedProps {
   catName?: string
   catSex?: 'male' | 'female' | 'unknown'
-  catId?: string
   reason?: string
 }
 

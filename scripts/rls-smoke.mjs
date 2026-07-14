@@ -55,32 +55,48 @@ async function run() {
   
   console.log(`TEST 1 SUCCESS: Anon sees only published cats, and exactly 12 of them.`)
 
-  // Generate a random user
-  const email = `test_${Date.now()}@example.com`
-  const password = "password123"
-  const fullName = "ישראל ישראלי"
-  const phone = "050-1234567"
+  let userId;
+  let adopterId;
+  let thirdId;
+  let draftCat;
+  let requestId;
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
-  console.log(`Creating test user: ${email}...`)
-  // 2. Signup new user
-  const { data: authData, error: signupError } = await supabaseAnon.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-        phone
-      }
+  const originalExit = process.exit;
+  process.exit = (code) => {
+    if (code !== 0) {
+      throw new Error(`process.exit(${code}) called`);
     }
-  })
+    originalExit(code);
+  };
 
-  if (signupError) {
-    console.error("Signup failed:", signupError.message)
-    process.exit(1)
-  }
+  try {
+    // Generate a random user
+    const email = `test_${Date.now()}@example.com`
+    const password = "password123"
+    const fullName = "ישראל ישראלי"
+    const phone = "050-1234567"
 
-  const userId = authData.user.id
-  console.log(`User created successfully with ID: ${userId}`)
+    console.log(`Creating test user: ${email}...`)
+    // 2. Signup new user
+    const { data: authData, error: signupError } = await supabaseAnon.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          phone
+        }
+      }
+    })
+
+    if (signupError) {
+      console.error("Signup failed:", signupError.message)
+      process.exit(1)
+    }
+
+    userId = authData.user.id
+    console.log(`User created successfully with ID: ${userId}`)
 
   // Create user authenticated client
   const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
@@ -150,7 +166,6 @@ async function run() {
     process.exit(1)
   }
 
-  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
   // Get a seeded published cat ID for request tests
   const { data: publishedCats } = await supabaseAdmin
@@ -252,7 +267,7 @@ async function run() {
 
   // Insert cat as 'draft' (should succeed)
   console.log("Inserting a cat as 'draft'...")
-  const { data: draftCat, error: draftInsertError } = await supabaseUser
+  const { data: insertedDraftCat, error: draftInsertError } = await supabaseUser
     .from('cats')
     .insert({
       owner_id: userId,
@@ -267,10 +282,11 @@ async function run() {
     .select('id')
     .single()
 
-  if (draftInsertError || !draftCat) {
+  if (draftInsertError || !insertedDraftCat) {
     console.error("TEST 7b FAILED: Approved publisher could not insert a draft cat:", draftInsertError?.message)
     process.exit(1)
   } else {
+    draftCat = insertedDraftCat
     console.log("TEST 7b SUCCESS: Inserted draft cat with ID:", draftCat.id)
   }
 
@@ -379,7 +395,7 @@ async function run() {
     console.error("Adopter signup failed:", adopterSignupError.message)
     process.exit(1)
   }
-  const adopterId = adopterAuth.user.id
+  adopterId = adopterAuth.user.id
   const supabaseAdopter = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false,
@@ -417,7 +433,7 @@ async function run() {
     console.error("Third user signup failed:", thirdSignupError.message)
     process.exit(1)
   }
-  const thirdId = thirdAuth.user.id
+  thirdId = thirdAuth.user.id
   const supabaseThird = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false,
@@ -452,32 +468,48 @@ async function run() {
     console.error("Failed to insert adoption request for isolation test:", reqInsertErr?.message)
     process.exit(1)
   }
-  const requestId = requestRow.id
+  requestId = requestRow.id
 
   // 5. Verify Isolation Before Approval
   // Adopter X cannot select Publisher Y profile
-  const { data: profSelectAdopter } = await supabaseAdopter.from('profiles').select('full_name, phone').eq('id', userId)
+  const { data: profSelectAdopter, error: profSelectAdopterErr } = await supabaseAdopter.from('profiles').select('full_name, phone').eq('id', userId)
+  if (profSelectAdopterErr) {
+    console.error("Unexpected error on Adopter direct profile select:", profSelectAdopterErr.message)
+    process.exit(1)
+  }
   if (profSelectAdopter && profSelectAdopter.length > 0) {
     console.error("TEST 10 FAILED: Adopter can read Publisher profile before approval!")
     process.exit(1)
   }
 
   // Publisher Y cannot select Adopter X profile
-  const { data: profSelectPublisher } = await supabaseUser.from('profiles').select('full_name, phone').eq('id', adopterId)
+  const { data: profSelectPublisher, error: profSelectPublisherErr } = await supabaseUser.from('profiles').select('full_name, phone').eq('id', adopterId)
+  if (profSelectPublisherErr) {
+    console.error("Unexpected error on Publisher direct profile select:", profSelectPublisherErr.message)
+    process.exit(1)
+  }
   if (profSelectPublisher && profSelectPublisher.length > 0) {
     console.error("TEST 10 FAILED: Publisher can read Adopter profile before approval!")
     process.exit(1)
   }
 
   // Adopter X calling RPC get_handoff_contact returns zero rows
-  const { data: rpcAdopterBefore } = await supabaseAdopter.rpc('get_handoff_contact', { request_id: requestId })
+  const { data: rpcAdopterBefore, error: rpcAdopterBeforeErr } = await supabaseAdopter.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcAdopterBeforeErr) {
+    console.error("Unexpected error on Adopter RPC call:", rpcAdopterBeforeErr.message)
+    process.exit(1)
+  }
   if (rpcAdopterBefore && rpcAdopterBefore.length > 0) {
     console.error("TEST 10 FAILED: Adopter RPC returned contact before approval!")
     process.exit(1)
   }
 
   // Publisher Y calling RPC get_handoff_contact returns zero rows
-  const { data: rpcPublisherBefore } = await supabaseUser.rpc('get_handoff_contact', { request_id: requestId })
+  const { data: rpcPublisherBefore, error: rpcPublisherBeforeErr } = await supabaseUser.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcPublisherBeforeErr) {
+    console.error("Unexpected error on Publisher RPC call:", rpcPublisherBeforeErr.message)
+    process.exit(1)
+  }
   if (rpcPublisherBefore && rpcPublisherBefore.length > 0) {
     console.error("TEST 10 FAILED: Publisher RPC returned contact before approval!")
     process.exit(1)
@@ -500,13 +532,21 @@ async function run() {
   }
 
   // 2. Direct profiles select STILL returns empty (both directions)
-  const { data: profSelectAdopterAfter } = await supabaseAdopter.from('profiles').select('full_name, phone').eq('id', userId)
+  const { data: profSelectAdopterAfter, error: profSelectAdopterAfterErr } = await supabaseAdopter.from('profiles').select('full_name, phone').eq('id', userId)
+  if (profSelectAdopterAfterErr) {
+    console.error("Unexpected error on Adopter direct profile select after approval:", profSelectAdopterAfterErr.message)
+    process.exit(1)
+  }
   if (profSelectAdopterAfter && profSelectAdopterAfter.length > 0) {
     console.error("TEST 11 FAILED: Direct select allowed profile read after approval (security leak)!")
     process.exit(1)
   }
 
-  const { data: profSelectPublisherAfter } = await supabaseUser.from('profiles').select('full_name, phone').eq('id', adopterId)
+  const { data: profSelectPublisherAfter, error: profSelectPublisherAfterErr } = await supabaseUser.from('profiles').select('full_name, phone').eq('id', adopterId)
+  if (profSelectPublisherAfterErr) {
+    console.error("Unexpected error on Publisher direct profile select after approval:", profSelectPublisherAfterErr.message)
+    process.exit(1)
+  }
   if (profSelectPublisherAfter && profSelectPublisherAfter.length > 0) {
     console.error("TEST 11 FAILED: Direct select allowed profile read after approval (security leak)!")
     process.exit(1)
@@ -537,33 +577,62 @@ async function run() {
   }
 
   // 5. Unrelated third user Z calling RPC returns zero rows
-  const { data: rpcThirdAfter } = await supabaseThird.rpc('get_handoff_contact', { request_id: requestId })
+  const { data: rpcThirdAfter, error: rpcThirdAfterErr } = await supabaseThird.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcThirdAfterErr) {
+    console.error("Unexpected error on Third RPC call after approval:", rpcThirdAfterErr.message)
+    process.exit(1)
+  }
   if (rpcThirdAfter && rpcThirdAfter.length > 0) {
     console.error("TEST 11 FAILED: Unrelated user Z could read approved contact details!")
     process.exit(1)
   }
 
   console.log("TEST 11 SUCCESS: Contact handoff RPC functions correctly and securely.")
-
+} catch (err) {
+  console.error("TEST RUN ENCOUNTERED ERROR:", err.message || err)
+  originalExit(1)
+} finally {
   // ============ TEST 12: Clean Up & Invariant Verification ============
   console.log("TEST 12: Cleaning up and verifying invariant...")
   
   // Delete the requests, cat, and users to return database to its exact original state
-  await supabaseAdmin.from('adoption_requests').delete().eq('id', requestId)
-  await supabaseAdmin.from('cats').delete().eq('id', draftCat.id)
-  await supabaseAdmin.auth.admin.deleteUser(adopterId)
-  await supabaseAdmin.auth.admin.deleteUser(thirdId)
-
-  // Clean up user using service role client
-  console.log("Cleaning up original test user...")
-  const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
-  if (deleteError) {
-    console.error("Cleanup failed:", deleteError.message)
-  } else {
-    console.log("Cleanup succeeded.")
+  if (requestId) {
+    await supabaseAdmin.from('adoption_requests').delete().eq('id', requestId)
+  }
+  if (draftCat && draftCat.id) {
+    await supabaseAdmin.from('cats').delete().eq('id', draftCat.id)
+  }
+  if (thirdId) {
+    await supabaseAdmin.auth.admin.deleteUser(thirdId).catch(() => {})
+  }
+  if (adopterId) {
+    await supabaseAdmin.auth.admin.deleteUser(adopterId).catch(() => {})
   }
 
+  // Clean up user using service role client
+  if (userId) {
+    console.log("Cleaning up original test user...")
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+    if (deleteError) {
+      console.error("Cleanup failed:", deleteError.message)
+    } else {
+      console.log("Cleanup succeeded.")
+    }
+  }
+
+  // Verify 12 published cats invariant
+  const { data: postCats, error: postCatsError } = await supabaseAnon.from('cats').select('*').eq('status', 'published')
+  if (postCatsError) {
+    console.error("Failed to query cats post-cleanup:", postCatsError.message)
+    originalExit(1)
+  }
+  if (postCats.length !== 12) {
+    console.error(`TEST 12 FAILED: Invariant violated! Found ${postCats.length} published cats post-cleanup (expected 12).`)
+    originalExit(1)
+  }
+  console.log("TEST 12 SUCCESS: Invariant verified: exactly 12 published cats remain in database.")
   console.log("--- RLS SMOKE TEST COMPLETED ---")
+}
 }
 
 run()

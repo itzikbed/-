@@ -24,11 +24,22 @@ export default async function RequestsPage() {
   }
 
   // Fetch adoption requests
-  const { data: requests } = await supabase
+  const { data: rawRequests } = await supabase
     .from('adoption_requests')
     .select('*, cats(name, region, city)')
     .eq('adopter_id', user.id)
     .order('created_at', { ascending: false })
+
+  const requests = await Promise.all((rawRequests || []).map(async (req) => {
+    let contactDetails: { full_name: string; phone: string | null } | null = null
+    if (req.status === 'approved') {
+      const { data } = await supabase.rpc('get_handoff_contact', { request_id: req.id })
+      if (data && data.length > 0) {
+        contactDetails = data[0] as { full_name: string; phone: string | null }
+      }
+    }
+    return { ...req, contactDetails }
+  }))
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -144,6 +155,13 @@ export default async function RequestsPage() {
                       <div className='text-sm font-semibold text-pine-dp leading-relaxed mt-2 bg-pine-soft/20 border-s-4 border-pine p-3 rounded'>
                         <strong className='block text-pine text-xs mb-0.5'>{strings.requests.adminNoteLabel}</strong>
                         {req.admin_note}
+                      </div>
+                    )}
+
+                    {req.contactDetails && (
+                      <div className='text-sm font-semibold text-pine leading-relaxed mt-2 bg-pine-soft/20 border-s-4 border-pine p-3 rounded'>
+                        <strong className='block text-pine text-xs mb-0.5'>{strings.admin.request.contactLabel}</strong>
+                        {req.contactDetails.full_name} &middot; <span dir="ltr">{req.contactDetails.phone}</span>
                       </div>
                     )}
                   </div>

@@ -3,6 +3,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { adoptionRequestSchema, AdoptionRequestInput } from '@/lib/schemas/request'
 import { revalidatePath } from 'next/cache'
+import React from 'react'
+import { sendEmail } from '@/lib/emails/send'
+import RequestReceived, { getSubject as getReqReceivedSub } from '@/emails/RequestReceived'
 
 export type ActionResult<T = unknown> = 
   | { ok: true; data?: T }
@@ -49,7 +52,7 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
 
   const { data: cat, error: catErr } = await supabase
     .from('cats')
-    .select('status')
+    .select('name, sex, status')
     .eq('id', catId)
     .single()
 
@@ -73,7 +76,14 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
     return { ok: false, formError: 'אירעה שגיאה בשליחת הבקשה. אנא נסה שנית.' }
   }
 
-  // TODO(phase4): send confirmation email 'request-received'
+  // Send confirmation email to adopter
+  if (user.email) {
+    void sendEmail({
+      to: user.email,
+      subject: getReqReceivedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+      react: React.createElement(RequestReceived, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown' })
+    }).catch(console.error)
+  }
 
   revalidatePath('/requests')
   revalidatePath(`/cats/${catId}`)

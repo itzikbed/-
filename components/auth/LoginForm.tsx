@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -15,6 +15,8 @@ import { strings } from '@/lib/strings'
 export default function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams.get('redirect') || '/'
 
   const {
     register,
@@ -38,7 +40,7 @@ export default function LoginForm() {
           })
         }
       } else {
-        router.push('/')
+        router.push(redirectUrl)
         router.refresh()
       }
     } catch {

@@ -359,8 +359,203 @@ async function run() {
   }
   console.log("TEST 9c SUCCESS: Owner deleted own object.")
 
+  // ============ TEST 10: Contact Isolation Before Approval ============
+  console.log("TEST 10: Contact Isolation Before Approval...")
+  
+  // 1. Create Adopter X
+  const adopterEmail = `adopter_${Date.now()}@example.com`
+  const adopterPassword = "password123"
+  const { data: adopterAuth, error: adopterSignupError } = await supabaseAnon.auth.signUp({
+    email: adopterEmail,
+    password: adopterPassword,
+    options: {
+      data: {
+        full_name: "משה המאמץ",
+        phone: "052-1111111"
+      }
+    }
+  })
+  if (adopterSignupError) {
+    console.error("Adopter signup failed:", adopterSignupError.message)
+    process.exit(1)
+  }
+  const adopterId = adopterAuth.user.id
+  const supabaseAdopter = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  })
+  await supabaseAdopter.auth.setSession(adopterAuth.session)
+
+  // Complete Adopter X's questionnaire
+  const { error: qErr } = await supabaseAdopter.from('adopter_profiles').upsert({
+    user_id: adopterId,
+    age: 30,
+    city: 'ירושלים',
+    completed_at: new Date().toISOString()
+  })
+  if (qErr) {
+    console.error("Adopter q-profile failed:", qErr.message)
+    process.exit(1)
+  }
+
+  // 2. Create Third User Z
+  const thirdEmail = `third_${Date.now()}@example.com`
+  const thirdPassword = "password123"
+  const { data: thirdAuth, error: thirdSignupError } = await supabaseAnon.auth.signUp({
+    email: thirdEmail,
+    password: thirdPassword,
+    options: {
+      data: {
+        full_name: "אורח זר",
+        phone: "053-2222222"
+      }
+    }
+  })
+  if (thirdSignupError) {
+    console.error("Third user signup failed:", thirdSignupError.message)
+    process.exit(1)
+  }
+  const thirdId = thirdAuth.user.id
+  const supabaseThird = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  })
+  await supabaseThird.auth.setSession(thirdAuth.session)
+
+  // 3. Make Publisher's draft cat published (using admin client to bypass self-publish block)
+  const { error: makePublishedError } = await supabaseAdmin
+    .from('cats')
+    .update({ status: 'published', published_at: new Date().toISOString() })
+    .eq('id', draftCat.id)
+  
+  if (makePublishedError) {
+    console.error("Failed to publish draft cat for test:", makePublishedError.message)
+    process.exit(1)
+  }
+
+  // 4. Adopter X submits adoption request
+  const { data: requestRow, error: reqInsertErr } = await supabaseAdopter
+    .from('adoption_requests')
+    .insert({
+      cat_id: draftCat.id,
+      adopter_id: adopterId,
+      message: 'אשמח מאוד לאמץ את החתול המקסים הזה!'
+    })
+    .select('id')
+    .single()
+
+  if (reqInsertErr || !requestRow) {
+    console.error("Failed to insert adoption request for isolation test:", reqInsertErr?.message)
+    process.exit(1)
+  }
+  const requestId = requestRow.id
+
+  // 5. Verify Isolation Before Approval
+  // Adopter X cannot select Publisher Y profile
+  const { data: profSelectAdopter } = await supabaseAdopter.from('profiles').select('full_name, phone').eq('id', userId)
+  if (profSelectAdopter && profSelectAdopter.length > 0) {
+    console.error("TEST 10 FAILED: Adopter can read Publisher profile before approval!")
+    process.exit(1)
+  }
+
+  // Publisher Y cannot select Adopter X profile
+  const { data: profSelectPublisher } = await supabaseUser.from('profiles').select('full_name, phone').eq('id', adopterId)
+  if (profSelectPublisher && profSelectPublisher.length > 0) {
+    console.error("TEST 10 FAILED: Publisher can read Adopter profile before approval!")
+    process.exit(1)
+  }
+
+  // Adopter X calling RPC get_handoff_contact returns zero rows
+  const { data: rpcAdopterBefore } = await supabaseAdopter.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcAdopterBefore && rpcAdopterBefore.length > 0) {
+    console.error("TEST 10 FAILED: Adopter RPC returned contact before approval!")
+    process.exit(1)
+  }
+
+  // Publisher Y calling RPC get_handoff_contact returns zero rows
+  const { data: rpcPublisherBefore } = await supabaseUser.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcPublisherBefore && rpcPublisherBefore.length > 0) {
+    console.error("TEST 10 FAILED: Publisher RPC returned contact before approval!")
+    process.exit(1)
+  }
+
+  console.log("TEST 10 SUCCESS: Contact isolation before approval is active.")
+
+  // ============ TEST 11: Contact Handoff After Approval ============
+  console.log("TEST 11: Contact Handoff After Approval...")
+
+  // 1. Admin approves request
+  const { error: adminApproveErr } = await supabaseAdmin
+    .from('adoption_requests')
+    .update({ status: 'approved' })
+    .eq('id', requestId)
+
+  if (adminApproveErr) {
+    console.error("Failed to approve request via admin:", adminApproveErr.message)
+    process.exit(1)
+  }
+
+  // 2. Direct profiles select STILL returns empty (both directions)
+  const { data: profSelectAdopterAfter } = await supabaseAdopter.from('profiles').select('full_name, phone').eq('id', userId)
+  if (profSelectAdopterAfter && profSelectAdopterAfter.length > 0) {
+    console.error("TEST 11 FAILED: Direct select allowed profile read after approval (security leak)!")
+    process.exit(1)
+  }
+
+  const { data: profSelectPublisherAfter } = await supabaseUser.from('profiles').select('full_name, phone').eq('id', adopterId)
+  if (profSelectPublisherAfter && profSelectPublisherAfter.length > 0) {
+    console.error("TEST 11 FAILED: Direct select allowed profile read after approval (security leak)!")
+    process.exit(1)
+  }
+
+  // 3. Adopter calling RPC returns Publisher details
+  const { data: rpcAdopterAfter, error: rpcAdopterAfterErr } = await supabaseAdopter.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcAdopterAfterErr || !rpcAdopterAfter || rpcAdopterAfter.length === 0) {
+    console.error("TEST 11 FAILED: Adopter RPC could not read Publisher contact after approval:", rpcAdopterAfterErr?.message)
+    process.exit(1)
+  }
+  const adopterContactResult = rpcAdopterAfter[0]
+  if (adopterContactResult.full_name !== fullName || adopterContactResult.phone !== phone) {
+    console.error("TEST 11 FAILED: Adopter RPC contact details mismatch", adopterContactResult)
+    process.exit(1)
+  }
+
+  // 4. Publisher calling RPC returns Adopter details
+  const { data: rpcPublisherAfter, error: rpcPublisherAfterErr } = await supabaseUser.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcPublisherAfterErr || !rpcPublisherAfter || rpcPublisherAfter.length === 0) {
+    console.error("TEST 11 FAILED: Publisher RPC could not read Adopter contact after approval:", rpcPublisherAfterErr?.message)
+    process.exit(1)
+  }
+  const publisherContactResult = rpcPublisherAfter[0]
+  if (publisherContactResult.full_name !== "משה המאמץ" || publisherContactResult.phone !== "052-1111111") {
+    console.error("TEST 11 FAILED: Publisher RPC contact details mismatch", publisherContactResult)
+    process.exit(1)
+  }
+
+  // 5. Unrelated third user Z calling RPC returns zero rows
+  const { data: rpcThirdAfter } = await supabaseThird.rpc('get_handoff_contact', { request_id: requestId })
+  if (rpcThirdAfter && rpcThirdAfter.length > 0) {
+    console.error("TEST 11 FAILED: Unrelated user Z could read approved contact details!")
+    process.exit(1)
+  }
+
+  console.log("TEST 11 SUCCESS: Contact handoff RPC functions correctly and securely.")
+
+  // ============ TEST 12: Clean Up & Invariant Verification ============
+  console.log("TEST 12: Cleaning up and verifying invariant...")
+  
+  // Delete the requests, cat, and users to return database to its exact original state
+  await supabaseAdmin.from('adoption_requests').delete().eq('id', requestId)
+  await supabaseAdmin.from('cats').delete().eq('id', draftCat.id)
+  await supabaseAdmin.auth.admin.deleteUser(adopterId)
+  await supabaseAdmin.auth.admin.deleteUser(thirdId)
+
   // Clean up user using service role client
-  console.log("Cleaning up test user...")
+  console.log("Cleaning up original test user...")
   const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
   if (deleteError) {
     console.error("Cleanup failed:", deleteError.message)
@@ -372,3 +567,4 @@ async function run() {
 }
 
 run()
+

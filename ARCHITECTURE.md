@@ -31,24 +31,24 @@ app/
   page.tsx                # ✅ landing: two-door hero + latest cats strip
   cats/page.tsx           # ✅ public catalog; filters via searchParams
   cats/[id]/page.tsx      # ✅ cat detail, gallery, request CTA
-  adopt/questionnaire/    # adopter wizard → adopter_profiles (saved, reusable)
-  publish/                # publisher application, cat upload wizard, my-cats list
-  requests/               # adopter's own requests + statuses
-  admin/                  # layout.tsx role gate + queues: publishers/cats/requests + log
+  adopt/questionnaire/    # ✅ adopter wizard → adopter_profiles (saved, reusable)
+  publish/                # ✅ publisher application, cat upload wizard, my-cats list
+  requests/               # ✅ adopter's own requests + statuses
+  admin/                  # ✅ layout.tsx role gate + queues: publishers/cats/requests + log
   (auth)/login, signup    # ✅ Supabase auth (email+password v1)
   dev/ui/page.tsx         # ✅ dev UI kit playground
 lib/
   supabase/{client,server,middleware}.ts # ✅ typed clients
-  schemas/                # ALL zod schemas (one per form) + he-errors.ts error map ✅
+  schemas/                # ✅ ALL zod schemas (one per form) + he-errors.ts error map
   constants.ts            # ✅ REGIONS (5), AGE_BUCKETS (5), HEALTH_LEVELS, status enums — single source
   strings.ts              # ✅ every Hebrew UI string, flat keys; no literals in JSX
-  emails/send.ts          # Resend helpers (fire-and-log, never throw to user)
+  emails/send.ts          # ✅ Resend helpers (fire-and-log, never throw to user)
 components/
   ui/                     # ✅ Button, Input, Badge, Chip, Dialog, Skeleton — per DESIGN.md
   cats/                   # ✅ CatCard, CatGrid, Filters, Gallery, PhotoUploader
-  admin/                  # QueueTable, DecisionDialog (reject requires reason)
+  admin/                  # ✅ QueueTable, DecisionDialog (reject requires reason)
   mascot/                 # ✅ Peeking Cat SVG set (see DESIGN.md §1)
-emails/                   # react-email templates (see rtl-transactional-email skill)
+emails/                   # ✅ react-email templates (see rtl-transactional-email skill)
 supabase/
   migrations/0001_init.sql  # ✅ full schema + RLS — never edit applied migrations
   seed.sql                # dev: 1 admin, 2 publishers, ~12 published cats
@@ -141,6 +141,9 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-13 · (architect) Removed `app/cats/loading.tsx`: its streamed Suspense boundary silently killed ALL client hydration on / and /cats in production builds (Next 16.2.10 bug — dev unaffected, zero console errors; bisected across commits and confirmed by removal). Filter-change skeletons still work via `useTransition` isPending → CatGrid `loading`. Do NOT reintroduce a route-level loading file (or a page-level Suspense around the catalog) until verified against a fixed Next version — verify hydration on a production build after any Next upgrade (§10).
 - 2026-07-14 · Video upload policy v1: accepts RAW uploads (≤15s, ≤25MB), autoplay limited to stored files ≤1.5MB; HEIC images decoded client-side via heic2any before canvas resize.
 - 2026-07-14 · (architect) Migration 0004: fixed storage RLS owner policies — 0001 used unqualified `name` inside the EXISTS subquery, which resolved to cats.name, so every authenticated photo/video upload+delete was rejected (surfaced in Phase 3 review; canonical 0001 fixed too). rls-smoke TEST 9 added to keep it covered.
+- 2026-07-14 · Added `resend` as dependency to send transactional emails · fits free tier assumptions.
+- 2026-07-14 · Added `@react-email/components` as dependency to build responsive RTL transactional email templates.
+
 
 ## 12. Now / Next (update every session)
 
@@ -151,6 +154,6 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 | 2 | Catalog + filters + cat page | ☑ |
 | 2.5 | Design elevation "החתול החי" | ☑ |
 | 3 | Questionnaire wizard · upload wizard · request flow | ☑ |
-| 4 | Admin queues + emails | ☐ |
-| 5 | Polish: SEO/OG, a11y audit, privacy page | ☐ |
+| 4 | Admin queues + emails | ☑ |
+| 5 | Polish: SEO/OG, a11y audit, privacy page · **Systemic auto-closing of stale sibling requests (deferred from Phase 4)** | ☐ |
 | 6 | Seed, QA as all 4 roles, domain, admin handover | ☐ |

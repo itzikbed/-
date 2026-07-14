@@ -8,7 +8,7 @@ import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/filters'
 import { Badge } from '@/components/ui/Badge'
 import { strings } from '@/lib/strings'
-import { shouldDisableVideo } from '@/lib/utils/video-playback'
+import { shouldDisableVideo, hasExtension } from '@/lib/utils/video-playback'
 import { PlaybackDirector } from '@/lib/utils/playback-director'
 import { triggerViewTransition } from '@/lib/utils/view-transition-navigation'
 
@@ -104,6 +104,8 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
     triggerViewTransition(router, `/cats/${cat.id}`)
   }
 
+  const hasAutoplayVideo = !!(cat.video_path && !hasExtension(cat.video_path))
+
   return (
     <Link
       href={`/cats/${cat.id}`}
@@ -111,16 +113,16 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
       data-cat-card
       data-cat-card-id={cat.id}
       onMouseEnter={() => {
-        if (cat.video_path && !disableVideo) PlaybackDirector.playSingle(cat.id)
+        if (hasAutoplayVideo && !disableVideo) PlaybackDirector.playSingle(cat.id)
       }}
       onMouseLeave={() => {
-        if (cat.video_path && !disableVideo) PlaybackDirector.pauseSingle(cat.id)
+        if (hasAutoplayVideo && !disableVideo) PlaybackDirector.pauseSingle(cat.id)
       }}
       onFocus={() => {
-        if (cat.video_path && !disableVideo) PlaybackDirector.playSingle(cat.id)
+        if (hasAutoplayVideo && !disableVideo) PlaybackDirector.playSingle(cat.id)
       }}
       onBlur={() => {
-        if (cat.video_path && !disableVideo) PlaybackDirector.pauseSingle(cat.id)
+        if (hasAutoplayVideo && !disableVideo) PlaybackDirector.pauseSingle(cat.id)
       }}
       className={`group bg-surface rounded-card border border-border shadow-resting hover:shadow-hover hover:-translate-y-0.5 transition-all duration-150 flex flex-col overflow-hidden select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 ${
         isAdopted ? 'opacity-90' : ''
@@ -140,7 +142,7 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
         />
 
         {/* Video Overlay with 150ms opacity transition */}
-        {cat.video_path && !disableVideo && (
+        {hasAutoplayVideo && !disableVideo && (
           <video
             ref={videoRef}
             muted
@@ -158,7 +160,7 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
         )}
 
         {/* Video Affordance Badge */}
-        {cat.video_path && (
+        {hasAutoplayVideo && (
           <div 
             className={`absolute bottom-3 start-3 z-10 bg-surface/85 backdrop-blur-sm text-ink rounded-full px-2.5 py-1 text-xs font-semibold flex items-center gap-1 shadow-sm transition-opacity duration-150 ${
               (disableVideo || !isActive) ? 'opacity-100' : 'opacity-0 pointer-events-none'

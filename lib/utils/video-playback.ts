@@ -25,3 +25,9 @@ export function shouldDisableVideo(): boolean {
   
   return prefersReducedMotion || saveData;
 }
+
+export function hasExtension(path: string | null | undefined): boolean {
+  if (!path) return false;
+  return /\.[a-zA-Z0-9]+$/.test(path);
+}
+

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { strings } from '@/lib/strings'
+import { hasExtension } from '@/lib/utils/video-playback'
 
 interface GalleryVideoPlayerProps {
   videoPath: string
@@ -84,8 +85,14 @@ export const GalleryVideoPlayer: React.FC<GalleryVideoPlayerProps> = ({
             isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
-          <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}.webm`} type="video/webm" />
-          <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}.mp4`} type="video/mp4" />
+          {hasExtension(videoPath) ? (
+            <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}`} />
+          ) : (
+            <>
+              <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}.webm`} type="video/webm" />
+              <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}.mp4`} type="video/mp4" />
+            </>
+          )}
         </video>
       )}
 

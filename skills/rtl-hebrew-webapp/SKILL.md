@@ -32,6 +32,7 @@ description: Hebrew right-to-left rules for live web apps — layout, mixed Hebr
 - Every string lives in `lib/strings.ts` (flat keys). No Hebrew literals inside JSX — this is a grep-able convention, enforce it.
 - zod Hebrew error map in `lib/schemas/he-errors.ts`, applied once globally with `z.setErrorMap`.
 - Required-field marker is the word "חובה", not a bare `*`.
+- **Grammatical gender**: any string that refers to a specific cat must agree with `cats.sex` — verbs, pronouns, adjectives (מחפש/מחפשת, לו/לה, מסורס/מעוקרת). Use the `<key>Male/<key>Female/<key>Unknown` triple in ui.json with the `gendered()` helper; unknown sex uses the "/ת" slash form or falls back to male. Generic/plural copy and FILTER labels stay masculine. This applies to emails too (Phase 4+): a request-received email about a female cat must read feminine.
 
 ## Gotchas
 - `truncate` on mixed Hebrew/English text can clip the wrong end — test cards with a long English cat name.
@@ -45,3 +46,4 @@ description: Hebrew right-to-left rules for live web apps — layout, mixed Hebr
 - [ ] Phones/emails/URLs wrapped `dir="ltr"`
 - [ ] Directional icons flip; others don't
 - [ ] Dates/numbers via Intl `he-IL`; all strings from `lib/strings.ts`
+- [ ] Cat-specific strings gender-agree with `cats.sex` (spot-check one female cat page)

@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { catSchema, CatInput, draftCatSchema } from '@/lib/schemas/cat'
 import { revalidatePath } from 'next/cache'
 import { ActionResult } from '@/app/(auth)/actions'
+import { closeSiblings } from '@/lib/requests/close-siblings'
+import { strings } from '@/lib/strings'
 
 async function checkApprovedPublisher(): Promise<{ ok: boolean; error?: string; userId?: string }> {
   const supabase = await createClient()
@@ -184,15 +186,56 @@ export async function markAsAdoptedAction(catId: string): Promise<ActionResult> 
     }
   }
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('cats')
     .update({ status: 'adopted', adopted_at: new Date().toISOString() })
     .eq('id', catId)
+    .eq('status', 'published')
+    .select()
 
-  if (error) return { ok: false, formError: 'שגיאה בעדכון סטטוס החתול: ' + error.message }
+  if (error || !updated || updated.length === 0) {
+    return { ok: false, formError: strings.admin.conflictError }
+  }
+
+  // Auto-close sibling requests
+  void closeSiblings(catId)
 
   revalidatePath('/publish/my-cats')
   revalidatePath('/cats')
   revalidatePath(`/cats/${catId}`)
+  revalidatePath('/')
+  return { ok: true, data: { success: true } }
+}
+
+export async function archiveCatAction(catId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, formError: 'אנא התחבר תחילה.' }
+
+  const { data: cat } = await supabase.from('cats').select('owner_id').eq('id', catId).single()
+  if (!cat) return { ok: false, formError: 'החתול לא נמצא.' }
+
+  if (cat.owner_id !== user.id) {
+    return { ok: false, formError: 'אין לך הרשאה לעדכן מודעה זו.' }
+  }
+
+  const { data: updated, error } = await supabase
+    .from('cats')
+    .update({ status: 'archived' })
+    .eq('id', catId)
+    .in('status', ['published', 'adopted'])
+    .select()
+
+  if (error || !updated || updated.length === 0) {
+    return { ok: false, formError: strings.admin.conflictError }
+  }
+
+  // Auto-close sibling requests
+  void closeSiblings(catId)
+
+  revalidatePath('/publish/my-cats')
+  revalidatePath('/cats')
+  revalidatePath(`/cats/${catId}`)
+  revalidatePath('/')
   return { ok: true, data: { success: true } }
 }

@@ -8,7 +8,7 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { strings } from '@/lib/strings'
 import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/filters'
-import { deleteCatAction, markAsAdoptedAction } from '@/app/publish/cat-actions'
+import { deleteCatAction, markAsAdoptedAction, archiveCatAction } from '@/app/publish/cat-actions'
 import { Edit, Trash2, Heart, Award } from 'lucide-react'
 
 interface CatPhoto {
@@ -25,6 +25,7 @@ interface Cat {
   city: string | null
   status: string
   reject_reason: string | null
+  published_at: string | null
   cat_photos?: CatPhoto[]
 }
 
@@ -70,6 +71,31 @@ export function MyCatsList({ initialCats }: MyCatsListProps) {
       const res = await deleteCatAction(catId)
       if (res.ok) {
         setCats(prev => prev.filter(c => c.id !== catId))
+      } else {
+        setError(res.formError || strings.common.errorOccurred)
+      }
+    } catch {
+      setError(strings.common.errorOccurred)
+    } finally {
+      setLoadingId(null)
+    }
+  }
+
+  const handleArchive = async (catId: string, name: string) => {
+    const confirmMsg = strings.publish.archiveConfirm.replace('{name}', name) + '\n\n' + strings.publish.archiveConfirmDesc
+    if (!confirm(confirmMsg)) return
+    setError(null)
+    setLoadingId(catId)
+    try {
+      const res = await archiveCatAction(catId)
+      if (res.ok) {
+        setCats(prev =>
+          prev.map(c =>
+            c.id === catId
+              ? { ...c, status: 'archived' }
+              : c
+          )
+        )
       } else {
         setError(res.formError || strings.common.errorOccurred)
       }
@@ -196,14 +222,27 @@ export function MyCatsList({ initialCats }: MyCatsListProps) {
                   {strings.common.edit}
                 </Link>
 
-                <button
-                  onClick={() => handleDelete(cat.id, cat.name)}
-                  disabled={isActionDisabled}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white disabled:opacity-50 text-sm font-bold rounded-btn transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  {strings.common.delete}
-                </button>
+                {cat.published_at === null ? (
+                  <button
+                    onClick={() => handleDelete(cat.id, cat.name)}
+                    disabled={isActionDisabled}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white disabled:opacity-50 text-sm font-bold rounded-btn transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    {strings.common.delete}
+                  </button>
+                ) : (
+                  cat.status !== 'archived' && (
+                    <button
+                      onClick={() => handleArchive(cat.id, cat.name)}
+                      disabled={isActionDisabled}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white disabled:opacity-50 text-sm font-bold rounded-btn transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {strings.publish.archiveBtn}
+                    </button>
+                  )
+                )}
               </div>
             </div>
           )

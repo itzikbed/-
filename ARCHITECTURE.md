@@ -71,7 +71,44 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 
 - `publisher_status`: none → pending → approved | blocked; admin may flip approved ↔ blocked.
 - `cats.status`: draft → pending → published | rejected(+reason) · published → adopted | archived · rejected → pending (owner edits & resubmits) · **owner edit of a published cat forces status back to pending** (re-approval by design).
-- `adoption_requests.status`: pending → approved | rejected(+note) · pending → withdrawn (adopter).
+- `adoption_requests.status`: pending → approved | rejected(+note) · pending → withdrawn (adopter) · pending → rejected(auto) when the cat leaves `published` (see §5a).
+- `cats`: archived → pending (owner edits & resubmits — same re-approval path as rejected).
+
+### 5a. Deletion & archival policy (decided 2026-07-15, architect + Itzik)
+
+**Default is archive — never hard delete.** A listing that has EVER been published has public
+traces (adoption requests, moderation_log, sent emails); those must survive the listing.
+The test for "ever published" is `published_at IS NOT NULL` (it survives the edit→pending round-trip).
+
+Hard delete is permitted in exactly three cases:
+1. **Owner deletes a never-published listing** (`published_at IS NULL`, status draft/pending/rejected).
+   Order of operations: delete the DB row FIRST and assert exactly one row was affected
+   (`.select()` on the delete), only then purge storage files. Requests cannot exist
+   pre-publish, so nothing dangles.
+2. **Account deletion / privacy request** — service-role script only (never UI); FK cascades
+   remove the user's cats and requests; write a moderation_log line before running it.
+3. **Unlawful-content purge** — service-role script only; moderation_log line mandatory.
+
+Everything else is archive (`status='archived'`):
+- Owner "remove" on an ever-published listing ⇒ archive (UI label: הסרה מהאתר). The delete
+  button is only offered on never-published listings.
+- Admin removal ⇒ archive with mandatory reason + moderation_log(action='archive') + email
+  to owner. There is NO hard-delete control in /admin, by design.
+- Archived listings are invisible everywhere except to owner + admin; owner may edit &
+  resubmit (archived → pending).
+- Media of archived/adopted listings is retained 90 days, then purged by a maintenance
+  script (post-launch item; storage pressure is negligible at 200 cats).
+
+RLS enforcement (migration 0007): `cats_delete_owner` — DELETE only when
+`owner_id = auth.uid() AND published_at IS NULL AND status IN ('draft','pending','rejected')`.
+No DELETE policy for admin via the app (cases 2–3 run as service role, outside the UI).
+Until 0007 lands, cats has NO delete policy at all — `deleteCatAction` purges storage, the
+row delete silently no-ops, and it reports success; the ordering fix above is part of 0007's change set.
+
+Lifecycle tie-in: any transition OUT of `published` (→ adopted or archived) auto-closes that
+cat's sibling pending requests (status='rejected', auto admin_note) via service role and
+emails those adopters. Approving a single request does NOT close siblings — adoption is
+final only when the owner marks the cat adopted.
 
 ## 6. Permission matrix (RLS is the boundary; UI checks are decoration)
 
@@ -110,7 +147,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 ## 10. Open product decisions (confirm with client before Phase 4)
 
 - [ ] Contact handoff on approval — implemented default: email both sides name+phone. Confirm.
-- [ ] Adopted cats — implemented default: stay visible with badge. Confirm (or hide).
+- [ ] Adopted cats — implemented reality (Phase 4): hidden everywhere once adopted (public queries filter `published`; CatCard's adopted badge is currently unreachable). Decide if the client wants a "סיפורי אימוץ" showcase instead.
 - [ ] Questionnaire timing — implemented default: free browsing, required only before first request (differs from client's original "at entry"). Confirm.
 - [ ] Should the cat's owner see the adopter's questionnaire directly? Current: admin-only, relayed on approval.
 - [ ] Site name + domain. Privacy-policy page text (personal data is collected — mandatory).
@@ -143,6 +180,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-14 · (architect) Migration 0004: fixed storage RLS owner policies — 0001 used unqualified `name` inside the EXISTS subquery, which resolved to cats.name, so every authenticated photo/video upload+delete was rejected (surfaced in Phase 3 review; canonical 0001 fixed too). rls-smoke TEST 9 added to keep it covered.
 - 2026-07-14 · Added `resend` as dependency to send transactional emails · fits free tier assumptions.
 - 2026-07-14 · Added `@react-email/components` as dependency to build responsive RTL transactional email templates.
+- 2026-07-15 · (architect) Deletion policy fixed as §5a: archive is the default for anything ever published; hard delete only for never-published listings (owner), account-deletion cascade, or unlawful-content purge via service-role script. Mandates migration 0007 (`cats_delete_owner` RLS), `deleteCatAction` row-first ordering fix (found: cats had NO delete policy — the action purged media, silently no-oped the row delete, and reported success), admin archive-with-reason control, and auto-close of sibling requests on adopted/archived.
 
 
 ## 12. Now / Next (update every session)
@@ -155,5 +193,6 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 | 2.5 | Design elevation "החתול החי" | ☑ |
 | 3 | Questionnaire wizard · upload wizard · request flow | ☑ |
 | 4 | Admin queues + emails | ☑ |
-| 5 | Polish: SEO/OG, a11y audit, privacy page · **Systemic auto-closing of stale sibling requests (deferred from Phase 4)** | ☐ |
+| 4.2 | Deletion & archive lifecycle per §5a: migration 0007, deleteCatAction fix, owner/admin archive controls, sibling-request auto-close + emails (prompt 04.2) | ☐ |
+| 5 | Polish: SEO/OG, a11y audit, privacy page | ☐ |
 | 6 | Seed, QA as all 4 roles, domain, admin handover | ☐ |

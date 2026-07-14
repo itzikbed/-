@@ -51,3 +51,38 @@ request approved (BOTH emails with correct cross-contact, phones render unscramb
 DoD gates · two-admin race tested (two tabs, same item — second gets the friendly
 conflict message) · moderation_log rows written for every decision · all 6 emails
 verified in Gmail mobile · ARCHITECTURE §12 updated.
+
+## Phase 3 → 4 context addendum (architect, 2026-07-14 — binding)
+
+State you inherit:
+- Phase 3 closed and approved. Migrations now go through 0004 (storage RLS fix —
+  architect). `scripts/rls-smoke.mjs` runs TESTS 1–9; EXTEND it (TEST 10+), never
+  rewrite. TEST 1 asserts exactly 12 published cats — an invariant.
+- Local review accounts: arch-review-pub@example.com / arch-review-adopter@example.com
+  (password `Review!2026`). Draft cat `1879afab-…` belongs to the publisher account
+  and must stay a DRAFT.
+
+Rules added since prompt 04 was written:
+1. **Gendered Hebrew applies to emails** (rtl-hebrew-webapp skill, updated): any email
+   about a specific cat (cat-approved, cat-rejected, request-*) must gender-agree with
+   `cats.sex` using the `gendered()` helper / `Male|Female|Unknown` triples in ui.json.
+   A request-approved email about a female cat reads feminine throughout.
+2. **Lint bar is 0 errors / 0 warnings.** For reactive form reads use `useWatch`, not
+   render-scope `watch()` and not `getValues()` (see commit b74b5ae).
+3. **Admin test account**: create one locally (service-role sets `role='admin'`),
+   document its credentials in the report.
+4. **Queue/approval testing**: create fresh cats under your own test publisher for the
+   full-loop test and return them to non-published states (or delete them) before
+   running `check:rls` — do NOT approve/alter the 12 seeded cats.
+5. **RESEND_API_KEY is a mock locally** (`re_local_mock_key`). Real delivery cannot be
+   verified yet. Required instead: `lib/emails/send.ts` fire-and-log wrapper must no-op
+   cleanly on mock key (log + persist rendered HTML to `.email-outbox/` locally);
+   verify all six templates via `react-email` preview + a render unit test per template
+   (RTL direction, LTR phone spans, subject length ≤ 45 chars). Real-Gmail + mobile
+   verification moves to a checklist item blocked on the client's API key — flag it in
+   your report, do not fake it.
+6. Process (unchanged but restated): one commit per milestone; report includes raw
+   `npm run gate` + `npm run check:rls` output and all test credentials; milestone
+   verification against a PRODUCTION build; your server on :3000/:3001 — :3100 is
+   reserved for architect verification. `prompts/`, `skills/`, `scripts/checks/`
+   remain READ-ONLY.

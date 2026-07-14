@@ -12,11 +12,13 @@ import { loginAction } from '@/app/(auth)/actions'
 import { loginSchema, LoginInput } from '@/lib/schemas/auth'
 import { strings } from '@/lib/strings'
 
+import { getSafeRedirect } from '@/lib/utils/safe-redirect'
+
 export default function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectUrl = searchParams.get('redirect') || '/'
+  const redirectUrl = getSafeRedirect(searchParams.get('redirect'))
 
   const {
     register,

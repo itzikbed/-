@@ -60,6 +60,7 @@ async function run() {
   let thirdId;
   let draftCat;
   let requestId;
+  let failed = false;
   const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
   const originalExit = process.exit;
@@ -589,8 +590,10 @@ async function run() {
 
   console.log("TEST 11 SUCCESS: Contact handoff RPC functions correctly and securely.")
 } catch (err) {
+  // exiting here would skip the finally below (process.exit does not unwind);
+  // flag the failure and exit only after cleanup has run.
   console.error("TEST RUN ENCOUNTERED ERROR:", err.message || err)
-  originalExit(1)
+  failed = true
 } finally {
   // ============ TEST 12: Clean Up & Invariant Verification ============
   console.log("TEST 12: Cleaning up and verifying invariant...")
@@ -631,6 +634,10 @@ async function run() {
     originalExit(1)
   }
   console.log("TEST 12 SUCCESS: Invariant verified: exactly 12 published cats remain in database.")
+  if (failed) {
+    console.error("--- RLS SMOKE TEST FAILED — see error above (cleanup ran) ---")
+    originalExit(1)
+  }
   console.log("--- RLS SMOKE TEST COMPLETED ---")
 }
 }

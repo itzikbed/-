@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { questionnaireSchema, QuestionnaireInput } from '@/lib/schemas/questionnaire'
 import { saveQuestionnaireStepAction } from '@/app/adopt/actions'
@@ -35,7 +35,6 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
     handleSubmit,
     trigger,
     control,
-    watch,
     setValue,
     getValues,
     formState: { errors },
@@ -45,7 +44,7 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
     mode: 'onTouched',
   })
 
-  const watchHasOtherPets = watch('has_other_pets')
+  const watchHasOtherPets = useWatch({ control, name: 'has_other_pets' })
 
   // Clear conditional pets description when has_other_pets is false
   useEffect(() => {

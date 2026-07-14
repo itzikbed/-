@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { catSchema, CatInput } from '@/lib/schemas/cat'
 import { upsertCatAction } from '@/app/publish/cat-actions'
@@ -81,6 +81,7 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
     register,
     trigger,
     watch,
+    control,
     setValue,
     getValues,
     formState: { errors }
@@ -108,8 +109,8 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
     }
   })
 
-  const photos = watch('photos') || []
-  const videoPath = watch('video_path')
+  const photos = useWatch({ control, name: 'photos' }) || []
+  const videoPath = useWatch({ control, name: 'video_path' })
 
   const handleNextStep = async () => {
     let fieldsToValidate: Array<keyof CatInput> = []

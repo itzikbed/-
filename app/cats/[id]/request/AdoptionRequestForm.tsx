@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { adoptionRequestSchema, AdoptionRequestInput } from '@/lib/schemas/request'
 import { submitAdoptionRequestAction } from '@/app/requests/actions'
@@ -34,7 +34,7 @@ export const AdoptionRequestForm: React.FC<AdoptionRequestFormProps> = ({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting }
   } = useForm<AdoptionRequestInput>({
     resolver: zodResolver(adoptionRequestSchema),
@@ -44,7 +44,7 @@ export const AdoptionRequestForm: React.FC<AdoptionRequestFormProps> = ({
     }
   })
 
-  const messageValue = watch('message') || ''
+  const messageValue = useWatch({ control, name: 'message' }) || ''
 
   const onSubmit = async (data: AdoptionRequestInput) => {
     setServerError(null)

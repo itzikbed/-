@@ -1,0 +1,100 @@
+'use client'
+
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
+import { strings } from '@/lib/strings'
+
+interface UploadStep1Props {
+  register: UseFormRegister<any>
+  errors: FieldErrors<any>
+}
+
+export function UploadStep1({ register, errors }: UploadStep1Props) {
+  return (
+    <div className="space-y-4">
+      <h3 className="text-xl font-display font-extrabold text-ink mb-4">
+        {strings.publish.wizardStep.replace('{step}', '1').replace('{total}', '4')} — פרטי החתול
+      </h3>
+
+      {/* Name */}
+      <div>
+        <label className="block text-sm font-bold text-ink mb-1.5" htmlFor="name">
+          {strings.publish.catName}
+        </label>
+        <input
+          {...register('name')}
+          id="name"
+          className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
+        />
+        {errors.name && (
+          <p className="text-xs text-danger font-semibold mt-1" role="alert">
+            {errors.name.message as string}
+          </p>
+        )}
+      </div>
+
+      {/* Sex */}
+      <div>
+        <label className="block text-sm font-bold text-ink mb-1.5" htmlFor="sex">
+          {strings.publish.catSex}
+        </label>
+        <select
+          {...register('sex')}
+          id="sex"
+          className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
+        >
+          <option value="male">{strings.catalog.genderMale}</option>
+          <option value="female">{strings.catalog.genderFemale}</option>
+          <option value="unknown">{strings.catalog.genderUnknown}</option>
+        </select>
+        {errors.sex && (
+          <p className="text-xs text-danger font-semibold mt-1" role="alert">
+            {errors.sex.message as string}
+          </p>
+        )}
+      </div>
+
+      {/* Age */}
+      <div>
+        <span className="block text-sm font-bold text-ink mb-1.5">גיל משוער (חובה)</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="sr-only" htmlFor="ageYears">{strings.publish.catAgeYears}</label>
+            <input
+              type="number"
+              placeholder={strings.publish.catAgeYears}
+              {...register('ageYears', { valueAsNumber: true })}
+              id="ageYears"
+              min="0"
+              max="25"
+              className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
+            />
+            <span className="text-xs text-ink-soft font-semibold block mt-1">{strings.publish.catAgeYears}</span>
+            {errors.ageYears && (
+              <p className="text-xs text-danger font-semibold mt-1" role="alert">
+                {errors.ageYears.message as string}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="sr-only" htmlFor="ageMonths">{strings.publish.catAgeMonths}</label>
+            <input
+              type="number"
+              placeholder={strings.publish.catAgeMonths}
+              {...register('ageMonths', { valueAsNumber: true })}
+              id="ageMonths"
+              min="0"
+              max="11"
+              className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
+            />
+            <span className="text-xs text-ink-soft font-semibold block mt-1">{strings.publish.catAgeMonths}</span>
+            {errors.ageMonths && (
+              <p className="text-xs text-danger font-semibold mt-1" role="alert">
+                {errors.ageMonths.message as string}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

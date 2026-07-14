@@ -20,7 +20,7 @@ export default async function RequestPage({ params }: RequestPageProps) {
   // Fetch cat
   const { data: cat } = await supabase
     .from('cats')
-    .select('id, name, region, city, status')
+    .select('id, name, region, city, status, sex')
     .eq('id', id)
     .single()
 
@@ -48,6 +48,7 @@ export default async function RequestPage({ params }: RequestPageProps) {
         <AdoptionRequestForm
           catId={cat.id}
           catName={cat.name}
+          catSex={cat.sex || 'male'}
           region={regionLabel}
           city={cat.city || ''}
         />

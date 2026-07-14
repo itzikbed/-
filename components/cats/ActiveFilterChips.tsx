@@ -60,10 +60,10 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
   filters.health.forEach((h) => {
     const label =
       h === 'full'
-        ? strings.catalog.healthFull
+        ? strings.catalog.filterHealthFull
         : h === 'partial'
-        ? strings.catalog.healthPartial
-        : strings.catalog.healthNone
+        ? strings.catalog.filterHealthPartial
+        : strings.catalog.filterHealthNone
     chips.push(
       <span
         key={`health-${h}`}
@@ -83,10 +83,10 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
   filters.good_with.forEach((g) => {
     const label =
       g === 'cats'
-        ? strings.catalog.goodWithCats
+        ? strings.catalog.filterGoodWithCats
         : g === 'dogs'
-        ? strings.catalog.goodWithDogs
-        : strings.catalog.goodWithNeither
+        ? strings.catalog.filterGoodWithDogs
+        : strings.catalog.filterGoodWithNeither
     chips.push(
       <span
         key={`good_with-${g}`}

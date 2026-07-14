@@ -1,7 +1,7 @@
 'use client'
 
 import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form'
-import { strings } from '@/lib/strings'
+import { strings, gendered } from '@/lib/strings'
 import { REGIONS } from '@/lib/constants'
 import { CatInput } from '@/lib/schemas/cat'
 
@@ -13,6 +13,7 @@ interface UploadStep3Props {
 
 export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
   const feeRequired = watch('fee_required')
+  const sex = watch('sex') || 'male'
 
   return (
     <div className="space-y-4">
@@ -83,14 +84,14 @@ export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
       {/* Description */}
       <div className="border-t border-border/40 pt-4">
         <label className="block text-sm font-bold text-ink mb-1.5" htmlFor="description">
-          {strings.publish.description}
+          {gendered('publish', 'description', sex)}
         </label>
         <textarea
           {...register('description')}
           id="description"
           rows={4}
           className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-          placeholder={strings.publish.catDescriptionPlaceholder}
+          placeholder={gendered('publish', 'catDescriptionPlaceholder', sex)}
         />
         {errors.description && (
           <p className="text-xs text-danger font-semibold mt-1" role="alert">

@@ -9,12 +9,13 @@ import { submitAdoptionRequestAction } from '@/app/requests/actions'
 import { Mascot } from '@/components/mascot/Mascot'
 import { Button } from '@/components/ui/Button'
 import { ChevronRight, Heart } from 'lucide-react'
-import { strings } from '@/lib/strings'
+import { strings, gendered } from '@/lib/strings'
 import Link from 'next/link'
 
 interface AdoptionRequestFormProps {
   catId: string
   catName: string
+  catSex: string
   region: string
   city: string
 }
@@ -22,6 +23,7 @@ interface AdoptionRequestFormProps {
 export const AdoptionRequestForm: React.FC<AdoptionRequestFormProps> = ({
   catId,
   catName,
+  catSex,
   region,
   city
 }) => {
@@ -131,7 +133,7 @@ export const AdoptionRequestForm: React.FC<AdoptionRequestFormProps> = ({
               <span className='text-danger text-xs font-semibold select-none'>{strings.questionnaire.requiredSuffix}</span>
             </label>
             <p className='text-xs font-semibold text-ink-soft'>
-              {strings.requests.explainWhyAdopt.replace('{name}', catName)}
+              {gendered('requests', 'explainWhyAdopt', catSex).replace('{name}', catName)}
             </p>
             <textarea
               {...register('message')}

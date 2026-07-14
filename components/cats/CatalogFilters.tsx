@@ -159,17 +159,17 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
           </h4>
           <div className="flex flex-col gap-2">
             <Checkbox
-              label={strings.catalog.healthFull}
+              label={strings.catalog.filterHealthFull}
               checked={filters.health.includes('full')}
               onChange={(e) => handleArrayChange('health', 'full', e.target.checked)}
             />
             <Checkbox
-              label={strings.catalog.healthPartial}
+              label={strings.catalog.filterHealthPartial}
               checked={filters.health.includes('partial')}
               onChange={(e) => handleArrayChange('health', 'partial', e.target.checked)}
             />
             <Checkbox
-              label={strings.catalog.healthNone}
+              label={strings.catalog.filterHealthNone}
               checked={filters.health.includes('none')}
               onChange={(e) => handleArrayChange('health', 'none', e.target.checked)}
             />
@@ -179,21 +179,21 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
         {/* Good With Filter */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
-            {strings.catalog.goodWithLabel}
+            {strings.catalog.filterGoodWithLabel}
           </h4>
           <div className="flex flex-col gap-2">
             <Checkbox
-              label={strings.catalog.goodWithCats}
+              label={strings.catalog.filterGoodWithCats}
               checked={filters.good_with.includes('cats')}
               onChange={(e) => handleArrayChange('good_with', 'cats', e.target.checked)}
             />
             <Checkbox
-              label={strings.catalog.goodWithDogs}
+              label={strings.catalog.filterGoodWithDogs}
               checked={filters.good_with.includes('dogs')}
               onChange={(e) => handleArrayChange('good_with', 'dogs', e.target.checked)}
             />
             <Checkbox
-              label={strings.catalog.goodWithNeither}
+              label={strings.catalog.filterGoodWithNeither}
               checked={filters.good_with.includes('neither')}
               onChange={(e) => handleArrayChange('good_with', 'neither', e.target.checked)}
             />

@@ -5,7 +5,7 @@ import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/filters'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/Badge'
-import { strings } from '@/lib/strings'
+import { strings, gendered } from '@/lib/strings'
 import { Info, Coins, Stethoscope, Compass, ChevronLeft } from 'lucide-react'
 
 interface CatDetailPageProps {
@@ -39,12 +39,7 @@ export async function generateMetadata({ params }: CatDetailPageProps) {
     ? strings.catalog.genderFemale 
     : strings.catalog.genderUnknown
 
-  let title = strings.catalog.detailTitleUnknown.replace('{name}', cat.name)
-  if (cat.sex === 'male') {
-    title = strings.catalog.detailTitleMale.replace('{name}', cat.name)
-  } else if (cat.sex === 'female') {
-    title = strings.catalog.detailTitleFemale.replace('{name}', cat.name)
-  }
+  const title = gendered('catalog', 'detailTitle', cat.sex).replace('{name}', cat.name)
 
   const regionObj = REGIONS.find((r) => r.id === cat.region as RegionId)
   const regionLabel = regionObj ? regionObj.label : cat.region
@@ -176,32 +171,34 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
               
               <div className="flex flex-wrap gap-2">
                 <Badge variant={cat.neutered ? 'adopted' : 'draft'} className="text-sm py-1.5 px-3">
-                  {cat.neutered ? strings.catalog.neuteredTrue : strings.catalog.neuteredFalse}
+                  {cat.neutered
+                    ? gendered('catalog', 'neuteredTrue', cat.sex)
+                    : gendered('catalog', 'neuteredFalse', cat.sex)}
                 </Badge>
                 
                 <Badge variant={cat.vaccinations >= 2 ? 'adopted' : 'draft'} className="text-sm py-1.5 px-3">
                   {cat.vaccinations === 0
-                    ? strings.catalog.vaccinesNone
+                    ? gendered('catalog', 'vaccinesNone', cat.sex)
                     : cat.vaccinations === 1
-                    ? strings.catalog.vaccinesOne
-                    : strings.catalog.vaccinesMultiple.replace('{count}', cat.vaccinations.toString())}
+                    ? gendered('catalog', 'vaccinesOne', cat.sex)
+                    : gendered('catalog', 'vaccinesMultiple', cat.sex).replace('{count}', cat.vaccinations.toString())}
                 </Badge>
                 
                 {cat.good_with_cats && (
                   <Badge variant="adopted" className="text-sm py-1.5 px-3">
-                    {strings.catalog.goodWithCats}
+                    {gendered('catalog', 'goodWithCats', cat.sex)}
                   </Badge>
                 )}
 
                 {cat.good_with_dogs && (
                   <Badge variant="adopted" className="text-sm py-1.5 px-3">
-                    {strings.catalog.goodWithDogs}
+                    {gendered('catalog', 'goodWithDogs', cat.sex)}
                   </Badge>
                 )}
                 
                 {!cat.good_with_cats && !cat.good_with_dogs && (
                   <Badge variant="draft" className="text-sm py-1.5 px-3">
-                    {strings.catalog.goodWithNeither}
+                    {gendered('catalog', 'goodWithNeither', cat.sex)}
                   </Badge>
                 )}
               </div>

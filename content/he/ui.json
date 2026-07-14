@@ -356,7 +356,13 @@
     "newCatPageDesc": "פרסמו מודעה חדשה למסירת חתול לאימוץ.",
     "myCatsPageDesc": "נהלו את רשימת החתולים שפרסמתם למסירה.",
     "publishPageDesc": "הגשת בקשה למסירת חתול או ניהול מודעות המסירה שלך.",
-    "editCatPageTitle": "עריכת מודעה"
+    "editCatPageTitle": "עריכת מודעה",
+    "catPublishedDeleteError": "מודעה שפורסמה אינה נמחקת — ניתן להעביר לארכיון",
+    "catDeleteError": "לא ניתן למחוק את המודעה",
+    "archiveBtn": "הסרה מהאתר",
+    "archiveConfirm": "האם אתה בטוח שברצונך להסיר את המודעה של {name} מהאתר?",
+    "archiveConfirmDesc": "הסרת המודעה תעביר אותה לארכיון. היא לא תהיה גלויה יותר למאמצים, וכל הבקשות הפתוחות עבורה יידחו.",
+    "archiveSubmit": "הסרה מהאתר"
   },
   "requests": {
     "title": "הבקשות שלי",
@@ -471,7 +477,31 @@
     "requestRejectedTextFemale": "לצערנו, לא ניתן לאשר את פנייתך הנוכחית לאימוץ {name}.",
     "requestRejectedTextUnknown": "לצערנו, לא ניתן לאשר את פנייתך הנוכחית לאימוץ {name}.",
     "requestRejectedCta": "למאגר החתולים לאימוץ",
-    "requestRejectedNoteLabel": "הערת המנהל:"
+    "requestRejectedNoteLabel": "הערת המנהל:",
+    "catArchivedByAdminSubjectMale": "עדכון לגבי המודעה של {name} 🐾",
+    "catArchivedByAdminSubjectFemale": "עדכון לגבי המודעה של {name} 🐾",
+    "catArchivedByAdminSubjectUnknown": "עדכון לגבי המודעה של {name} 🐾",
+    "catArchivedByAdminHeadingMale": "המודעה של {name} הוסרה מהאתר",
+    "catArchivedByAdminHeadingFemale": "המודעה של {name} הוסרה מהאתר",
+    "catArchivedByAdminHeadingUnknown": "המודעה של {name} הוסרה מהאתר",
+    "catArchivedByAdminTextMale": "ברצוננו לעדכן כי מודעת הפרסום של {name} הוסרה מהאתר והועברה לארכיון על ידי מנהלי המערכת.",
+    "catArchivedByAdminTextFemale": "ברצוננו לעדכן כי מודעת הפרסום של {name} הוסרה מהאתר והועברה לארכיון על ידי מנהלי המערכת.",
+    "catArchivedByAdminTextUnknown": "ברצוננו לעדכן כי מודעת הפרסום של {name} הוסרה מהאתר והועברה לארכיון על ידי מנהלי המערכת.",
+    "catArchivedByAdminReasonLabel": "סיבת ההסרה:",
+    "catArchivedByAdminCta": "לאזור האישי שלי",
+    "requestClosedCatAdoptedSubjectMale": "עדכון לגבי בקשת האימוץ של {name}",
+    "requestClosedCatAdoptedSubjectFemale": "עדכון לגבי בקשת האימוץ של {name}",
+    "requestClosedCatAdoptedSubjectUnknown": "עדכון לגבי בקשת האימוץ של {name}",
+    "requestClosedCatAdoptedHeadingMale": "{name} מצא בית חם! 🎉",
+    "requestClosedCatAdoptedHeadingFemale": "{name} מצאה בית חם! 🎉",
+    "requestClosedCatAdoptedHeadingUnknown": "{name} מצא/ה בית חם! 🎉",
+    "requestClosedCatAdoptedTextMale": "ברצוננו לעדכן כי {name} מצא בית חם ומודעת האימוץ הוסרה. לכן, פנייתך נסגרה באופן אוטומטי.",
+    "requestClosedCatAdoptedTextFemale": "ברצוננו לעדכן כי {name} מצאה בית חם ומודעת האימוץ הוסרה. לכן, פנייתך נסגרה באופן אוטומטי.",
+    "requestClosedCatAdoptedTextUnknown": "ברצוננו לעדכן כי {name} מצא/ה בית חם ומודעת האימוץ הוסרה. לכן, פנייתך נסגרה באופן אוטומטי.",
+    "requestClosedCatAdoptedCta": "לחתולים נוספים במאגר",
+    "catAdoptedSiblingNoteMale": "{name} כבר נמסר לאימוץ",
+    "catAdoptedSiblingNoteFemale": "{name} כבר נמסרה לאימוץ",
+    "catAdoptedSiblingNoteUnknown": "{name} כבר נמסר/ה לאימוץ"
   },
   "admin": {
     "metaTitle": "ניהול המערכת — בית לחתול",
@@ -567,7 +597,10 @@
     "dialog": {
       "rejectReasonMin": "סיבת הדחייה חייבת להכיל לפחות 10 תווים"
     },
-    "conflictError": "טופל כבר על ידי אדמין אחר"
+    "conflictError": "טופל כבר על ידי אדמין אחר",
+    "archiveCatBtn": "הסרה מהאתר",
+    "archiveCatConfirmTitle": "הסרת מודעה מהאתר (ארכיון)",
+    "archiveCatSuccess": "המודעה הוסרה והועברה לארכיון בהצלחה."
   }
 }
 

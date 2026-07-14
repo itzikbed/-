@@ -114,17 +114,32 @@ export async function deleteCatAction(catId: string): Promise<ActionResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, formError: 'אנא התחבר תחילה.' }
 
-  const { data: cat } = await supabase.from('cats').select('owner_id, video_path').eq('id', catId).single()
+  const { data: cat } = await supabase.from('cats').select('owner_id, video_path, published_at').eq('id', catId).single()
   if (!cat) return { ok: false, formError: 'המודעה לא נמצאה.' }
 
   if (cat.owner_id !== user.id) {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    if (!profile || profile.role !== 'admin') {
-      return { ok: false, formError: 'אין לך הרשאה למחוק מודעה זו.' }
-    }
+    return { ok: false, formError: 'אין לך הרשאה למחוק מודעה זו.' }
   }
 
+  if (cat.published_at !== null) {
+    return { ok: false, formError: strings.publish.catPublishedDeleteError }
+  }
+
+  // Load photos to delete before database cascade deletes them
   const { data: photos } = await supabase.from('cat_photos').select('path_card, path_full').eq('cat_id', catId)
+
+  // Delete DB row first
+  const { data: deletedRows, error: deleteError } = await supabase
+    .from('cats')
+    .delete()
+    .eq('id', catId)
+    .select()
+
+  if (deleteError || !deletedRows || deletedRows.length !== 1) {
+    return { ok: false, formError: strings.publish.catDeleteError }
+  }
+
+  // Remove storage files (non-fatal if it fails)
   const filesToDelete: string[] = []
   if (photos) {
     photos.forEach((p) => {
@@ -132,14 +147,22 @@ export async function deleteCatAction(catId: string): Promise<ActionResult> {
       filesToDelete.push(p.path_full)
     })
   }
-  if (cat.video_path) filesToDelete.push(cat.video_path)
-
-  if (filesToDelete.length > 0) {
-    await supabase.storage.from('cat-photos').remove(filesToDelete)
+  if (cat.video_path) {
+    filesToDelete.push(cat.video_path)
   }
 
-  const { error } = await supabase.from('cats').delete().eq('id', catId)
-  if (error) return { ok: false, formError: 'שגיאה במחיקת המודעה: ' + error.message }
+  if (filesToDelete.length > 0) {
+    void (async () => {
+      try {
+        const { error: storageError } = await supabase.storage.from('cat-photos').remove(filesToDelete)
+        if (storageError) {
+          console.error('Storage cleanup failed on deleteCatAction:', storageError.message)
+        }
+      } catch (err) {
+        console.error('Storage cleanup error on deleteCatAction:', err)
+      }
+    })()
+  }
 
   revalidatePath('/publish/my-cats')
   revalidatePath('/cats')

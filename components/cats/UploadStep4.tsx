@@ -97,7 +97,10 @@ export function UploadStep4({
         updatedPhotos.push(newPhoto)
         setPhotos([...updatedPhotos])
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err)
+        let message = err instanceof Error ? err.message : String(err)
+        if (message === 'image_decode_failed') {
+          message = strings.publish.invalidImage
+        }
         setUploadError(`${strings.publish.uploadError}${message}`)
         break
       }

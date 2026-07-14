@@ -1,18 +1,24 @@
 export async function processImageFile(
   file: File
 ): Promise<{ cardBlob: Blob; fullBlob: Blob }> {
-  // 1. Detect HEIC and convert to JPEG blob
   let sourceFile: Blob | File = file
   const isHeic = file.name.toLowerCase().endsWith('.heic') || file.type === 'image/heic'
   
-  if (isHeic) {
-    const heic2any = (await import('heic2any')).default
-    const converted = await heic2any({ blob: file, toType: 'image/jpeg' })
-    sourceFile = Array.isArray(converted) ? converted[0] : converted
+  let imageBitmap: ImageBitmap
+  try {
+    if (isHeic) {
+      const heic2any = (await import('heic2any')).default
+      const converted = await heic2any({ blob: file, toType: 'image/jpeg' })
+      sourceFile = Array.isArray(converted) ? converted[0] : converted
+    }
+
+    // 2. Decode using createImageBitmap to apply EXIF orientation automatically
+    imageBitmap = await createImageBitmap(sourceFile, { imageOrientation: 'from-image' })
+  } catch (err) {
+    console.error("Image decode or HEIC conversion failed", err)
+    throw new Error('image_decode_failed')
   }
 
-  // 2. Decode using createImageBitmap to apply EXIF orientation automatically
-  const imageBitmap = await createImageBitmap(sourceFile, { imageOrientation: 'from-image' })
   const originalWidth = imageBitmap.width
   const originalHeight = imageBitmap.height
 

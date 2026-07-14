@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: EditCatPageProps) {
     .single()
 
   return {
-    title: cat ? `עריכת מודעה של ${cat.name} — בית לחתול` : 'עריכת מודעה — בית לחתול'
+    title: cat ? `${strings.publish.editCatTitle.replace('{name}', cat.name)} — ${strings.common.siteName}` : `${strings.publish.editCatPageTitle} — ${strings.common.siteName}`
   }
 }
 
@@ -84,7 +84,7 @@ export default async function EditCatPage({ params }: EditCatPageProps) {
         </div>
 
         {/* Wizard Card */}
-        <CatUploadWizard initialCat={cat} />
+        <CatUploadWizard initialCat={{ ...cat, sex: cat.sex as 'male' | 'female' | 'unknown', neutered: cat.neutered || false }} />
 
       </div>
     </div>

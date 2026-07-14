@@ -7,8 +7,8 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { PublisherApplicationForm } from '@/components/auth/PublisherApplicationForm'
 
 export const metadata = {
-  title: 'למסירת חתול — בית לחתול',
-  description: 'הגשת בקשה למסירת חתול או ניהול מודעות המסירה שלך.'
+  title: `${strings.publish.title} — ${strings.common.siteName}`,
+  description: strings.publish.publishPageDesc
 }
 
 export default async function PublishPage() {

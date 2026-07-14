@@ -4,25 +4,21 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { processImageFile } from '@/lib/utils/image-processing'
 import { strings } from '@/lib/strings'
-import { Image as ImageIcon, Film, X, ArrowUp, ArrowDown, UploadCloud, RefreshCw } from 'lucide-react'
-import Image from 'next/image'
+import { Film, X, UploadCloud, RefreshCw } from 'lucide-react'
+import { PhotoUploadGrid } from './PhotoUploadGrid'
 
 interface PhotoItem {
-  id?: string // local key for rendering
+  id?: string
   path_card: string
   path_full: string
   sort_order: number
-  localUrl?: string // preview
+  localUrl?: string
 }
 
 interface UploadStep4Props {
-  catId: string
-  photos: PhotoItem[]
-  setPhotos: (photos: PhotoItem[]) => void
-  videoPath: string | null
-  setVideoPath: (path: string | null) => void
-  isProcessing: boolean
-  setIsProcessing: (loading: boolean) => void
+  catId: string; photos: PhotoItem[]; setPhotos: (photos: PhotoItem[]) => void
+  videoPath: string | null; setVideoPath: (path: string | null) => void
+  isProcessing: boolean; setIsProcessing: (loading: boolean) => void
 }
 
 export function UploadStep4({
@@ -42,15 +38,8 @@ export function UploadStep4({
   const supabase = createClient()
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
 
-  // Revoke local object URLs on unmount
-  useEffect(() => {
-    return () => {
-      photos.forEach((p) => {
-        if (p.localUrl && p.localUrl.startsWith('blob:')) {
-          URL.revokeObjectURL(p.localUrl)
-        }
-      })
-    }
+  useEffect(() => () => {
+    photos.forEach((p) => p.localUrl?.startsWith('blob:') && URL.revokeObjectURL(p.localUrl))
   }, [photos])
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,23 +49,21 @@ export function UploadStep4({
     setUploadError(null)
     const newFiles = Array.from(files)
 
-    // Validate max 6 photos total
     if (photos.length + newFiles.length > 6) {
-      setUploadError('ניתן להעלות עד 6 תמונות לכל היותר.')
+      setUploadError(strings.publish.maxPhotosLimit)
       return
     }
 
     setIsProcessing(true)
     setTotalFiles(newFiles.length)
+    const updatedPhotos = [...photos]
 
-    // Process files sequentially
     for (let i = 0; i < newFiles.length; i++) {
       setCurrentFileIndex(i + 1)
       const file = newFiles[i]
 
-      // Check max size 12MB
       if (file.size > 12 * 1024 * 1024) {
-        setUploadError(`הקובץ ${file.name} חורג מהגודל המרבי של 12MB.`);
+        setUploadError(strings.publish.maxSizePhoto.replace('{name}', file.name))
         continue
       }
 
@@ -88,30 +75,30 @@ export function UploadStep4({
         const cardPath = `${catId}/${uuid}-card.webp`
         const fullPath = `${catId}/${uuid}-full.webp`
 
-        // Upload card variant
         const { error: cardErr } = await supabase.storage
           .from('cat-photos')
           .upload(cardPath, cardBlob, { contentType: 'image/webp' })
 
-        if (cardErr) throw new Error('שגיאה בהעלאת תמונת כרטיס: ' + cardErr.message)
+        if (cardErr) throw new Error(cardErr.message)
 
-        // Upload full variant
         const { error: fullErr } = await supabase.storage
           .from('cat-photos')
           .upload(fullPath, fullBlob, { contentType: 'image/webp' })
 
-        if (fullErr) throw new Error('שגיאה בהעלאת תמונה מלאה: ' + fullErr.message)
+        if (fullErr) throw new Error(fullErr.message)
 
         const newPhoto: PhotoItem = {
           path_card: cardPath,
           path_full: fullPath,
-          sort_order: photos.length + i,
+          sort_order: updatedPhotos.length,
           localUrl
         }
 
-        setPhotos((prev) => [...prev, newPhoto])
-      } catch (err: any) {
-        setUploadError('אירעה שגיאה בעיבוד או העלאת התמונות: ' + err.message)
+        updatedPhotos.push(newPhoto)
+        setPhotos([...updatedPhotos])
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        setUploadError(`${strings.publish.uploadError}${message}`)
         break
       }
     }
@@ -128,15 +115,13 @@ export function UploadStep4({
     setUploadError(null)
     setVideoLoading(true)
 
-    // Check size limit: 25MB
     if (file.size > 25 * 1024 * 1024) {
-      setUploadError('סרטון לא יכול לעלות על 25MB.')
+      setUploadError(strings.publish.videoSizeLimit)
       setVideoLoading(false)
       return
     }
 
     try {
-      // Check duration limit: 15s using temporary video player
       const tempVideo = document.createElement('video')
       tempVideo.preload = 'metadata'
       tempVideo.src = URL.createObjectURL(file)
@@ -149,24 +134,23 @@ export function UploadStep4({
       })
 
       if (duration > 15) {
-        setUploadError('משך הסרטון המרבי הוא 15 שניות.')
+        setUploadError(strings.publish.videoDurationLimit)
         setVideoLoading(false)
         return
       }
 
-      const uuid = crypto.randomUUID()
-      const ext = file.name.split('.').pop() || 'mp4'
-      const videoPath = `${catId}/${uuid}-video.${ext}`
+      const videoPath = `${catId}/${crypto.randomUUID()}-video.${file.name.split('.').pop() || 'mp4'}`
 
       const { error: uploadErr } = await supabase.storage
         .from('cat-photos')
         .upload(videoPath, file, { contentType: file.type })
 
-      if (uploadErr) throw new Error('העלאת סרטון נכשלה: ' + uploadErr.message)
+      if (uploadErr) throw new Error(uploadErr.message)
 
       setVideoPath(videoPath)
-    } catch (err: any) {
-      setUploadError('שגיאה בהעלאת הסרטון: ' + err.message)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      setUploadError(`${strings.publish.videoUploadError}${message}`)
     } finally {
       setVideoLoading(false)
     }
@@ -174,54 +158,34 @@ export function UploadStep4({
 
   const handleRemovePhoto = async (index: number, pathCard: string, pathFull: string) => {
     if (isProcessing) return
-    setErrorClean()
+    setUploadError(null)
     try {
-      // Remove from storage
       await supabase.storage.from('cat-photos').remove([pathCard, pathFull])
-      setPhotos((prev) => {
-        const filtered = prev.filter((_, i) => i !== index)
-        // Recalculate sort order
-        return filtered.map((p, idx) => ({ ...p, sort_order: idx }))
-      })
+      const nextPhotos = photos.filter((_, i) => i !== index).map((p, idx) => ({ ...p, sort_order: idx }))
+      setPhotos(nextPhotos)
     } catch {
-      setUploadError('שגיאה במחיקת התמונה מהשרת.')
+      setUploadError(strings.publish.photoDeleteError)
     }
   }
 
   const handleRemoveVideo = async () => {
     if (!videoPath) return
-    setErrorClean()
+    setUploadError(null)
     setVideoLoading(true)
     try {
       await supabase.storage.from('cat-photos').remove([videoPath])
       setVideoPath(null)
     } catch {
-      setUploadError('שגיאה במחיקת הסרטון מהשרת.')
+      setUploadError(strings.publish.videoDeleteError)
     } finally {
       setVideoLoading(false)
     }
   }
 
-  const movePhoto = (index: number, direction: 'up' | 'down') => {
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    if (newIndex < 0 || newIndex >= photos.length) return
-
-    const updated = [...photos]
-    const temp = updated[index]
-    updated[index] = updated[newIndex]
-    updated[newIndex] = temp
-
-    // Update sort orders
-    const resort = updated.map((p, idx) => ({ ...p, sort_order: idx }))
-    setPhotos(resort)
-  }
-
-  const setErrorClean = () => setUploadError(null)
-
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-display font-extrabold text-ink">
-        {strings.publish.wizardStep.replace('{step}', '4').replace('{total}', '4')} — תמונות וסרטון
+        {strings.publish.wizardStep.replace('{step}', '4').replace('{total}', '4')} — {strings.publish.wizardStep4Title}
       </h3>
 
       {uploadError && (
@@ -230,88 +194,16 @@ export function UploadStep4({
         </div>
       )}
 
-      {/* Sequential Image Processing Status */}
-      {isProcessing && (
-        <div className="bg-marmalade-sf/40 border border-marmalade/30 rounded-input p-4 text-center space-y-2">
-          <RefreshCw className="w-6 h-6 text-warning animate-spin mx-auto" />
-          <p className="text-sm font-bold text-ink">
-            מעבד תמונה {currentFileIndex} מתוך {totalFiles}...
-          </p>
-          <span className="text-xs text-ink-soft block">מבצע כיווץ והסרת נתוני מיקום (GPS) לשמירה על פרטיות</span>
-        </div>
-      )}
-
-      {/* Image Upload Area */}
-      <div className="space-y-3">
-        <span className="block text-sm font-bold text-ink">{strings.publish.photos}</span>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-          {/* Photos Cards */}
-          {photos.map((p, idx) => (
-            <div key={idx} className="relative aspect-square bg-surface border border-border rounded-input overflow-hidden group">
-              <Image
-                src={p.localUrl || `${supabaseUrl}/storage/v1/object/public/cat-photos/${p.path_card}`}
-                alt="Cat preview"
-                fill
-                sizes="80px"
-                className="object-cover"
-                unoptimized
-              />
-              {idx === 0 && (
-                <span className="absolute top-1 start-1 text-[10px] font-bold bg-pine text-white px-1.5 py-0.5 rounded-full select-none">
-                  ראשי
-                </span>
-              )}
-              {/* Overlay controls */}
-              <div className="absolute inset-0 bg-ink/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                {idx > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => movePhoto(idx, 'up')}
-                    className="p-1 bg-surface rounded-full text-ink hover:text-pine cursor-pointer"
-                  >
-                    <ArrowRightIcon className="w-3.5 h-3.5 rotate-90" />
-                  </button>
-                )}
-                {idx < photos.length - 1 && (
-                  <button
-                    type="button"
-                    onClick={() => movePhoto(idx, 'down')}
-                    className="p-1 bg-surface rounded-full text-ink hover:text-pine cursor-pointer"
-                  >
-                    <ArrowRightIcon className="w-3.5 h-3.5 -rotate-90" />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleRemovePhoto(idx, p.path_card, p.path_full)}
-                  className="p-1 bg-danger text-white rounded-full hover:bg-danger-dp cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
-
-          {/* Add Photo slot */}
-          {photos.length < 6 && (
-            <label className="relative aspect-square border-2 border-dashed border-border hover:border-pine rounded-input flex flex-col items-center justify-center cursor-pointer bg-surface/50 hover:bg-surface transition-all">
-              <input
-                type="file"
-                multiple
-                accept="image/jpeg,image/png,image/webp,image/heic"
-                disabled={isProcessing}
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <ImageIcon className="w-6 h-6 text-ink-soft/80" />
-              <span className="text-[10px] font-semibold text-ink-soft mt-1">הוסף תמונה</span>
-            </label>
-          )}
-        </div>
-        <p className="text-xs text-ink-soft font-semibold mt-1">
-          {strings.publish.photosCoaching}
-        </p>
-      </div>
+      <PhotoUploadGrid
+        photos={photos}
+        setPhotos={setPhotos}
+        isProcessing={isProcessing}
+        currentFileIndex={currentFileIndex}
+        totalFiles={totalFiles}
+        handleImageChange={handleImageChange}
+        handleRemovePhoto={handleRemovePhoto}
+        supabaseUrl={supabaseUrl}
+      />
 
       {/* Video Upload Area */}
       <div className="space-y-3 border-t border-border/40 pt-4">
@@ -320,13 +212,13 @@ export function UploadStep4({
         {videoLoading ? (
           <div className="bg-surface border border-border rounded-input p-6 text-center space-y-2">
             <RefreshCw className="w-6 h-6 text-warning animate-spin mx-auto" />
-            <p className="text-sm font-bold text-ink">מעלה סרטון...</p>
+            <p className="text-sm font-bold text-ink">{strings.publish.videoUploading}</p>
           </div>
         ) : videoPath ? (
           <div className="relative border border-border rounded-input p-3 bg-surface flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Film className="w-5 h-5 text-pine" />
-              <span className="text-sm font-semibold text-ink">סרטון הועלה בהצלחה</span>
+              <span className="text-sm font-semibold text-ink">{strings.publish.videoSuccess}</span>
             </div>
             <button
               type="button"
@@ -346,7 +238,7 @@ export function UploadStep4({
               className="hidden"
             />
             <UploadCloud className="w-8 h-8 text-ink-soft" />
-            <span className="text-sm font-bold text-ink mt-2">לחצו להעלאת סרטון קצר</span>
+            <span className="text-sm font-bold text-ink mt-2">{strings.publish.videoUploadBtn}</span>
             <span className="text-xs text-ink-soft font-semibold mt-1">
               {strings.publish.videoCoaching}
             </span>
@@ -354,23 +246,5 @@ export function UploadStep4({
         )}
       </div>
     </div>
-  )
-}
-
-function ArrowRightIcon({ className, ...props }: any) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      {...props}
-    >
-      <path d="m18 15-6-6-6 6" />
-    </svg>
   )
 }

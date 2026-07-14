@@ -8,8 +8,8 @@ import { MyCatsList } from '@/components/cats/MyCatsList'
 import { ChevronRight, Plus } from 'lucide-react'
 
 export const metadata = {
-  title: 'החתולים שלי למסירה — בית לחתול',
-  description: 'נהלו את רשימת החתולים שפרסמתם למסירה.'
+  title: `${strings.publish.myCats} — ${strings.common.siteName}`,
+  description: strings.publish.myCatsPageDesc
 }
 
 export default async function MyCatsPage() {

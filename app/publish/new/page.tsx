@@ -8,8 +8,8 @@ import { CatUploadWizard } from '@/components/cats/CatUploadWizard'
 import { ChevronRight } from 'lucide-react'
 
 export const metadata = {
-  title: 'פרסום חתול חדש — בית לחתול',
-  description: 'פרסמו מודעה חדשה למסירת חתול לאימוץ.'
+  title: `${strings.publish.newCatTitle} — ${strings.common.siteName}`,
+  description: strings.publish.newCatPageDesc
 }
 
 export default async function NewCatPage() {

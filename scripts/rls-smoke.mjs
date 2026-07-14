@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -320,6 +321,43 @@ async function run() {
     console.error("TEST 8b FAILED: Duplicate adoption request was allowed!")
     process.exit(1)
   }
+
+  // TEST 9: Storage — owner can upload into own cat folder; others cannot.
+  // Guards against the 0001 policy bug (unqualified `name` resolved to cats.name)
+  // fixed in migration 0004. draftCat belongs to this (now approved) publisher.
+  console.log("TEST 9: Storage upload policies...")
+  const testBlob = new Blob(['rls-smoke storage probe'], { type: 'image/webp' })
+
+  const { error: ownUploadError } = await supabaseUser.storage
+    .from('cat-photos')
+    .upload(`${draftCat.id}/rls-smoke-probe-card.webp`, testBlob, { contentType: 'image/webp' })
+
+  if (ownUploadError) {
+    console.error("TEST 9a FAILED: Owner could not upload photo to own cat folder:", ownUploadError.message)
+    process.exit(1)
+  }
+  console.log("TEST 9a SUCCESS: Owner uploaded into own cat folder.")
+
+  const { error: foreignUploadError } = await supabaseUser.storage
+    .from('cat-photos')
+    .upload(`${publishedCatId}/rls-smoke-intruder-card.webp`, testBlob, { contentType: 'image/webp' })
+
+  if (foreignUploadError) {
+    console.log("TEST 9b SUCCESS: Upload into another owner's cat folder blocked. Error:", foreignUploadError.message)
+  } else {
+    console.error("TEST 9b FAILED: User uploaded into a cat folder they do not own!")
+    process.exit(1)
+  }
+
+  const { data: removed, error: ownDeleteError } = await supabaseUser.storage
+    .from('cat-photos')
+    .remove([`${draftCat.id}/rls-smoke-probe-card.webp`])
+
+  if (ownDeleteError || !removed || removed.length === 0) {
+    console.error("TEST 9c FAILED: Owner could not delete own object:", ownDeleteError?.message ?? 'no object removed')
+    process.exit(1)
+  }
+  console.log("TEST 9c SUCCESS: Owner deleted own object.")
 
   // Clean up user using service role client
   console.log("Cleaning up test user...")

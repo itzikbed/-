@@ -3,22 +3,23 @@
 import React, { useState } from 'react'
 import { withdrawAdoptionRequestAction } from './actions'
 import { Button } from '@/components/ui/Button'
+import { strings } from '@/lib/strings'
 
 export const WithdrawButton = ({ requestId }: { requestId: string }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleWithdraw = async () => {
-    if (!confirm('האם אתה בטוח שברצונך למשוך את בקשת האימוץ?')) return
+    if (!confirm(strings.requests.withdrawGeneralConfirm)) return
     setIsSubmitting(true)
     setError(null)
     try {
       const res = await withdrawAdoptionRequestAction(requestId)
       if (!res.ok) {
-        setError(res.formError || 'שגיאה בביטול הבקשה')
+        setError(res.formError || strings.requests.withdrawError)
       }
     } catch {
-      setError('אירעה שגיאה')
+      setError(strings.common.errorOccurred)
     } finally {
       setIsSubmitting(false)
     }
@@ -33,7 +34,7 @@ export const WithdrawButton = ({ requestId }: { requestId: string }) => {
         disabled={isSubmitting}
         onClick={handleWithdraw}
       >
-        משוך בקשה
+        {strings.requests.withdrawBtn}
       </Button>
       {error && <span className='text-xs text-danger font-semibold'>{error}</span>}
     </div>

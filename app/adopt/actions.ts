@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import { questionnaireSchema, QuestionnaireInput } from '@/lib/schemas/questionnaire'
+import { questionnaireSchema, QuestionnaireInput, questionnaireBaseSchema } from '@/lib/schemas/questionnaire'
 import { Database } from '@/lib/supabase/database.types'
 import { revalidatePath } from 'next/cache'
 
@@ -21,10 +21,20 @@ export async function saveQuestionnaireStepAction(
     return { ok: false, formError: 'משתמש לא מחובר' }
   }
 
-  // 2. Parse/validate inputs using questionnaireSchema
-  // If not final, we do a partial parse because some future fields might be empty or missing
-  const schema = isFinal ? questionnaireSchema : questionnaireSchema.partial()
-  const result = schema.safeParse(data)
+  // 2. Parse/validate inputs using questionnaireSchema or questionnaireBaseSchema.partial()
+  const schema = isFinal ? questionnaireSchema : questionnaireBaseSchema.partial()
+  
+  // Strip empty strings from data when doing partial validation to allow optional fields
+  const dataToValidate = { ...data }
+  if (!isFinal) {
+    for (const key in dataToValidate) {
+      if (dataToValidate[key as keyof typeof dataToValidate] === '') {
+        delete dataToValidate[key as keyof typeof dataToValidate]
+      }
+    }
+  }
+  
+  const result = schema.safeParse(dataToValidate)
 
   if (!result.success) {
     const fieldErrors = result.error.flatten().fieldErrors

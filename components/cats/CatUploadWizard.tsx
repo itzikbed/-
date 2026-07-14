@@ -4,17 +4,49 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { catSchema, CatInput } from '@/lib/schemas/cat'
-import { upsertCatAction } from '@/app/publish/actions'
+import { upsertCatAction } from '@/app/publish/cat-actions'
 import { strings } from '@/lib/strings'
-import { Mascot } from '@/components/mascot/Mascot'
 import { UploadStep1 } from './UploadStep1'
 import { UploadStep2 } from './UploadStep2'
 import { UploadStep3 } from './UploadStep3'
 import { UploadStep4 } from './UploadStep4'
-import Link from 'next/link'
+import { UploadSuccessState } from './UploadSuccessState'
+import { WizardNavigation } from './WizardNavigation'
+
+interface PhotoItem {
+  id?: string
+  path_card: string
+  path_full: string
+  sort_order: number
+  localUrl?: string
+}
+
+interface InitialCatInput {
+  id: string
+  name: string
+  sex: 'male' | 'female' | 'unknown'
+  birth_est: string
+  vaccinations: number
+  neutered: boolean
+  health_notes: string | null
+  is_special: boolean
+  special_needs: string | null
+  good_with_cats: boolean | null
+  good_with_dogs: boolean | null
+  fee_amount: number | null
+  description: string
+  region: string
+  city: string | null
+  cat_photos?: Array<{
+    path_card: string
+    path_full: string
+    sort_order: number
+  }>
+  video_path?: string | null
+}
 
 interface CatUploadWizardProps {
-  initialCat?: any // If editing
+  initialCat?: InitialCatInput
 }
 
 export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
@@ -26,20 +58,18 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   const [isFinished, setIsFinished] = useState(false)
   const [isDraftFinished, setIsDraftFinished] = useState(false)
 
-  // Parse photos and initial age for editing
-  let defaultPhotos: any[] = []
+  let defaultPhotos: PhotoItem[] = []
   let defaultAgeYears = 0
   let defaultAgeMonths = 0
 
   if (initialCat) {
     if (initialCat.cat_photos) {
-      defaultPhotos = initialCat.cat_photos.map((p: any) => ({
+      defaultPhotos = initialCat.cat_photos.map((p) => ({
         path_card: p.path_card,
         path_full: p.path_full,
         sort_order: p.sort_order
       }))
     }
-    // Compute age back from birth_est
     const birthDate = new Date(initialCat.birth_est)
     const today = new Date()
     const totalMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth())
@@ -49,7 +79,6 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
 
   const {
     register,
-    handleSubmit,
     trigger,
     watch,
     setValue,
@@ -72,7 +101,7 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
       fee_required: !!initialCat?.fee_amount,
       fee_amount: initialCat?.fee_amount || null,
       description: initialCat?.description || '',
-      region: initialCat?.region || 'center',
+      region: (initialCat?.region || 'center') as 'north' | 'south' | 'center' | 'jerusalem' | 'yosh',
       city: initialCat?.city || '',
       photos: defaultPhotos,
       video_path: initialCat?.video_path || null
@@ -83,7 +112,7 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   const videoPath = watch('video_path')
 
   const handleNextStep = async () => {
-    let fieldsToValidate: any[] = []
+    let fieldsToValidate: Array<keyof CatInput> = []
     if (step === 1) {
       fieldsToValidate = ['name', 'sex', 'ageYears', 'ageMonths']
     } else if (step === 2) {
@@ -97,23 +126,17 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
 
     setWizardError(null)
 
-    // Clear conditional fields on transition
-    if (step === 2 && !watch('is_special')) {
-      setValue('special_needs', '')
-    }
-    if (step === 3 && !watch('fee_required')) {
-      setValue('fee_amount', null)
-    }
+    if (step === 2 && !watch('is_special')) setValue('special_needs', '')
+    if (step === 3 && !watch('fee_required')) setValue('fee_amount', null)
 
     if (step === 3) {
-      // Before entering step 4, we MUST persist the cat in the database as a draft to satisfy RLS for storage uploads
       setIsSubmitting(true)
       const values = getValues()
       try {
         const res = await upsertCatAction(values, catId || undefined, true)
-        if (res.ok && res.data) {
+        if (res.ok) {
           setCatId(res.data.catId)
-          setValue('photos', defaultPhotos) // ensure photos initialized
+          setValue('photos', defaultPhotos)
           setStep(4)
         } else {
           setWizardError(res.formError || strings.common.errorOccurred)
@@ -129,7 +152,6 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   }
 
   const handleSaveDraft = async () => {
-    // Clear conditional fields on save
     if (!watch('is_special')) setValue('special_needs', '')
     if (!watch('fee_required')) setValue('fee_amount', null)
 
@@ -138,7 +160,7 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
     const values = getValues()
     try {
       const res = await upsertCatAction(values, catId || undefined, true)
-      if (res.ok && res.data) {
+      if (res.ok) {
         setCatId(res.data.catId)
         setIsDraftFinished(true)
       } else {
@@ -173,25 +195,7 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   }
 
   if (isFinished || isDraftFinished) {
-    return (
-      <div className="bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-center space-y-6 animate-scaleIn">
-        <Mascot pose="celebrating" width={140} height={140} />
-        <h2 className="text-3xl font-display font-extrabold text-ink">
-          {isFinished ? strings.publish.successNewTitle : 'הטיוטה נשמרה!'}
-        </h2>
-        <p className="text-base font-semibold text-ink-soft leading-relaxed max-w-sm mx-auto">
-          {isFinished ? strings.publish.successNewDesc : 'המודעה נשמרה כטיוטה וניתן להמשיך לערוך אותה מתי שתרצו.'}
-        </p>
-        <div className="pt-4">
-          <Link
-            href="/publish/my-cats"
-            className="inline-flex items-center justify-center font-bold px-6 py-3 bg-marmalade text-ink hover:bg-marmalade-dp rounded-btn shadow-resting transition-all active:scale-98 cursor-pointer focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-          >
-            {strings.publish.myCats}
-          </Link>
-        </div>
-      </div>
-    )
+    return <UploadSuccessState isFinished={isFinished} />
   }
 
   return (
@@ -210,59 +214,22 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
           catId={catId}
           photos={photos}
           setPhotos={(newPhotos) => setValue('photos', newPhotos, { shouldValidate: true })}
-          videoPath={videoPath}
-          setVideoPath={(path) => setValue('video_path', path)}
+          videoPath={videoPath || null}
+          setVideoPath={(path) => setValue('video_path', path || null)}
           isProcessing={isProcessing}
           setIsProcessing={setIsProcessing}
         />
       )}
 
-      {/* Navigation buttons */}
-      <div className="flex justify-between items-center pt-6 border-t border-border/40 gap-3">
-        {step > 1 ? (
-          <button
-            type="button"
-            disabled={isProcessing || isSubmitting}
-            onClick={() => setStep(prev => prev - 1)}
-            className="px-5 py-3 border border-border text-ink hover:bg-marmalade-sf disabled:opacity-50 text-base font-bold rounded-btn transition-all focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-          >
-            {strings.questionnaire.prevBtn}
-          </button>
-        ) : (
-          <div />
-        )}
-
-        <div className="flex gap-2.5">
-          <button
-            type="button"
-            disabled={isProcessing || isSubmitting}
-            onClick={handleSaveDraft}
-            className="px-5 py-3 border border-border text-pine hover:bg-pine-soft disabled:opacity-50 text-base font-bold rounded-btn transition-all focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-          >
-            {strings.publish.saveDraft}
-          </button>
-
-          {step < 4 ? (
-            <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={handleNextStep}
-              className="px-5 py-3 bg-marmalade text-ink hover:bg-marmalade-dp disabled:opacity-50 text-base font-bold rounded-btn shadow-resting transition-all active:scale-98 cursor-pointer focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-            >
-              {isSubmitting ? strings.common.loading : strings.questionnaire.nextBtn}
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={isProcessing || isSubmitting}
-              onClick={handleFinalSubmit}
-              className="px-6 py-3 bg-marmalade text-ink hover:bg-marmalade-dp disabled:opacity-50 text-base font-bold rounded-btn shadow-resting transition-all active:scale-98 cursor-pointer focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-            >
-              {isSubmitting ? strings.common.loading : strings.publish.submitPending}
-            </button>
-          )}
-        </div>
-      </div>
+      <WizardNavigation
+        step={step}
+        isProcessing={isProcessing}
+        isSubmitting={isSubmitting}
+        onPrev={() => setStep(prev => prev - 1)}
+        onSaveDraft={handleSaveDraft}
+        onNext={handleNextStep}
+        onFinalSubmit={handleFinalSubmit}
+      />
     </div>
   )
 }

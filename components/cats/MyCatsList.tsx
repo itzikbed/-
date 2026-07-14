@@ -8,7 +8,7 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { strings } from '@/lib/strings'
 import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/filters'
-import { deleteCatAction, markAsAdoptedAction } from '@/app/publish/actions'
+import { deleteCatAction, markAsAdoptedAction } from '@/app/publish/cat-actions'
 import { Edit, Trash2, Heart, Award } from 'lucide-react'
 
 interface CatPhoto {
@@ -38,7 +38,7 @@ export function MyCatsList({ initialCats }: MyCatsListProps) {
   const [error, setError] = useState<string | null>(null)
 
   const handleMarkAdopted = async (catId: string) => {
-    if (!confirm(strings.publish.markAdopted + '?')) return
+    if (!confirm(strings.publish.markAdoptedConfirm)) return
     setError(null)
     setLoadingId(catId)
     try {
@@ -90,7 +90,7 @@ export function MyCatsList({ initialCats }: MyCatsListProps) {
           {strings.publish.noCats}
         </h3>
         <p className="text-sm text-ink-soft max-w-sm mx-auto font-semibold">
-          מכאן תוכלו לפרסם חתולים חדשים למסירה ולעקוב אחר סטטוס האישור שלהם.
+          {strings.publish.myCatsDashboardDesc}
         </p>
         <div className="pt-2">
           <Link
@@ -155,9 +155,9 @@ export function MyCatsList({ initialCats }: MyCatsListProps) {
                 <div className="space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <h4 className="text-xl font-display font-extrabold text-ink leading-none">
-                      {cat.name}
+                       {cat.name}
                     </h4>
-                    <Badge variant={cat.status as any}>
+                    <Badge variant={cat.status as 'adopted' | 'pending' | 'published' | 'rejected' | 'draft' | 'archived'}>
                       {strings.badges[cat.status as keyof typeof strings.badges] || cat.status}
                     </Badge>
                   </div>
@@ -168,7 +168,7 @@ export function MyCatsList({ initialCats }: MyCatsListProps) {
 
                   {cat.status === 'rejected' && cat.reject_reason && (
                     <div className="text-xs bg-danger/5 text-danger border border-danger/10 px-3 py-1.5 rounded-input font-semibold max-w-md">
-                      <strong>סיבת הדחייה: </strong>
+                      <strong>{strings.publish.rejectReasonLabel}</strong>
                       {cat.reject_reason}
                     </div>
                   )}

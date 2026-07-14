@@ -3,11 +3,12 @@
 import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form'
 import { strings } from '@/lib/strings'
 import { REGIONS } from '@/lib/constants'
+import { CatInput } from '@/lib/schemas/cat'
 
 interface UploadStep3Props {
-  register: UseFormRegister<any>
-  errors: FieldErrors<any>
-  watch: UseFormWatch<any>
+  register: UseFormRegister<CatInput>
+  errors: FieldErrors<CatInput>
+  watch: UseFormWatch<CatInput>
 }
 
 export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
@@ -16,7 +17,7 @@ export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-display font-extrabold text-ink mb-4">
-        {strings.publish.wizardStep.replace('{step}', '3').replace('{total}', '4')} — אופי והתאמה
+        {strings.publish.wizardStep.replace('{step}', '3').replace('{total}', '4')} — {strings.publish.wizardStep3Title}
       </h3>
 
       {/* Good with cats */}
@@ -73,7 +74,7 @@ export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
           />
           {errors.fee_amount && (
             <p className="text-xs text-danger font-semibold mt-1" role="alert">
-              {errors.fee_amount.message as string}
+              {errors.fee_amount.message}
             </p>
           )}
         </div>
@@ -89,11 +90,11 @@ export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
           id="description"
           rows={4}
           className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-          placeholder="ספרו על האופי שלו, הרגלים, למה הוא מחפש בית..."
+          placeholder={strings.publish.catDescriptionPlaceholder}
         />
         {errors.description && (
           <p className="text-xs text-danger font-semibold mt-1" role="alert">
-            {errors.description.message as string}
+            {errors.description.message}
           </p>
         )}
       </div>
@@ -117,7 +118,7 @@ export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
           </select>
           {errors.region && (
             <p className="text-xs text-danger font-semibold mt-1" role="alert">
-              {errors.region.message as string}
+              {errors.region.message}
             </p>
           )}
         </div>
@@ -133,7 +134,7 @@ export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
           />
           {errors.city && (
             <p className="text-xs text-danger font-semibold mt-1" role="alert">
-              {errors.city.message as string}
+              {errors.city.message}
             </p>
           )}
         </div>

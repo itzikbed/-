@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { publisherApplicationSchema, PublisherApplicationInput } from '@/lib/schemas/publisher'
-import { applyAsPublisherAction } from '@/app/publish/actions'
+import { applyAsPublisherAction } from '@/app/publish/publisher-actions'
 import { strings } from '@/lib/strings'
 import { REGIONS, PUBLISHER_TYPES } from '@/lib/constants'
 
@@ -50,7 +50,7 @@ export function PublisherApplicationForm({ initialData }: PublisherApplicationFo
       } else {
         window.location.reload()
       }
-    } catch (err) {
+    } catch {
       setError(strings.common.errorOccurred)
     } finally {
       setIsSubmitting(false)
@@ -160,7 +160,7 @@ export function PublisherApplicationForm({ initialData }: PublisherApplicationFo
             id="region"
             className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
           >
-            <option value="">בחר אזור מגורים...</option>
+            <option value="">{strings.publish.applySelectRegion}</option>
             {REGIONS.map((region) => (
               <option key={region.id} value={region.id}>
                 {region.label}

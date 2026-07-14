@@ -3,14 +3,12 @@ import { initHebrewValidation } from './he-errors'
 
 initHebrewValidation()
 
-export const catSchema = z.object({
+export const catBaseSchema = z.object({
   // Step 1: Details
   name: z.string().min(1, { message: 'שם החתול חובה' }).max(40, { message: 'שם החתול ארוך מדי' }),
-  sex: z.enum(['male', 'female', 'unknown'], {
-    errorMap: () => ({ message: 'נא לבחור מין' })
-  }),
-  ageYears: z.number({ required_error: 'שדה חובה' }).min(0).max(25),
-  ageMonths: z.number({ required_error: 'שדה חובה' }).min(0).max(11),
+  sex: z.enum(['male', 'female', 'unknown'], { message: 'נא לבחור מין' }),
+  ageYears: z.number().min(0).max(25),
+  ageMonths: z.number().min(0).max(11),
 
   // Step 2: Health
   vaccinations: z.number().int().min(0).max(3),
@@ -25,9 +23,7 @@ export const catSchema = z.object({
   fee_required: z.boolean(),
   fee_amount: z.number().optional().nullable(),
   description: z.string().min(20, { message: 'תיאור החתול חייב להכיל לפחות 20 תווים' }),
-  region: z.enum(['north', 'south', 'center', 'jerusalem', 'yosh'], {
-    errorMap: () => ({ message: 'נא לבחור אזור' })
-  }),
+  region: z.enum(['north', 'south', 'center', 'jerusalem', 'yosh'], { message: 'נא לבחור אזור' }),
   city: z.string().min(1, { message: 'שדה חובה' }),
   
   // Step 4: Photos (paths returned from pipeline)
@@ -39,7 +35,19 @@ export const catSchema = z.object({
   
   // Optional video path
   video_path: z.string().optional().nullable()
-}).superRefine((data, ctx) => {
+})
+
+const ageSpecialRefine = (
+  data: {
+    ageYears: number
+    ageMonths: number
+    is_special: boolean
+    special_needs?: string | null
+    fee_required: boolean
+    fee_amount?: number | null
+  },
+  ctx: z.RefinementCtx
+) => {
   // Check age is not zero
   if (data.ageYears === 0 && data.ageMonths === 0) {
     ctx.addIssue({
@@ -64,6 +72,16 @@ export const catSchema = z.object({
       path: ['fee_amount']
     })
   }
-})
+}
+
+export const catSchema = catBaseSchema.superRefine(ageSpecialRefine)
+
+export const draftCatSchema = catBaseSchema.extend({
+  photos: z.array(z.object({
+    path_card: z.string(),
+    path_full: z.string(),
+    sort_order: z.number()
+  }))
+}).superRefine(ageSpecialRefine)
 
 export type CatInput = z.infer<typeof catSchema>

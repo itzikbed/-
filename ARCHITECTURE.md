@@ -116,8 +116,8 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - [ ] Site name + domain. Privacy-policy page text (personal data is collected — mandatory).
 - [ ] Re-verify image optimization against the cloud Supabase URL before launch.
 - [ ] NEXT_IMAGE_UNOPTIMIZED is a LOCAL-testing flag only — the cloud deployment must never set it, and must add the https://*.supabase.co remotePattern.
-
 - [ ] On the next Next.js upgrade: re-test whether a route-level `loading.tsx` for /cats still breaks production hydration (see 2026-07-13 architect decision); if fixed upstream, restore the route-level skeleton.
+- [ ] Server-side transcoding pipeline for publisher video clips (convert RAW mp4/webm/mov inputs to ≤3s, 480px, ≤1MB specs) — future (§11 decision 2026-07-14).
 
 ## 11. Decision log (append one line per decision, newest last)
 
@@ -139,6 +139,8 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 - 2026-07-12 · Design-v2 decision: living cat cards, hero film sequence, and self-drawing mascot approved by architect.
 - 2026-07-13 · View Transition production workaround: replaced Next.js experimental.viewTransition with custom promise-based document.startViewTransition wrapper synchronized with route rendering.
 - 2026-07-13 · (architect) Removed `app/cats/loading.tsx`: its streamed Suspense boundary silently killed ALL client hydration on / and /cats in production builds (Next 16.2.10 bug — dev unaffected, zero console errors; bisected across commits and confirmed by removal). Filter-change skeletons still work via `useTransition` isPending → CatGrid `loading`. Do NOT reintroduce a route-level loading file (or a page-level Suspense around the catalog) until verified against a fixed Next version — verify hydration on a production build after any Next upgrade (§10).
+- 2026-07-14 · Video upload policy v1: accepts RAW uploads (≤15s, ≤25MB), autoplay limited to stored files ≤1.5MB; HEIC images decoded client-side via heic2any before canvas resize.
+- 2026-07-14 · (architect) Migration 0004: fixed storage RLS owner policies — 0001 used unqualified `name` inside the EXISTS subquery, which resolved to cats.name, so every authenticated photo/video upload+delete was rejected (surfaced in Phase 3 review; canonical 0001 fixed too). rls-smoke TEST 9 added to keep it covered.
 
 ## 12. Now / Next (update every session)
 
@@ -148,7 +150,7 @@ Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.we
 | 1 | Repo, RTL shell, migration 0001, auth, ui/ kit | ☑ |
 | 2 | Catalog + filters + cat page | ☑ |
 | 2.5 | Design elevation "החתול החי" | ☑ |
-| 3 | Questionnaire wizard · upload wizard · request flow | ☐ |
+| 3 | Questionnaire wizard · upload wizard · request flow | ☑ |
 | 4 | Admin queues + emails | ☐ |
 | 5 | Polish: SEO/OG, a11y audit, privacy page | ☐ |
 | 6 | Seed, QA as all 4 roles, domain, admin handover | ☐ |

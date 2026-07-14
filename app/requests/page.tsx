@@ -7,9 +7,11 @@ import { REGIONS, RegionId } from '@/lib/constants'
 import Link from 'next/link'
 import { Compass, Calendar } from 'lucide-react'
 
+import { strings } from '@/lib/strings'
+
 export const metadata = {
-  title: 'הבקשות שלי — בית לחתול',
-  description: 'ניהול ומעקב אחר בקשות האימוץ ששלחת.'
+  title: strings.requests.metaTitle,
+  description: strings.requests.metaDesc
 }
 
 export default async function RequestsPage() {
@@ -44,13 +46,13 @@ export default async function RequestsPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'ממתין לאישור'
+        return strings.requests.statusPending
       case 'approved':
-        return 'אושר'
+        return strings.requests.statusApproved
       case 'rejected':
-        return 'נדחה'
+        return strings.requests.statusRejected
       case 'withdrawn':
-        return 'בוטל (נמשך)'
+        return strings.requests.statusWithdrawn
       default:
         return status
     }
@@ -65,10 +67,10 @@ export default async function RequestsPage() {
         {/* Header */}
         <div className='flex flex-col gap-2 border-b border-border/60 pb-5 text-start'>
           <h1 className='text-3xl md:text-4xl font-display font-extrabold text-ink'>
-            הבקשות שלי
+            {strings.requests.title}
           </h1>
           <p className='text-base font-semibold text-ink-soft'>
-            מעקב אחר בקשות האימוץ שהגשת לחתולים השונים
+            {strings.requests.dashboardSubtitle}
           </p>
         </div>
 
@@ -78,10 +80,10 @@ export default async function RequestsPage() {
             <Mascot pose='sleeping' className='mx-auto' width={120} height={80} />
             <div className='space-y-2'>
               <h2 className='text-2xl font-display font-extrabold text-ink'>
-                לא נמצאו בקשות אימוץ
+                {strings.requests.noRequestsTitle}
               </h2>
               <p className='text-ink-soft font-semibold max-w-md mx-auto leading-relaxed'>
-                אין לך בקשות אימוץ פעילות כרגע. מצא חתול חמוד והגש בקשה להתחלת תהליך אימוץ!
+                {strings.requests.noRequestsDesc}
               </p>
             </div>
             <div className='pt-4'>
@@ -89,7 +91,7 @@ export default async function RequestsPage() {
                 href='/cats'
                 className='inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-marmalade text-ink hover:bg-marmalade-dp transition-all duration-150 shadow-resting hover:-translate-y-0.5'
               >
-                למאגר החתולים לאימוץ
+                {strings.notFound.backBtn}
               </Link>
             </div>
           </div>
@@ -97,7 +99,7 @@ export default async function RequestsPage() {
           <div className='space-y-4'>
             {requests.map((req) => {
               const cat = req.cats as unknown as { name: string; region: string; city: string | null } | null
-              const catName = cat?.name || 'חתול'
+              const catName = cat?.name || strings.common.defaultCatName
               const regionObj = REGIONS.find((r) => r.id === cat?.region as RegionId)
               const regionLabel = regionObj ? regionObj.label : cat?.region || ''
 
@@ -125,7 +127,7 @@ export default async function RequestsPage() {
                       <span className='hidden md:inline text-ink-soft/40'>&middot;</span>
                       <span className='flex items-center gap-1'>
                         <Calendar className='w-4 h-4 text-ink-soft/80' />
-                        <span>נשלחה ב-</span>
+                        <span>{strings.requests.submittedAt}</span>
                       <bdi>
                           {new Date(req.created_at).toLocaleDateString('he-IL')}
                         </bdi>
@@ -140,7 +142,7 @@ export default async function RequestsPage() {
 
                     {req.admin_note && (
                       <div className='text-sm font-semibold text-pine-dp leading-relaxed mt-2 bg-pine-soft/20 border-s-4 border-pine p-3 rounded'>
-                        <strong className='block text-pine text-xs mb-0.5'>הערת מוסר / מנהל:</strong>
+                        <strong className='block text-pine text-xs mb-0.5'>{strings.requests.adminNoteLabel}</strong>
                         {req.admin_note}
                       </div>
                     )}

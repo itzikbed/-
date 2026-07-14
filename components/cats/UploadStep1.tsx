@@ -2,17 +2,18 @@
 
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
 import { strings } from '@/lib/strings'
+import { CatInput } from '@/lib/schemas/cat'
 
 interface UploadStep1Props {
-  register: UseFormRegister<any>
-  errors: FieldErrors<any>
+  register: UseFormRegister<CatInput>
+  errors: FieldErrors<CatInput>
 }
 
 export function UploadStep1({ register, errors }: UploadStep1Props) {
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-display font-extrabold text-ink mb-4">
-        {strings.publish.wizardStep.replace('{step}', '1').replace('{total}', '4')} — פרטי החתול
+        {strings.publish.wizardStep.replace('{step}', '1').replace('{total}', '4')} — {strings.publish.wizardStep1Title}
       </h3>
 
       {/* Name */}
@@ -27,7 +28,7 @@ export function UploadStep1({ register, errors }: UploadStep1Props) {
         />
         {errors.name && (
           <p className="text-xs text-danger font-semibold mt-1" role="alert">
-            {errors.name.message as string}
+            {errors.name.message}
           </p>
         )}
       </div>
@@ -48,14 +49,14 @@ export function UploadStep1({ register, errors }: UploadStep1Props) {
         </select>
         {errors.sex && (
           <p className="text-xs text-danger font-semibold mt-1" role="alert">
-            {errors.sex.message as string}
+            {errors.sex.message}
           </p>
         )}
       </div>
 
       {/* Age */}
       <div>
-        <span className="block text-sm font-bold text-ink mb-1.5">גיל משוער (חובה)</span>
+        <span className="block text-sm font-bold text-ink mb-1.5">{strings.publish.catAgeLabel}</span>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="sr-only" htmlFor="ageYears">{strings.publish.catAgeYears}</label>
@@ -71,7 +72,7 @@ export function UploadStep1({ register, errors }: UploadStep1Props) {
             <span className="text-xs text-ink-soft font-semibold block mt-1">{strings.publish.catAgeYears}</span>
             {errors.ageYears && (
               <p className="text-xs text-danger font-semibold mt-1" role="alert">
-                {errors.ageYears.message as string}
+                {errors.ageYears.message}
               </p>
             )}
           </div>
@@ -89,7 +90,7 @@ export function UploadStep1({ register, errors }: UploadStep1Props) {
             <span className="text-xs text-ink-soft font-semibold block mt-1">{strings.publish.catAgeMonths}</span>
             {errors.ageMonths && (
               <p className="text-xs text-danger font-semibold mt-1" role="alert">
-                {errors.ageMonths.message as string}
+                {errors.ageMonths.message}
               </p>
             )}
           </div>

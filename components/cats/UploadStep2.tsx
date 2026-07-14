@@ -2,11 +2,12 @@
 
 import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form'
 import { strings } from '@/lib/strings'
+import { CatInput } from '@/lib/schemas/cat'
 
 interface UploadStep2Props {
-  register: UseFormRegister<any>
-  errors: FieldErrors<any>
-  watch: UseFormWatch<any>
+  register: UseFormRegister<CatInput>
+  errors: FieldErrors<CatInput>
+  watch: UseFormWatch<CatInput>
 }
 
 export function UploadStep2({ register, errors, watch }: UploadStep2Props) {
@@ -15,7 +16,7 @@ export function UploadStep2({ register, errors, watch }: UploadStep2Props) {
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-display font-extrabold text-ink mb-4">
-        {strings.publish.wizardStep.replace('{step}', '2').replace('{total}', '4')} — בריאות ורפואה
+        {strings.publish.wizardStep.replace('{step}', '2').replace('{total}', '4')} — {strings.publish.wizardStep2Title}
       </h3>
 
       {/* Vaccinations */}
@@ -28,14 +29,14 @@ export function UploadStep2({ register, errors, watch }: UploadStep2Props) {
           id="vaccinations"
           className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
         >
-          <option value="0">0 (לא חוסן)</option>
-          <option value="1">1 (חיסון ראשון חלקי)</option>
-          <option value="2">2 (חיסון שני)</option>
-          <option value="3">3 (חיסון דחף מלא)</option>
+          <option value="0">{strings.publish.vaccine0}</option>
+          <option value="1">{strings.publish.vaccine1}</option>
+          <option value="2">{strings.publish.vaccine2}</option>
+          <option value="3">{strings.publish.vaccine3}</option>
         </select>
         {errors.vaccinations && (
           <p className="text-xs text-danger font-semibold mt-1" role="alert">
-            {errors.vaccinations.message as string}
+            {errors.vaccinations.message}
           </p>
         )}
       </div>
@@ -66,7 +67,7 @@ export function UploadStep2({ register, errors, watch }: UploadStep2Props) {
         />
         {errors.health_notes && (
           <p className="text-xs text-danger font-semibold mt-1" role="alert">
-            {errors.health_notes.message as string}
+            {errors.health_notes.message}
           </p>
         )}
       </div>
@@ -95,11 +96,11 @@ export function UploadStep2({ register, errors, watch }: UploadStep2Props) {
             id="special_needs"
             rows={3}
             className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-            placeholder="עיוורון, שלוש רגליים, מחלה כרונית וכו'..."
+            placeholder={strings.publish.isSpecialPrompt}
           />
           {errors.special_needs && (
             <p className="text-xs text-danger font-semibold mt-1" role="alert">
-              {errors.special_needs.message as string}
+              {errors.special_needs.message}
             </p>
           )}
         </div>

@@ -126,8 +126,8 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
 
     setWizardError(null)
 
-    if (step === 2 && !watch('is_special')) setValue('special_needs', '')
-    if (step === 3 && !watch('fee_required')) setValue('fee_amount', null)
+    if (step === 2 && !getValues('is_special')) setValue('special_needs', '')
+    if (step === 3 && !getValues('fee_required')) setValue('fee_amount', null)
 
     if (step === 3) {
       setIsSubmitting(true)
@@ -152,8 +152,8 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   }
 
   const handleSaveDraft = async () => {
-    if (!watch('is_special')) setValue('special_needs', '')
-    if (!watch('fee_required')) setValue('fee_amount', null)
+    if (!getValues('is_special')) setValue('special_needs', '')
+    if (!getValues('fee_required')) setValue('fee_amount', null)
 
     setIsSubmitting(true)
     setWizardError(null)

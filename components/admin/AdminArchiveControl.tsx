@@ -7,10 +7,9 @@ import { strings } from '@/lib/strings'
 
 interface AdminArchiveControlProps {
   catId: string
-  catName: string
 }
 
-export function AdminArchiveControl({ catId, catName }: AdminArchiveControlProps) {
+export function AdminArchiveControl({ catId }: AdminArchiveControlProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

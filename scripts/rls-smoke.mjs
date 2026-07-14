@@ -589,6 +589,131 @@ async function run() {
   }
 
   console.log("TEST 11 SUCCESS: Contact handoff RPC functions correctly and securely.")
+
+  // ============ TEST 11.5: Deletion & Archival RLS Policies ============
+  console.log("TEST 11.5: Deletion & Archival RLS Policies...")
+
+  // 1. Owner CAN delete their never-published draft cat
+  console.log("TEST 11.5a: Owner CAN delete never-published draft cat...")
+  const { data: tempCat1, error: tempCat1Err } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'מחיקון',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'חתול זמני למחיקה לצורכי בדיקות מחיקה של מודעות',
+      status: 'draft'
+    })
+    .select('id')
+    .single()
+
+  if (tempCat1Err || !tempCat1) {
+    throw new Error("Failed to insert tempCat1 for delete test: " + tempCat1Err?.message)
+  }
+
+  const { data: deletedTemp1, error: deleteTemp1Err } = await supabaseUser
+    .from('cats')
+    .delete()
+    .eq('id', tempCat1.id)
+    .select()
+
+  if (deleteTemp1Err) {
+    throw new Error("Owner failed to delete never-published draft cat: " + deleteTemp1Err.message)
+  }
+  if (!deletedTemp1 || deletedTemp1.length !== 1) {
+    throw new Error("Owner delete never-published draft cat did not affect exactly 1 row")
+  }
+
+  const { data: selectTemp1 } = await supabaseAdmin.from('cats').select('id').eq('id', tempCat1.id).maybeSingle()
+  if (selectTemp1) {
+    throw new Error("Temp cat 1 still exists after owner deletion")
+  }
+  console.log("TEST 11.5a SUCCESS: Owner deleted never-published draft cat successfully.")
+
+  // 2. Owner CANNOT delete the cat once it has published_at set
+  console.log("TEST 11.5b: Owner CANNOT delete cat with published_at set...")
+  const { data: tempCat2, error: tempCat2Err } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'לא-מחיקון',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'חתול זמני שלא יימחק לצורכי בדיקות מחיקה של מודעות',
+      status: 'published',
+      published_at: new Date().toISOString()
+    })
+    .select('id')
+    .single()
+
+  if (tempCat2Err || !tempCat2) {
+    throw new Error("Failed to insert tempCat2 for delete test: " + tempCat2Err?.message)
+  }
+
+  const { data: deletedTemp2 } = await supabaseUser
+    .from('cats')
+    .delete()
+    .eq('id', tempCat2.id)
+    .select()
+
+  if (deletedTemp2 && deletedTemp2.length > 0) {
+    await supabaseAdmin.from('cats').delete().eq('id', tempCat2.id)
+    throw new Error("Owner was able to delete cat with published_at set!")
+  }
+  console.log("TEST 11.5b SUCCESS: Owner delete of published cat returned 0 rows.")
+  await supabaseAdmin.from('cats').delete().eq('id', tempCat2.id)
+
+  // 3. Anon/other-user delete attempts affect 0 rows
+  console.log("TEST 11.5c: Other user/anon CANNOT delete cat...")
+  const { data: tempCat3, error: tempCat3Err } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'זר-לא-ימחוק',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'חתול מוגן מפני זרים לצורכי בדיקת הרשאות מחיקה',
+      status: 'draft'
+    })
+    .select('id')
+    .single()
+
+  if (tempCat3Err || !tempCat3) {
+    throw new Error("Failed to insert tempCat3 for delete test: " + tempCat3Err?.message)
+  }
+
+  const { data: deletedTemp3 } = await supabaseThird
+    .from('cats')
+    .delete()
+    .eq('id', tempCat3.id)
+    .select()
+
+  if (deletedTemp3 && deletedTemp3.length > 0) {
+    await supabaseAdmin.from('cats').delete().eq('id', tempCat3.id)
+    throw new Error("Other user was able to delete owner's cat!")
+  }
+
+  const { data: deletedAnon } = await supabaseAnon
+    .from('cats')
+    .delete()
+    .eq('id', tempCat3.id)
+    .select()
+
+  if (deletedAnon && deletedAnon.length > 0) {
+    await supabaseAdmin.from('cats').delete().eq('id', tempCat3.id)
+    throw new Error("Anon user was able to delete cat!")
+  }
+
+  console.log("TEST 11.5c SUCCESS: Other user and anon delete attempts returned 0 rows.")
+  await supabaseAdmin.from('cats').delete().eq('id', tempCat3.id)
+
 } catch (err) {
   // exiting here would skip the finally below (process.exit does not unwind);
   // flag the failure and exit only after cleanup has run.

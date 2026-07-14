@@ -249,7 +249,7 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
 
               {isAdmin && (
                 <div className="pt-2 border-t border-border/20">
-                  <AdminArchiveControl catId={cat.id} catName={cat.name} />
+                  <AdminArchiveControl catId={cat.id} />
                 </div>
               )}
             </div>

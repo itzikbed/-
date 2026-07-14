@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Badge } from '@/components/ui/Badge'
 import { strings, gendered } from '@/lib/strings'
 import { Info, Coins, Stethoscope, Compass, ChevronLeft } from 'lucide-react'
+import { AdminArchiveControl } from '@/components/admin/AdminArchiveControl'
 
 interface CatDetailPageProps {
   params: Promise<{ id: string }>
@@ -77,16 +78,17 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
     notFound()
   }
 
-  // Check if current user has a completed questionnaire
+  // Check if current user has a completed questionnaire and if user is admin
   const { data: { user } } = await supabase.auth.getUser()
   let hasQuestionnaire = false
+  let isAdmin = false
   if (user) {
-    const { data: adopterProfile } = await supabase
-      .from('adopter_profiles')
-      .select('completed_at')
-      .eq('user_id', user.id)
-      .single()
-    hasQuestionnaire = !!adopterProfile?.completed_at
+    const [adopterRes, profileRes] = await Promise.all([
+      supabase.from('adopter_profiles').select('completed_at').eq('user_id', user.id).maybeSingle(),
+      supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
+    ])
+    hasQuestionnaire = !!adopterRes.data?.completed_at
+    isAdmin = profileRes.data?.role === 'admin'
   }
 
   // Look up region label
@@ -237,13 +239,19 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
             )}
 
             {/* Primary CTA */}
-            <div className="pt-6 border-t border-border/40">
+            <div className="pt-6 border-t border-border/40 space-y-3">
               <Link
                 href={adoptionLink}
                 className="w-full inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-marmalade text-ink hover:bg-marmalade-dp transition-all duration-150 active:scale-98 shadow-resting hover:-translate-y-0.5"
               >
                 {strings.catalog.adoptCta.replace('{name}', cat.name)}
               </Link>
+
+              {isAdmin && (
+                <div className="pt-2 border-t border-border/20">
+                  <AdminArchiveControl catId={cat.id} catName={cat.name} />
+                </div>
+              )}
             </div>
 
           </div>

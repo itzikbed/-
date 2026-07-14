@@ -183,6 +183,7 @@ const buttonTableStyle = {
 const buttonTdStyle = {
   backgroundColor: '#EBAF56',
   borderRadius: '9999px',
+  padding: '12px 30px',
 }
 
 const buttonLinkStyle = {
@@ -190,7 +191,6 @@ const buttonLinkStyle = {
   fontSize: '16px',
   fontWeight: '600',
   textDecoration: 'none',
-  padding: '12px 30px',
   display: 'inline-block',
 }
 

@@ -3,6 +3,81 @@
 Read `00-orchestrator.md` first. Skills: `code-quality`, `rtl-hebrew-webapp`,
 `catalog-and-filters` (SEO section), plus any skill matching a bug you touch.
 
+## Phase 4.2→5 context addendum (architect, 2026-07-15) — read before the tracks
+
+Status: Phases 1–4.2 are closed and architect-approved. A security-hardening pass is
+committed (`41bc64a`; read `SECURITY.md` — its launch checklist is part of this phase's
+final gate). Stack reality: Next 16 / React 19 / Tailwind v4 / zod v4.
+
+Binding constraints (violations fail the review):
+
+1. **NEVER add a `loading.tsx`** (or any new streamed Suspense boundary) on `/` or
+   `/cats` — it silently breaks ALL client hydration in Next 16.2.10 production builds
+   (ARCHITECTURE.md §10–§11). Any new loading UI needs architect sign-off first.
+2. Every milestone is verified against the **production build** (`npm run build` +
+   `npm run start`), not dev. Static screenshots don't prove hydration — prove
+   interactivity (open the filter drawer, click a control) on the production server.
+3. `prompts/`, `skills/`, `scripts/checks/` remain READ-ONLY. Servers on :3000/:3001
+   only (:3100 is the architect's). One commit per item, raw `npm run gate` +
+   `npm run check:rls` output in the report, all test credentials in the report.
+4. Seed↔test coupling: `scripts/rls-smoke.mjs` TEST 12 asserts EXACTLY 12 published
+   cats. If your final `seed.sql` changes that count, update the invariant in the same
+   commit and call it out in the report. Current seed: 15 cats (12 published, 2
+   pending, 1 rejected).
+5. Deletion/archive semantics are §5a of ARCHITECTURE.md — QA flows must respect them
+   (published listings are archived, never deleted; delete exists only for
+   never-published drafts).
+
+Scope facts discovered in review (fold into the tracks):
+
+- The footer ALREADY links to `/privacy` and `/accessibility` — **both routes 404
+  today**. Track A must build both (privacy per the track spec; accessibility
+  statement in plain Hebrew, aligned with the WCAG audit findings). `/terms` stub too.
+- `sitemap.ts` must list only `status='published'` cats — adopted/archived cats are
+  hidden from all public queries (§10 decision).
+- `app/dev/ui` still exists — Track B deletes it.
+- Final-gate scope split: Vercel deploy, Resend domain (SPF/DKIM), and prod Supabase
+  setup (apply migrations 0008/0009, enable email confirmations, CAPTCHA, admin MFA,
+  prod redirect URLs — the SECURITY.md checklist) are executed **with Itzik** — his
+  accounts, his credentials; never ask for or handle them yourself. Your deliverable:
+  everything ready + `docs/deploy-runbook.md` in Hebrew (step-by-step, including
+  setting `NEXT_PUBLIC_SITE_URL` — it currently points email links at localhost:3000).
+
+## Track D ∥ — carry-over fixes from the 4.x reviews (all architect-confirmed)
+
+Email set (rtl-transactional-email skill rules apply):
+
+1. `RequestClosedCatAdopted` subject is byte-identical to the request-REJECTED subject
+   (`ui.json` `requestClosedCatAdoptedSubject*` = "עדכון לגבי בקשת האימוץ של {name}").
+   Replace with warm, gendered subjects in the spirit of the body ("‏{name} מצא/ה
+   בית") — ≤45 chars for every gender/name variant.
+2. Harmonize `CatArchivedByAdmin` + `RequestClosedCatAdopted` chrome with the approved
+   templates (`CatApproved`/`CatRejected`): centered logo section, `#FDFCFA`
+   container, 20px radius, 600px max-width. Today the logo renders right-aligned and
+   the container diverges (white/16px/560px).
+3. `CatArchivedByAdmin` reason box must reuse `CatRejected`'s reasonBox style (orange
+   accent), not the current green.
+4. `emails/emails.test.tsx`: the "male and female" test for `RequestClosedCatAdopted`
+   never asserts gendered content — assert the female render contains "מצאה", the male
+   "מצא", and that the two differ; assert subject ≤45 for ALL gender variants of both
+   new templates.
+5. Outlook bulletproofing: add the MSO/VML conditional button pattern to CTA buttons
+   in ALL templates (accepted-with-note in Phase 4: currently square corners in
+   Outlook).
+
+Admin/UI:
+
+6. `components/admin/AdminArchiveControl.tsx`: the loading label reuses
+   `strings.admin.cat.approving` ("מאשר...") — give archiving its own string; the
+   dialog placeholder is reject-worded ("מדוע המודעה נדחתה") — add an archive-specific
+   placeholder.
+7. After a successful admin archive on `/cats/[id]`, `window.location.reload()` lands
+   the admin on a 404 (the page hides non-published cats). Redirect to `/admin` with
+   the success message instead.
+8. `app/requests/actions.ts`: when a profile lookup fails, both party emails are
+   silently skipped — add a `console.error` (fire-and-log means LOG), no PII in the
+   log line (message only, never the email address).
+
 ## Track A ∥ — SEO, a11y, meta
 
 - `generateMetadata` sitewide: Hebrew titles/descriptions, OG defaults + per-cat OG.

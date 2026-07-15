@@ -11,6 +11,7 @@ import { strings } from '@/lib/strings'
 import { shouldDisableVideo, hasExtension } from '@/lib/utils/video-playback'
 import { PlaybackDirector } from '@/lib/utils/playback-director'
 import { triggerViewTransition } from '@/lib/utils/view-transition-navigation'
+import { getMediaUrl } from '@/lib/security/media'
 
 export interface CatCardProps {
   cat: {
@@ -32,13 +33,12 @@ export interface CatCardProps {
 }
 
 export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
   const router = useRouter()
   
   // Find cover photo (sort_order = 0), otherwise fall back to first photo or a placeholder
   const coverPhoto = cat.cat_photos?.find(p => p.sort_order === 0) || cat.cat_photos?.[0]
   const imageUrl = coverPhoto
-    ? `${supabaseUrl}/storage/v1/object/public/cat-photos/${coverPhoto.path_card}`
+    ? getMediaUrl(coverPhoto.path_card)
     : '/hero/hero_1_poster.jpg' // fallback placeholder
 
   // Look up region label
@@ -154,8 +154,8 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
               isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           >
-            <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${cat.video_path}.webm`} type="video/webm" />
-            <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${cat.video_path}.mp4`} type="video/mp4" />
+            <source src={getMediaUrl(`${cat.video_path}.webm`)} type="video/webm" />
+            <source src={getMediaUrl(`${cat.video_path}.mp4`)} type="video/mp4" />
           </video>
         )}
 

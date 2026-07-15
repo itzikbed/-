@@ -11,8 +11,11 @@ import { checkAdmin, getUserEmail } from './actions-helper'
 import { ActionResult } from './actions'
 import { strings } from '@/lib/strings'
 import { closeSiblings } from '@/lib/requests/close-siblings'
+import { isUuid } from '@/lib/security/media'
 
 export async function approveCatAction(catId: string): Promise<ActionResult> {
+  if (!isUuid(catId)) return { ok: false, formError: strings.admin.conflictError }
+
   try {
     const adminId = await checkAdmin()
     const supabase = await createClient()
@@ -54,14 +57,14 @@ export async function approveCatAction(catId: string): Promise<ActionResult> {
     revalidatePath('/admin')
     revalidatePath('/')
     return { ok: true }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err)
-    return { ok: false, formError: message || strings.admin.errorOccurred }
+  } catch {
+    return { ok: false, formError: strings.admin.errorOccurred }
   }
 }
 
 export async function rejectCatAction(catId: string, reason: string): Promise<ActionResult> {
-  if (!reason || reason.trim().length < 10) {
+  reason = reason.trim()
+  if (!isUuid(catId) || reason.length < 10 || reason.length > 2000) {
     return { ok: false, formError: strings.admin.dialog.rejectReasonMin }
   }
 
@@ -105,14 +108,14 @@ export async function rejectCatAction(catId: string, reason: string): Promise<Ac
 
     revalidatePath('/admin')
     return { ok: true }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err)
-    return { ok: false, formError: message || strings.admin.errorOccurred }
+  } catch {
+    return { ok: false, formError: strings.admin.errorOccurred }
   }
 }
 
 export async function archiveCatAdminAction(catId: string, reason: string): Promise<ActionResult> {
-  if (!reason || reason.trim().length < 10) {
+  reason = reason.trim()
+  if (!isUuid(catId) || reason.length < 10 || reason.length > 2000) {
     return { ok: false, formError: strings.admin.dialog.rejectReasonMin }
   }
 
@@ -142,7 +145,7 @@ export async function archiveCatAdminAction(catId: string, reason: string): Prom
     })
 
     // Sibling auto-close tail
-    void closeSiblings(catId)
+    await closeSiblings(catId)
 
     // Fire-and-log email notification to the owner
     void (async () => {
@@ -167,8 +170,7 @@ export async function archiveCatAdminAction(catId: string, reason: string): Prom
     revalidatePath('/admin')
     revalidatePath('/')
     return { ok: true }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err)
-    return { ok: false, formError: message }
+  } catch {
+    return { ok: false, formError: strings.admin.errorOccurred }
   }
 }

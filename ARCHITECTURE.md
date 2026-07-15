@@ -65,7 +65,8 @@ supabase/
 | `adoption_requests` | adopter → cat | cat_id, adopter_id, message, `status`, admin_note, decided_by/at · **unique open request per (cat, adopter)** |
 | `moderation_log` | audit, append-only | actor_id, entity_type, entity_id, action, reason |
 
-Storage: bucket `cat-photos` (public read). Path `{cat_id}/{uuid}-{card|full}.webp`.
+Storage: private bucket `cat-photos`; `/api/media` issues 60-second signed URLs after
+storage RLS verifies published/owner/admin access. Path `{cat_id}/{uuid}-{card|full}.webp`.
 
 ## 5. Status machines (enforce via transition maps in actions + RLS `with check`)
 
@@ -142,7 +143,7 @@ final only when the owner marks the cat adopted.
 ## 9. Environment
 
 `NEXT_PUBLIC_SUPABASE_URL` · `NEXT_PUBLIC_SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY`
-(server only — never NEXT_PUBLIC) · `RESEND_API_KEY` · `NEXT_PUBLIC_SITE_URL`.
+(server only — never NEXT_PUBLIC) · `RESEND_API_KEY` · `RESEND_FROM_EMAIL` · `NEXT_PUBLIC_SITE_URL`.
 
 ## 10. Open product decisions (confirm with client before Phase 4)
 
@@ -152,7 +153,7 @@ final only when the owner marks the cat adopted.
 - [ ] Should the cat's owner see the adopter's questionnaire directly? Current: admin-only, relayed on approval.
 - [ ] Site name + domain. Privacy-policy page text (personal data is collected — mandatory).
 - [ ] Re-verify image optimization against the cloud Supabase URL before launch.
-- [ ] NEXT_IMAGE_UNOPTIMIZED is a LOCAL-testing flag only — the cloud deployment must never set it, and must add the https://*.supabase.co remotePattern.
+- [ ] NEXT_IMAGE_UNOPTIMIZED is a LOCAL-testing flag only; the cloud remote pattern is derived from `NEXT_PUBLIC_SUPABASE_URL`.
 - [ ] On the next Next.js upgrade: re-test whether a route-level `loading.tsx` for /cats still breaks production hydration (see 2026-07-13 architect decision); if fixed upstream, restore the route-level skeleton.
 - [ ] Server-side transcoding pipeline for publisher video clips (convert RAW mp4/webm/mov inputs to ≤3s, 480px, ≤1MB specs) — future (§11 decision 2026-07-14).
 
@@ -181,6 +182,7 @@ final only when the owner marks the cat adopted.
 - 2026-07-14 · Added `resend` as dependency to send transactional emails · fits free tier assumptions.
 - 2026-07-14 · Added `@react-email/components` as dependency to build responsive RTL transactional email templates.
 - 2026-07-15 · (architect) Deletion policy fixed as §5a: archive is the default for anything ever published; hard delete only for never-published listings (owner), account-deletion cascade, or unlawful-content purge via service-role script. Mandates migration 0007 (`cats_delete_owner` RLS), `deleteCatAction` row-first ordering fix (found: cats had NO delete policy — the action purged media, silently no-oped the row delete, and reported success), admin archive-with-reason control, and auto-close of sibling requests on adopted/archived.
+- 2026-07-15 · Security hardening: migrations 0008–0009 make media private, constrain direct PostgREST/storage writes, enforce owner status transitions, and block blocked publishers; app adds signed media access, security headers, origin checks, bounded inputs, and production-safe email handling.
 
 
 ## 12. Now / Next (update every session)

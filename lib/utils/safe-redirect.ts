@@ -4,10 +4,16 @@ export function getSafeRedirect(path: string | null | undefined, fallback = '/')
   const trimmed = path.trim()
   if (!trimmed) return fallback
 
-  // A path is safe if it starts with a single '/' and NOT '//' or '/\'
-  if (trimmed.startsWith('/') && !trimmed.startsWith('//') && !trimmed.startsWith('/\\')) {
-    return trimmed
-  }
+  const pathOnly = trimmed.split(/[?#]/, 1)[0]
+  if (/[\u0000-\u001f\u007f\\]/.test(trimmed) || /%2f|%5c/i.test(pathOnly)) return fallback
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//')) return fallback
 
-  return fallback
+  try {
+    const base = new URL('https://safe.invalid')
+    const parsed = new URL(trimmed, base)
+    if (parsed.origin !== base.origin) return fallback
+    return parsed.pathname + parsed.search + parsed.hash
+  } catch {
+    return fallback
+  }
 }

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { strings } from '@/lib/strings'
 import { hasExtension } from '@/lib/utils/video-playback'
+import { getMediaUrl } from '@/lib/security/media'
 
 interface GalleryVideoPlayerProps {
   videoPath: string
@@ -21,8 +22,6 @@ export const GalleryVideoPlayer: React.FC<GalleryVideoPlayerProps> = ({
   const [isPlaying, setIsPlaying] = useState(false)
   const [userOptIn, setUserOptIn] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
-
   useEffect(() => {
     const resetPlay = () => {
       setIsPlaying(false)
@@ -86,11 +85,11 @@ export const GalleryVideoPlayer: React.FC<GalleryVideoPlayerProps> = ({
           }`}
         >
           {hasExtension(videoPath) ? (
-            <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}`} />
+            <source src={getMediaUrl(videoPath)} />
           ) : (
             <>
-              <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}.webm`} type="video/webm" />
-              <source src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${videoPath}.mp4`} type="video/mp4" />
+              <source src={getMediaUrl(`${videoPath}.webm`)} type="video/webm" />
+              <source src={getMediaUrl(`${videoPath}.mp4`)} type="video/mp4" />
             </>
           )}
         </video>

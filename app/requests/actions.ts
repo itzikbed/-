@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import React from 'react'
 import { sendEmail } from '@/lib/emails/send'
 import RequestReceived, { getSubject as getReqReceivedSub } from '@/emails/RequestReceived'
+import { isUuid } from '@/lib/security/media'
 
 export type ActionResult<T = unknown> = 
   | { ok: true; data?: T }
@@ -82,7 +83,7 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
       to: user.email,
       subject: getReqReceivedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
       react: React.createElement(RequestReceived, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown' })
-    }).catch(console.error)
+    }).catch((e) => console.error('[REQUEST EMAIL] send failed:', e instanceof Error ? e.message : String(e)))
   }
 
   revalidatePath('/requests')
@@ -92,6 +93,8 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
 }
 
 export async function withdrawAdoptionRequestAction(requestId: string): Promise<ActionResult> {
+  if (!isUuid(requestId)) return { ok: false, formError: 'הבקשה לא נמצאה' }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {

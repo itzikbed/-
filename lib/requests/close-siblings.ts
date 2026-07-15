@@ -1,23 +1,38 @@
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/emails/send'
 import { gendered } from '@/lib/strings'
 import React from 'react'
 import RequestClosedCatAdopted, { getSubject as getClosedSubject } from '@/emails/RequestClosedCatAdopted'
+import { isUuid } from '@/lib/security/media'
 
 export async function closeSiblings(catId: string) {
+  if (!isUuid(catId)) return
+
   try {
+    // Authorize the caller: this helper bypasses RLS via the service role, so it
+    // must verify the caller is the cat's owner or an admin rather than trusting
+    // that every call site checked first.
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
     const supabaseAdmin = createAdminClient()
 
-    // 1. Get the cat's details (name and sex) to format the rejection note
+    // 1. Get the cat's details (name, sex, owner) to authorize and format the note
     const { data: cat, error: catError } = await supabaseAdmin
       .from('cats')
-      .select('name, sex')
+      .select('name, sex, owner_id')
       .eq('id', catId)
       .single()
 
     if (catError || !cat) {
-      console.error(`[CLOSE SIBLINGS ERROR] Failed to fetch cat ${catId} details:`, catError?.message)
+      console.error('[CLOSE SIBLINGS ERROR] Failed to fetch cat details:', catError?.message)
       return
+    }
+
+    if (cat.owner_id !== user.id) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      if (!profile || profile.role !== 'admin') return
     }
 
     // 2. Fetch all pending requests for this cat
@@ -29,7 +44,7 @@ export async function closeSiblings(catId: string) {
 
     if (reqError || !pendingRequests || pendingRequests.length === 0) {
       if (reqError) {
-        console.error(`[CLOSE SIBLINGS ERROR] Failed to fetch pending requests for cat ${catId}:`, reqError.message)
+        console.error('[CLOSE SIBLINGS ERROR] Failed to fetch pending requests:', reqError.message)
       }
       return
     }
@@ -58,7 +73,7 @@ export async function closeSiblings(catId: string) {
         try {
           const { data, error: userError } = await supabaseAdmin.auth.admin.getUserById(req.adopter_id)
           if (userError || !data || !data.user || !data.user.email) {
-            console.error(`[CLOSE SIBLINGS EMAIL] Failed to resolve email for adopter ${req.adopter_id}:`, userError?.message)
+            console.error('[CLOSE SIBLINGS EMAIL] Failed to resolve adopter email:', userError?.message)
             return
           }
 
@@ -71,11 +86,11 @@ export async function closeSiblings(catId: string) {
             })
           })
         } catch (e) {
-          console.error(`[CLOSE SIBLINGS EMAIL] Failed to send auto-close email to adopter ${req.adopter_id}:`, e)
+          console.error('[CLOSE SIBLINGS EMAIL] Failed to send auto-close email:', e instanceof Error ? e.message : String(e))
         }
       })()
     }
   } catch (err) {
-    console.error('[CLOSE SIBLINGS EXCEPTION] Failed:', err)
+    console.error('[CLOSE SIBLINGS EXCEPTION] Failed:', err instanceof Error ? err.message : String(err))
   }
 }

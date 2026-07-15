@@ -3,6 +3,7 @@
 import { Image as ImageIcon, X, ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react'
 import Image from 'next/image'
 import { strings } from '@/lib/strings'
+import { getMediaUrl } from '@/lib/security/media'
 
 interface PhotoItem {
   id?: string
@@ -20,7 +21,6 @@ interface PhotoUploadGridProps {
   totalFiles: number
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>
   handleRemovePhoto: (index: number, pathCard: string, pathFull: string) => Promise<void>
-  supabaseUrl: string
 }
 
 export function PhotoUploadGrid({
@@ -30,8 +30,7 @@ export function PhotoUploadGrid({
   currentFileIndex,
   totalFiles,
   handleImageChange,
-  handleRemovePhoto,
-  supabaseUrl
+  handleRemovePhoto
 }: PhotoUploadGridProps) {
   const movePhoto = (index: number, direction: 'prev' | 'next') => {
     const newIndex = direction === 'prev' ? index - 1 : index + 1
@@ -66,7 +65,7 @@ export function PhotoUploadGrid({
           {photos.map((p, idx) => (
             <div key={idx} className="relative aspect-square bg-surface border border-border rounded-input overflow-hidden group">
               <Image
-                src={p.localUrl || `${supabaseUrl}/storage/v1/object/public/cat-photos/${p.path_card}`}
+                src={p.localUrl || getMediaUrl(p.path_card)}
                 alt="Cat preview"
                 fill
                 sizes="80px"

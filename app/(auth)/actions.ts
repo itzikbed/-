@@ -11,9 +11,6 @@ export type ActionResult<T = unknown> =
 
 function mapAuthError(message: string): string {
   const msg = message.toLowerCase()
-  if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('email already in use')) {
-    return uiStrings.auth.emailExists
-  }
   if (msg.includes('weak password') || msg.includes('should be at least') || msg.includes('password should be')) {
     return uiStrings.auth.weakPassword
   }

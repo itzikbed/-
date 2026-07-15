@@ -9,8 +9,11 @@ import RequestRejected, { getSubject as getReqRejectedSub } from '@/emails/Reque
 import { checkAdmin, getUserEmail } from './actions-helper'
 import { ActionResult } from './actions'
 import { strings } from '@/lib/strings'
+import { isUuid } from '@/lib/security/media'
 
 export async function approveAdoptionRequestAction(requestId: string): Promise<ActionResult> {
+  if (!isUuid(requestId)) return { ok: false, formError: strings.admin.conflictError }
+
   try {
     const adminId = await checkAdmin()
     const supabase = await createClient()
@@ -83,14 +86,14 @@ export async function approveAdoptionRequestAction(requestId: string): Promise<A
     revalidatePath('/requests')
     revalidatePath('/admin')
     return { ok: true }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err)
-    return { ok: false, formError: message || strings.admin.errorOccurred }
+  } catch {
+    return { ok: false, formError: strings.admin.errorOccurred }
   }
 }
 
 export async function rejectAdoptionRequestAction(requestId: string, reason: string): Promise<ActionResult> {
-  if (!reason || reason.trim().length < 10) {
+  reason = reason.trim()
+  if (!isUuid(requestId) || reason.length < 10 || reason.length > 2000) {
     return { ok: false, formError: strings.admin.dialog.rejectReasonMin }
   }
 
@@ -142,8 +145,7 @@ export async function rejectAdoptionRequestAction(requestId: string, reason: str
     revalidatePath('/requests')
     revalidatePath('/admin')
     return { ok: true }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err)
-    return { ok: false, formError: message || strings.admin.errorOccurred }
+  } catch {
+    return { ok: false, formError: strings.admin.errorOccurred }
   }
 }

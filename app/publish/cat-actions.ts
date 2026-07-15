@@ -1,11 +1,17 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { catSchema, CatInput, draftCatSchema } from '@/lib/schemas/cat'
 import { revalidatePath } from 'next/cache'
 import { ActionResult } from '@/app/(auth)/actions'
 import { closeSiblings } from '@/lib/requests/close-siblings'
 import { strings } from '@/lib/strings'
+import {
+  getStoredVideoPaths,
+  isStoredMediaPath,
+  isUuid
+} from '@/lib/security/media'
+import { validateCatMedia } from '@/lib/security/verify-stored-media'
 
 async function checkApprovedPublisher(): Promise<{ ok: boolean; error?: string; userId?: string }> {
   const supabase = await createClient()
@@ -29,6 +35,10 @@ export async function upsertCatAction(
   catId?: string,
   isDraft = false
 ): Promise<ActionResult<{ catId: string }>> {
+  if (catId && !isUuid(catId)) {
+    return { ok: false, formError: strings.common.errorOccurred }
+  }
+
   const check = await checkApprovedPublisher()
   if (!check.ok) return { ok: false, formError: check.error }
   const userId = check.userId!
@@ -49,7 +59,7 @@ export async function upsertCatAction(
   const today = new Date()
   const birthEst = new Date(today.getFullYear() - ageYears, today.getMonth() - ageMonths, 15)
   const birthEstStr = birthEst.toISOString().split('T')[0]
-  const status = isDraft ? 'draft' : 'pending'
+  const requestedStatus = isDraft ? 'draft' : 'pending'
   let targetId = catId
 
   if (targetId) {
@@ -63,6 +73,11 @@ export async function upsertCatAction(
       }
     }
 
+    if (!(await validateCatMedia(supabase, photos || [], video_path, targetId))) {
+      return { ok: false, formError: strings.common.errorOccurred }
+    }
+
+    const status = existingCat.status === 'published' ? 'pending' : requestedStatus
     const { error: updateError } = await supabase
       .from('cats')
       .update({
@@ -72,8 +87,16 @@ export async function upsertCatAction(
       })
       .eq('id', targetId)
 
-    if (updateError) return { ok: false, formError: 'שגיאה בעדכון החתול: ' + updateError.message }
+    if (updateError) {
+      console.error('Cat update failed:', updateError.code)
+      return { ok: false, formError: strings.common.errorOccurred }
+    }
   } else {
+    if ((photos && photos.length > 0) || video_path) {
+      return { ok: false, formError: strings.common.errorOccurred }
+    }
+
+    const status = requestedStatus
     const { data: inserted, error: insertError } = await supabase
       .from('cats')
       .insert({
@@ -85,13 +108,17 @@ export async function upsertCatAction(
       .single()
 
     if (insertError || !inserted) {
-      return { ok: false, formError: 'שגיאה ביצירת החתול: ' + (insertError?.message || 'לא התקבל מזהה') }
+      console.error('Cat insert failed:', insertError?.code)
+      return { ok: false, formError: strings.common.errorOccurred }
     }
     targetId = inserted.id
   }
 
   const { error: deletePhotosError } = await supabase.from('cat_photos').delete().eq('cat_id', targetId)
-  if (deletePhotosError) return { ok: false, formError: 'שגיאה בעדכון תמונות: ' + deletePhotosError.message }
+  if (deletePhotosError) {
+    console.error('Cat photo metadata cleanup failed:', deletePhotosError.code)
+    return { ok: false, formError: strings.common.errorOccurred }
+  }
 
   if (photos && photos.length > 0) {
     const photosToInsert = photos.map((p) => ({
@@ -102,7 +129,10 @@ export async function upsertCatAction(
     }))
 
     const { error: insertPhotosError } = await supabase.from('cat_photos').insert(photosToInsert)
-    if (insertPhotosError) return { ok: false, formError: 'שגיאה בשמירת תמונות: ' + insertPhotosError.message }
+    if (insertPhotosError) {
+      console.error('Cat photo metadata insert failed:', insertPhotosError.code)
+      return { ok: false, formError: strings.common.errorOccurred }
+    }
   }
 
   revalidatePath('/publish/my-cats')
@@ -112,6 +142,8 @@ export async function upsertCatAction(
 }
 
 export async function deleteCatAction(catId: string): Promise<ActionResult> {
+  if (!isUuid(catId)) return { ok: false, formError: strings.common.errorOccurred }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, formError: 'אנא התחבר תחילה.' }
@@ -128,7 +160,12 @@ export async function deleteCatAction(catId: string): Promise<ActionResult> {
   }
 
   // Load photos to delete before database cascade deletes them
-  const { data: photos } = await supabase.from('cat_photos').select('path_card, path_full').eq('cat_id', catId)
+  const { data: photos, error: photosError } = await supabase
+    .from('cat_photos')
+    .select('path_card, path_full')
+    .eq('cat_id', catId)
+
+  if (photosError) return { ok: false, formError: strings.publish.catDeleteError }
 
   // Delete DB row first
   const { data: deletedRows, error: deleteError } = await supabase
@@ -143,27 +180,19 @@ export async function deleteCatAction(catId: string): Promise<ActionResult> {
 
   // Remove storage files (non-fatal if it fails)
   const filesToDelete: string[] = []
-  if (photos) {
-    photos.forEach((p) => {
-      filesToDelete.push(p.path_card)
-      filesToDelete.push(p.path_full)
-    })
-  }
-  if (cat.video_path) {
-    filesToDelete.push(cat.video_path)
-  }
+  if (photos) photos.forEach((photo) => filesToDelete.push(photo.path_card, photo.path_full))
+  if (cat.video_path) filesToDelete.push(...getStoredVideoPaths(cat.video_path))
 
-  if (filesToDelete.length > 0) {
-    void (async () => {
-      try {
-        const { error: storageError } = await supabase.storage.from('cat-photos').remove(filesToDelete)
-        if (storageError) {
-          console.error('Storage cleanup failed on deleteCatAction:', storageError.message)
-        }
-      } catch (err) {
-        console.error('Storage cleanup error on deleteCatAction:', err)
-      }
-    })()
+  const safeFilesToDelete = filesToDelete.filter((path) =>
+    path.toLowerCase().startsWith(`${catId.toLowerCase()}/`) && isStoredMediaPath(path)
+  )
+
+  if (safeFilesToDelete.length > 0) {
+    const storageAdmin = createAdminClient()
+    const { error: storageError } = await storageAdmin.storage
+      .from('cat-photos')
+      .remove(safeFilesToDelete)
+    if (storageError) console.error('Storage cleanup failed after cat deletion:', storageError.message)
   }
 
   revalidatePath('/publish/my-cats')
@@ -172,6 +201,8 @@ export async function deleteCatAction(catId: string): Promise<ActionResult> {
 }
 
 export async function markAsAdoptedAction(catId: string): Promise<ActionResult> {
+  if (!isUuid(catId)) return { ok: false, formError: strings.common.errorOccurred }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, formError: 'אנא התחבר תחילה.' }
@@ -198,7 +229,7 @@ export async function markAsAdoptedAction(catId: string): Promise<ActionResult> 
   }
 
   // Auto-close sibling requests
-  void closeSiblings(catId)
+  await closeSiblings(catId)
 
   revalidatePath('/publish/my-cats')
   revalidatePath('/cats')
@@ -208,6 +239,8 @@ export async function markAsAdoptedAction(catId: string): Promise<ActionResult> 
 }
 
 export async function archiveCatAction(catId: string): Promise<ActionResult> {
+  if (!isUuid(catId)) return { ok: false, formError: strings.common.errorOccurred }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, formError: 'אנא התחבר תחילה.' }
@@ -231,7 +264,7 @@ export async function archiveCatAction(catId: string): Promise<ActionResult> {
   }
 
   // Auto-close sibling requests
-  void closeSiblings(catId)
+  await closeSiblings(catId)
 
   revalidatePath('/publish/my-cats')
   revalidatePath('/cats')

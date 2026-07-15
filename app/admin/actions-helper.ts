@@ -16,10 +16,13 @@ export async function checkAdmin() {
 }
 
 export async function getUserEmail(userId: string): Promise<string> {
+  // Defense-in-depth: this uses the service role to read any user's email, so it
+  // must independently confirm the caller is an admin (not rely on call sites).
+  await checkAdmin()
   const supabaseService = createAdminClient()
   const { data, error } = await supabaseService.auth.admin.getUserById(userId)
   if (error || !data.user || !data.user.email) {
-    throw new Error(`Failed to fetch email for user ${userId}`)
+    throw new Error('Failed to fetch user email')
   }
   return data.user.email
 }

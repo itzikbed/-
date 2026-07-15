@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 import { strings, gendered } from '@/lib/strings'
 import { Info, Coins, Stethoscope, Compass, ChevronLeft } from 'lucide-react'
 import { AdminArchiveControl } from '@/components/admin/AdminArchiveControl'
+import { getMediaUrl } from '@/lib/security/media'
 
 interface CatDetailPageProps {
   params: Promise<{ id: string }>
@@ -29,9 +30,8 @@ export async function generateMetadata({ params }: CatDetailPageProps) {
   }
 
   const coverPhoto = cat.cat_photos?.find((p) => p.sort_order === 0) || cat.cat_photos?.[0]
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
   const ogImageUrl = coverPhoto
-    ? `${supabaseUrl}/storage/v1/object/public/cat-photos/${coverPhoto.path_full}`
+    ? new URL(getMediaUrl(coverPhoto.path_full), process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').toString()
     : undefined
 
   const sexLabel = cat.sex === 'male' 

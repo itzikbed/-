@@ -27,7 +27,10 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
   process.exit(1)
 }
 
-const supabaseAnon = createClient(supabaseUrl, supabaseAnonKey)
+const createAnonClient = () => createClient(supabaseUrl, supabaseAnonKey, {
+  auth: { persistSession: false, autoRefreshToken: false }
+})
+const supabaseAnon = createAnonClient()
 
 async function run() {
   console.log("--- STARTING RLS SMOKE TEST ---")
@@ -80,7 +83,7 @@ async function run() {
 
     console.log(`Creating test user: ${email}...`)
     // 2. Signup new user
-    const { data: authData, error: signupError } = await supabaseAnon.auth.signUp({
+    const { data: authData, error: signupError } = await createAnonClient().auth.signUp({
       email,
       password,
       options: {
@@ -344,10 +347,12 @@ async function run() {
   // fixed in migration 0004. draftCat belongs to this (now approved) publisher.
   console.log("TEST 9: Storage upload policies...")
   const testBlob = new Blob(['rls-smoke storage probe'], { type: 'image/webp' })
+  const ownProbePath = `${draftCat.id}/${crypto.randomUUID()}-card.webp`
+  const foreignProbePath = `${publishedCatId}/${crypto.randomUUID()}-card.webp`
 
   const { error: ownUploadError } = await supabaseUser.storage
     .from('cat-photos')
-    .upload(`${draftCat.id}/rls-smoke-probe-card.webp`, testBlob, { contentType: 'image/webp' })
+    .upload(ownProbePath, testBlob, { contentType: 'image/webp' })
 
   if (ownUploadError) {
     console.error("TEST 9a FAILED: Owner could not upload photo to own cat folder:", ownUploadError.message)
@@ -355,26 +360,36 @@ async function run() {
   }
   console.log("TEST 9a SUCCESS: Owner uploaded into own cat folder.")
 
+  const { data: draftSignedUrl, error: draftSignedUrlError } = await supabaseAnon.storage
+    .from('cat-photos')
+    .createSignedUrl(ownProbePath, 60)
+
+  if (!draftSignedUrlError || draftSignedUrl?.signedUrl) {
+    console.error("TEST 9b FAILED: Anon obtained a signed URL for unmoderated media!")
+    process.exit(1)
+  }
+  console.log("TEST 9b SUCCESS: Anon cannot access unmoderated media.")
+
   const { error: foreignUploadError } = await supabaseUser.storage
     .from('cat-photos')
-    .upload(`${publishedCatId}/rls-smoke-intruder-card.webp`, testBlob, { contentType: 'image/webp' })
+    .upload(foreignProbePath, testBlob, { contentType: 'image/webp' })
 
   if (foreignUploadError) {
-    console.log("TEST 9b SUCCESS: Upload into another owner's cat folder blocked. Error:", foreignUploadError.message)
+    console.log("TEST 9c SUCCESS: Upload into another owner's cat folder blocked. Error:", foreignUploadError.message)
   } else {
-    console.error("TEST 9b FAILED: User uploaded into a cat folder they do not own!")
+    console.error("TEST 9c FAILED: User uploaded into a cat folder they do not own!")
     process.exit(1)
   }
 
   const { data: removed, error: ownDeleteError } = await supabaseUser.storage
     .from('cat-photos')
-    .remove([`${draftCat.id}/rls-smoke-probe-card.webp`])
+    .remove([ownProbePath])
 
   if (ownDeleteError || !removed || removed.length === 0) {
-    console.error("TEST 9c FAILED: Owner could not delete own object:", ownDeleteError?.message ?? 'no object removed')
+    console.error("TEST 9d FAILED: Owner could not delete own object:", ownDeleteError?.message ?? 'no object removed')
     process.exit(1)
   }
-  console.log("TEST 9c SUCCESS: Owner deleted own object.")
+  console.log("TEST 9d SUCCESS: Owner deleted own object.")
 
   // ============ TEST 10: Contact Isolation Before Approval ============
   console.log("TEST 10: Contact Isolation Before Approval...")
@@ -382,7 +397,7 @@ async function run() {
   // 1. Create Adopter X
   const adopterEmail = `adopter_${Date.now()}@example.com`
   const adopterPassword = "password123"
-  const { data: adopterAuth, error: adopterSignupError } = await supabaseAnon.auth.signUp({
+  const { data: adopterAuth, error: adopterSignupError } = await createAnonClient().auth.signUp({
     email: adopterEmail,
     password: adopterPassword,
     options: {
@@ -420,7 +435,7 @@ async function run() {
   // 2. Create Third User Z
   const thirdEmail = `third_${Date.now()}@example.com`
   const thirdPassword = "password123"
-  const { data: thirdAuth, error: thirdSignupError } = await supabaseAnon.auth.signUp({
+  const { data: thirdAuth, error: thirdSignupError } = await createAnonClient().auth.signUp({
     email: thirdEmail,
     password: thirdPassword,
     options: {
@@ -768,4 +783,3 @@ async function run() {
 }
 
 run()
-

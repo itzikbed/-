@@ -33,7 +33,8 @@ export async function applyAsPublisherAction(formData: PublisherApplicationInput
     .eq('id', user.id)
 
   if (error) {
-    return { ok: false, formError: 'אירעה שגיאה בשמירת הבקשה: ' + error.message }
+    console.error('Publisher application update failed:', error.code)
+    return { ok: false, formError: 'אירעה שגיאה בשמירת הבקשה. נא לנסות שוב.' }
   }
 
   revalidatePath('/publish')

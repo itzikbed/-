@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { Database } from './database.types'
 
 export async function updateSession(request: NextRequest) {
+  if (process.env.NODE_ENV === 'production' && request.nextUrl.pathname.startsWith('/dev')) {
+    return new NextResponse(null, { status: 404 })
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -43,4 +47,3 @@ export async function updateSession(request: NextRequest) {
 
   return supabaseResponse
 }
-

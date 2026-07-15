@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/filters'
 import { strings } from '@/lib/strings'
+import { getMediaUrl } from '@/lib/security/media'
 import Image from 'next/image'
 
 interface CatPhoto {
@@ -55,8 +56,6 @@ export default function CatQueueItem({
   onRejectTrigger
 }: CatQueueItemProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
-
   const toggleExpand = () => {
     setIsExpanded(!isExpanded)
   }
@@ -73,7 +72,7 @@ export default function CatQueueItem({
 
   const coverPhoto = cat.cat_photos?.find(p => p.sort_order === 0) || cat.cat_photos?.[0]
   const imageUrl = coverPhoto
-    ? `${supabaseUrl}/storage/v1/object/public/cat-photos/${coverPhoto.path_card}`
+    ? getMediaUrl(coverPhoto.path_card)
     : '/hero/hero_1_poster.jpg'
 
   return (
@@ -180,9 +179,9 @@ export default function CatQueueItem({
               </span>
               <div className="flex flex-wrap gap-2">
                 {cat.cat_photos.map((photo) => {
-                  const photoUrl = `${supabaseUrl}/storage/v1/object/public/cat-photos/${photo.path_card}`
+                  const photoUrl = getMediaUrl(photo.path_card)
                   return (
-                    <a key={photo.id} href={`${supabaseUrl}/storage/v1/object/public/cat-photos/${photo.path_full}`} target="_blank" rel="noreferrer">
+                    <a key={photo.id} href={getMediaUrl(photo.path_full)} target="_blank" rel="noreferrer">
                       <Image 
                         src={photoUrl} 
                         alt=""

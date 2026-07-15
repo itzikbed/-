@@ -69,7 +69,8 @@ export async function saveQuestionnaireStepAction(
     .upsert(updateData)
 
   if (upsertError) {
-    return { ok: false, formError: 'שגיאה בשמירת הנתונים במערכת: ' + upsertError.message }
+    console.error('Questionnaire upsert failed:', upsertError.code)
+    return { ok: false, formError: 'אירעה שגיאה בשמירת הנתונים. נא לנסות שוב.' }
   }
 
   revalidatePath('/adopt/questionnaire')

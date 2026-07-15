@@ -6,6 +6,7 @@ import { processImageFile } from '@/lib/utils/image-processing'
 import { strings } from '@/lib/strings'
 import { Film, X, UploadCloud, RefreshCw } from 'lucide-react'
 import { PhotoUploadGrid } from './PhotoUploadGrid'
+import { getAllowedVideoExtension } from '@/lib/security/media'
 
 interface PhotoItem {
   id?: string
@@ -36,7 +37,6 @@ export function UploadStep4({
   const [videoLoading, setVideoLoading] = useState(false)
 
   const supabase = createClient()
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
 
   useEffect(() => () => {
     photos.forEach((p) => p.localUrl?.startsWith('blob:') && URL.revokeObjectURL(p.localUrl))
@@ -62,7 +62,7 @@ export function UploadStep4({
       setCurrentFileIndex(i + 1)
       const file = newFiles[i]
 
-      if (file.size > 12 * 1024 * 1024) {
+      if (file.size === 0 || file.size > 12 * 1024 * 1024) {
         setUploadError(strings.publish.maxSizePhoto.replace('{name}', file.name))
         continue
       }
@@ -85,7 +85,10 @@ export function UploadStep4({
           .from('cat-photos')
           .upload(fullPath, fullBlob, { contentType: 'image/webp' })
 
-        if (fullErr) throw new Error(fullErr.message)
+        if (fullErr) {
+          await supabase.storage.from('cat-photos').remove([cardPath])
+          throw new Error(fullErr.message)
+        }
 
         const newPhoto: PhotoItem = {
           path_card: cardPath,
@@ -97,11 +100,8 @@ export function UploadStep4({
         updatedPhotos.push(newPhoto)
         setPhotos([...updatedPhotos])
       } catch (err) {
-        let message = err instanceof Error ? err.message : String(err)
-        if (message === 'image_decode_failed') {
-          message = strings.publish.invalidImage
-        }
-        setUploadError(`${strings.publish.uploadError}${message}`)
+        const isDecodeError = err instanceof Error && err.message === 'image_decode_failed'
+        setUploadError(isDecodeError ? strings.publish.invalidImage : strings.publish.uploadError)
         break
       }
     }
@@ -118,7 +118,8 @@ export function UploadStep4({
     setUploadError(null)
     setVideoLoading(true)
 
-    if (file.size > 25 * 1024 * 1024) {
+    const extension = getAllowedVideoExtension(file.type)
+    if (!extension || file.size === 0 || file.size > 25 * 1024 * 1024) {
       setUploadError(strings.publish.videoSizeLimit)
       setVideoLoading(false)
       return
@@ -129,20 +130,24 @@ export function UploadStep4({
       tempVideo.preload = 'metadata'
       tempVideo.src = URL.createObjectURL(file)
 
-      const duration = await new Promise<number>((resolve) => {
+      const duration = await new Promise<number>((resolve, reject) => {
         tempVideo.onloadedmetadata = () => {
           URL.revokeObjectURL(tempVideo.src)
           resolve(tempVideo.duration)
         }
+        tempVideo.onerror = () => {
+          URL.revokeObjectURL(tempVideo.src)
+          reject(new Error('invalid_video'))
+        }
       })
 
-      if (duration > 15) {
+      if (!Number.isFinite(duration) || duration <= 0 || duration > 15) {
         setUploadError(strings.publish.videoDurationLimit)
         setVideoLoading(false)
         return
       }
 
-      const videoPath = `${catId}/${crypto.randomUUID()}-video.${file.name.split('.').pop() || 'mp4'}`
+      const videoPath = `${catId}/${crypto.randomUUID()}-video.${extension}`
 
       const { error: uploadErr } = await supabase.storage
         .from('cat-photos')
@@ -151,9 +156,8 @@ export function UploadStep4({
       if (uploadErr) throw new Error(uploadErr.message)
 
       setVideoPath(videoPath)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-      setUploadError(`${strings.publish.videoUploadError}${message}`)
+    } catch {
+      setUploadError(strings.publish.videoUploadError)
     } finally {
       setVideoLoading(false)
     }
@@ -163,7 +167,8 @@ export function UploadStep4({
     if (isProcessing) return
     setUploadError(null)
     try {
-      await supabase.storage.from('cat-photos').remove([pathCard, pathFull])
+      const { error } = await supabase.storage.from('cat-photos').remove([pathCard, pathFull])
+      if (error) throw new Error('photo_delete_failed')
       const nextPhotos = photos.filter((_, i) => i !== index).map((p, idx) => ({ ...p, sort_order: idx }))
       setPhotos(nextPhotos)
     } catch {
@@ -176,7 +181,8 @@ export function UploadStep4({
     setUploadError(null)
     setVideoLoading(true)
     try {
-      await supabase.storage.from('cat-photos').remove([videoPath])
+      const { error } = await supabase.storage.from('cat-photos').remove([videoPath])
+      if (error) throw new Error('video_delete_failed')
       setVideoPath(null)
     } catch {
       setUploadError(strings.publish.videoDeleteError)
@@ -205,7 +211,6 @@ export function UploadStep4({
         totalFiles={totalFiles}
         handleImageChange={handleImageChange}
         handleRemovePhoto={handleRemovePhoto}
-        supabaseUrl={supabaseUrl}
       />
 
       {/* Video Upload Area */}

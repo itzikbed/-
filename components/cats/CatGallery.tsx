@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { strings } from '@/lib/strings'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { shouldDisableVideo } from '@/lib/utils/video-playback'
+import { getMediaUrl } from '@/lib/security/media'
 import { GalleryVideoPlayer } from './GalleryVideoPlayer'
 
 interface Photo {
@@ -35,8 +36,6 @@ export const CatGallery: React.FC<CatGalleryProps> = ({
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [disableVideo, setDisableVideo] = useState(true)
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
 
   useEffect(() => {
     const checkVideoSettings = () => {
@@ -117,7 +116,7 @@ export const CatGallery: React.FC<CatGalleryProps> = ({
       >
         {activeSlide.type === 'photo' ? (
           <Image
-            src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${activeSlide.photo!.path_full}`}
+            src={getMediaUrl(activeSlide.photo!.path_full)}
             alt={strings.catalog.photoAlt.replace('{name}', catName).replace('{index}', (activeSlide.index + 1).toString())}
             fill
             priority={activeIndex === 0}
@@ -129,7 +128,7 @@ export const CatGallery: React.FC<CatGalleryProps> = ({
           <GalleryVideoPlayer
             videoPath={videoPath!}
             catName={catName}
-            coverPhotoUrl={`${supabaseUrl}/storage/v1/object/public/cat-photos/${photos[0].path_full}`}
+            coverPhotoUrl={getMediaUrl(photos[0].path_full)}
             disableVideo={disableVideo}
           />
         )}
@@ -162,8 +161,8 @@ export const CatGallery: React.FC<CatGalleryProps> = ({
           {slides.map((slide, idx) => {
             const isVideo = slide.type === 'video'
             const thumbUrl = isVideo 
-              ? `${supabaseUrl}/storage/v1/object/public/cat-photos/${photos[0].path_card}`
-              : `${supabaseUrl}/storage/v1/object/public/cat-photos/${slide.photo!.path_card}`
+              ? getMediaUrl(photos[0].path_card)
+              : getMediaUrl(slide.photo!.path_card)
             const isActive = idx === activeIndex
             
             return (

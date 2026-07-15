@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/Badge'
 import { strings } from '@/lib/strings'
+import { getMediaUrl } from '@/lib/security/media'
 import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/filters'
 import { Edit, Trash2, Heart, Award } from 'lucide-react'
@@ -55,8 +56,6 @@ export function MyCatCard({
   const regionLabel = regionObj ? regionObj.label : cat.region
 
   const isActionDisabled = loadingId === cat.id
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321'
-
   return (
     <div
       className="bg-surface border border-border rounded-card p-4 md:p-5 shadow-resting flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between hover:shadow-hover transition-all duration-200"
@@ -66,12 +65,12 @@ export function MyCatCard({
         <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-input overflow-hidden bg-pine-soft/40 border border-border flex-shrink-0">
           {coverPhoto ? (
             <Image
-              src={`${supabaseUrl}/storage/v1/object/public/cat-photos/${coverPhoto.path_card}`}
+              src={getMediaUrl(coverPhoto.path_card)}
               alt={cat.name}
               fill
               sizes="96px"
               className="object-cover"
-              unoptimized={process.env.NEXT_PUBLIC_TEMPORARY_DISABLE_IMAGE_OPTIMIZATION === 'true'}
+              unoptimized
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-pine">

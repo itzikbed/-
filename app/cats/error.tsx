@@ -11,7 +11,8 @@ interface ErrorPageProps {
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   useEffect(() => {
-    console.error(error)
+    // Avoid logging the full error object; message + digest are enough to correlate.
+    console.error('Client error boundary:', error.message, error.digest)
   }, [error])
 
   return (

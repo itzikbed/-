@@ -18,6 +18,13 @@ describe('safe-redirect utility', () => {
 
   it('rejects backslash protocol relative paths', () => {
     expect(getSafeRedirect('/\\evil.com')).toBe('/')
+    expect(getSafeRedirect('/safe\\evil.com')).toBe('/')
+    expect(getSafeRedirect('/%5cevil.com')).toBe('/')
+    expect(getSafeRedirect('/%2fevil.com')).toBe('/')
+  })
+
+  it('rejects control characters', () => {
+    expect(getSafeRedirect('/cats\nLocation:https://evil.com')).toBe('/')
   })
 
   it('rejects javascript URIs', () => {

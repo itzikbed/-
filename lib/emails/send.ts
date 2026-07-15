@@ -1,9 +1,11 @@
+import 'server-only'
 import fs from 'fs'
 import path from 'path'
 import React from 'react'
 
-const resendApiKey = process.env.RESEND_API_KEY || 're_local_mock_key'
-const isMock = resendApiKey === 're_local_mock_key'
+const resendApiKey = process.env.RESEND_API_KEY
+const configuredFromAddress = process.env.RESEND_FROM_EMAIL
+const isMock = !resendApiKey && process.env.NODE_ENV !== 'production'
 
 export interface SendEmailOptions {
   to: string | string[]
@@ -14,6 +16,11 @@ export interface SendEmailOptions {
 
 export async function sendEmail({ to, subject, react, text }: SendEmailOptions) {
   try {
+    if (!isMock && (!resendApiKey || !configuredFromAddress)) {
+      console.error('[EMAIL CONFIG ERROR] Production email configuration is incomplete')
+      return { data: null, error: new Error('Email service is not configured') }
+    }
+
     const { Resend } = await import('resend')
     const { render } = await import('@react-email/components')
 
@@ -33,15 +40,15 @@ export async function sendEmail({ to, subject, react, text }: SendEmailOptions) 
       const txtFilepath = path.join(outboxDir, txtFilename)
       fs.writeFileSync(htmlFilepath, html, 'utf8')
       fs.writeFileSync(txtFilepath, plainText, 'utf8')
-      console.error(`[MOCK EMAIL SENT] to: ${JSON.stringify(to)} | subject: ${subject} | saved to: ${htmlFilepath} and ${txtFilepath}`)
+      console.error(`[MOCK EMAIL SAVED] ${htmlFilepath} and ${txtFilepath}`)
       return { data: { id: `mock-${Date.now()}` }, error: null }
     }
 
-    const resend = new Resend(resendApiKey)
+    const resend = new Resend(resendApiKey!)
     const fromAddress = 'בית לחתול <no-reply@domain>'
     
     const res = await resend.emails.send({
-      from: fromAddress,
+      from: configuredFromAddress || fromAddress,
       to,
       subject,
       html,
@@ -49,13 +56,14 @@ export async function sendEmail({ to, subject, react, text }: SendEmailOptions) 
     })
 
     if (res.error) {
-      console.error(`[EMAIL ERROR] Failed to send email to ${JSON.stringify(to)}:`, res.error)
+      // Log only the provider message, never the full error object (may echo the recipient address).
+      console.error('[EMAIL ERROR] Provider rejected the message:', res.error.message)
     } else {
-      console.error(`[EMAIL SENT] to: ${JSON.stringify(to)} | subject: ${subject} | id: ${res.data?.id}`)
+      console.error(`[EMAIL SENT] id: ${res.data?.id}`)
     }
     return res
   } catch (err: unknown) {
-    console.error(`[EMAIL EXCEPTION] Failed to send email to ${JSON.stringify(to)}:`, err instanceof Error ? err.message : String(err))
+    console.error('[EMAIL EXCEPTION]', err instanceof Error ? err.message : String(err))
     return { data: null, error: err }
   }
 }

@@ -144,8 +144,12 @@ the card photo morphs into the detail hero (shared element). 250–300ms, transf
 only. Zero bytes; this is the "feels like an app" moment on mobile. Falls back to a normal
 navigation on unsupported browsers — never polyfill.
 
-**3. Hero film sequence.** 3 warm clips crossfading (6–8s each, 1.5s fade). Only clip #1
-loads eagerly; #2–#3 lazy after `load`. Each ≤ 1.2MB, 960px is enough. Poster-first always.
+**3. Hero film sequence.** 4–5 warm clips crossfading (6–8s each, 1.5s fade). Only clip #1
+loads eagerly; the rest lazy after `load`. Each ≤ 1.2MB, 960px is enough. Poster-first always.
+**Mobile legibility (client feedback via Itzik, 2026-07-16):** the hero is watched on a
+6-inch screen — every clip must read at 390px wide: close-up/medium shots only, the cat
+filling roughly ≥ 40% of frame height; no wide establishing shots. Visibly over-compressed
+sources fail this bar too (the original `hero_2` is the canonical example to replace).
 
 **4. Self-drawing mascot.** Peeking Cat ink strokes draw themselves (CSS
 `stroke-dashoffset`, ~700ms) when their section enters the viewport — used in

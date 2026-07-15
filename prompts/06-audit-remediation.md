@@ -289,6 +289,18 @@ describing exactly this behavior.
 - **Q12 raw-video privacy notice (SEC-08, deferred):** Hebrew notice in the video
   upload step: the clip is published exactly as uploaded — including audio and any
   identifying details visible in it. No transcoding work.
+- **Q13 hero film v2.1 (client feedback via Itzik, 2026-07-16):** the current 3-clip
+  hero fails on phones — wide shots are illegible at 390px and `hero_2` is visibly
+  over-compressed. Per DESIGN.md §6b item 3 (amended): rebuild the rotation with
+  **4–5 clips**, close-up/medium shots where the cat fills roughly ≥ 40% of frame
+  height, warm grading per §6a; replace `hero_2`; source openly-licensed footage
+  like the existing assets and document each source + license in the report.
+  Budgets unchanged: clip #1 eager only (combine with Q3's preload change), each
+  ≤ 1.2MB @ 960px, WebM+MP4+poster per clip, reduced-motion/saveData ⇒ poster, one
+  video playing site-wide (PERF-02/R2 fix applies to the new clips too).
+  Acceptance: at a 390px viewport every clip's subject is instantly identifiable;
+  the crossfade cycles through all clips; above-the-fold mobile transfer stays
+  ≤ 2.5MB.
 
 ## Done checklist
 

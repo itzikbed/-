@@ -195,6 +195,7 @@ final only when the owner marks the cat adopted.
 | 2.5 | Design elevation "החתול החי" | ☑ |
 | 3 | Questionnaire wizard · upload wizard · request flow | ☑ |
 | 4 | Admin queues + emails | ☑ |
-| 4.2 | Deletion & archive lifecycle per §5a: migration 0007, deleteCatAction fix, owner/admin archive controls, sibling-request auto-close + emails (prompt 04.2) | ☐ |
+| 4.2 | Deletion & archive lifecycle per §5a: migration 0007, deleteCatAction fix, owner/admin archive controls, sibling-request auto-close + emails (prompt 04.2) | ☑ |
 | 5 | Polish: SEO/OG, a11y audit, privacy page | ☐ |
 | 6 | Seed, QA as all 4 roles, domain, admin handover | ☐ |
+| 7 | External-audit remediation — triage of SITE_AUDIT_REPORT.md (prompt 06) | ☐ |

@@ -74,8 +74,9 @@ Admin/UI:
 7. After a successful admin archive on `/cats/[id]`, `window.location.reload()` lands
    the admin on a 404 (the page hides non-published cats). Redirect to `/admin` with
    the success message instead.
-8. `app/requests/actions.ts`: when a profile lookup fails, both party emails are
-   silently skipped — add a `console.error` (fire-and-log means LOG), no PII in the
+8. `app/admin/request-actions.ts` (path corrected 2026-07-16): the
+   `if (adopter && owner)` guard silently skips both party emails when a profile
+   lookup fails — add a `console.error` (fire-and-log means LOG), no PII in the
    log line (message only, never the email address).
 
 ## Track A ∥ — SEO, a11y, meta

@@ -33,11 +33,11 @@ prompt and the report disagree, this prompt wins. Skills: `supabase-fullstack`,
   (Phase 3, architect-approved): path WITH extension ⇒ raw upload ⇒ plays on the
   detail page only, no catalog live-card; extensionless ⇒ optimized pair ⇒ catalog
   autoplay. The live-card feature is for optimized assets only.
-- **Open client decisions — skip; Itzik will decide:** UX-12 (minors' consent
-  field), UX-14 (adopted-cats visibility — ARCHITECTURE §10), UX-17 (trust copy /
-  organizational identity), SEC-08 (video transcoding is deferred for the ₪0
-  budget; add only a Hebrew UI notice in the upload step advising owners that the
-  video is published as-is — no location/audio they don't want public).
+- **Decided by the architect (2026-07-16, authority delegated by Itzik — see
+  ARCHITECTURE §11):** UX-12 → adopters must be 18+, no consent flow (item J9);
+  UX-14 → adopted cats stay hidden at launch, showcase deferred (item Q10);
+  UX-17 → process-true trust copy (item Q11); SEC-08 → video transcoding stays
+  deferred for the ₪0 budget, upload-step privacy notice instead (item Q12).
 - **Architect-accepted, document only (SECURITY.md residuals section):** SEC-16,
   SEC-18, PERF-12.
 
@@ -182,6 +182,12 @@ Add a contact channel: `NEXT_PUBLIC_CONTACT_EMAIL` env (placeholder in
 `.env.example`; Itzik supplies the real address at deploy), rendered as a `mailto:`
 link in the footer + in the "פנו לתמיכה" copy so the promise is real.
 
+### J9 — adopters are 18+ (UX-12, decided)
+
+Questionnaire age: schema minimum 18 (Hebrew error: "האימוץ דרך האתר מגיל 18
+בלבד"), input `min` attribute to match, and the privacy page states the 18+
+requirement. No parental-consent field. Existing stored profiles are unaffected.
+
 ## Track R ∥ — Reliability & lifecycle (P1)
 
 ### R1 — email delivery survives serverless (REL-01)
@@ -270,6 +276,19 @@ describing exactly this behavior.
 - **Q9 catalog discovery (UX-15):** name search (`ilike`, debounced, in the filter
   drawer) + sort select (newest / youngest / oldest). Keyset pagination is
   OPTIONAL — document if skipped.
+- **Q10 adopted-cats cleanup (UX-14, decided):** adopted cats remain hidden at
+  launch. Delete the unreachable adopted-badge branch in `CatCard` and align any
+  copy/docs that promise visible adopted listings ("סיפורי אימוץ" is deferred
+  post-launch — do not build it).
+- **Q11 process-true trust copy (UX-17, decided):** replace unverifiable claims
+  (variants of "בטוח", "מאובטח", "התאמה מלאה") with accurate process statements —
+  every listing is reviewed and approved by the site team before publication;
+  contact details are shared only after a request is approved; adopters complete a
+  questionnaire. Where the copy promises support, link the J8 contact channel. Do
+  not invent organizational credentials or certifications.
+- **Q12 raw-video privacy notice (SEC-08, deferred):** Hebrew notice in the video
+  upload step: the clip is published exactly as uploaded — including audio and any
+  identifying details visible in it. No transcoding work.
 
 ## Done checklist
 

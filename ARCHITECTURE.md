@@ -147,11 +147,11 @@ final only when the owner marks the cat adopted.
 
 ## 10. Open product decisions (confirm with client before Phase 4)
 
-- [ ] Contact handoff on approval — implemented default: email both sides name+phone. Confirm.
-- [ ] Adopted cats — implemented reality (Phase 4): hidden everywhere once adopted (public queries filter `published`; CatCard's adopted badge is currently unreachable). Decide if the client wants a "סיפורי אימוץ" showcase instead.
-- [ ] Questionnaire timing — implemented default: free browsing, required only before first request (differs from client's original "at entry"). Confirm.
-- [ ] Should the cat's owner see the adopter's questionnaire directly? Current: admin-only, relayed on approval.
-- [ ] Site name + domain. Privacy-policy page text (personal data is collected — mandatory).
+- [x] Contact handoff on approval — email both sides name+phone. CONFIRMED (architect, delegated, 2026-07-16).
+- [x] Adopted cats — DECIDED 2026-07-16 (architect, delegated): stay hidden at launch; "סיפורי אימוץ" showcase deferred post-launch; unreachable badge branch removed in prompt 06 Q10.
+- [x] Questionnaire timing — CONFIRMED: free browsing, questionnaire required only before first request.
+- [x] Adopter questionnaire stays admin-only, relayed on approval. CONFIRMED (privacy default).
+- [x] Site name confirmed "בית לחתול"; domain purchase at deploy (runbook). Privacy-policy page built in Phase 5; adopters 18+ (prompt 06 J9).
 - [ ] Re-verify image optimization against the cloud Supabase URL before launch.
 - [ ] NEXT_IMAGE_UNOPTIMIZED is a LOCAL-testing flag only; the cloud remote pattern is derived from `NEXT_PUBLIC_SUPABASE_URL`.
 - [ ] On the next Next.js upgrade: re-test whether a route-level `loading.tsx` for /cats still breaks production hydration (see 2026-07-13 architect decision); if fixed upstream, restore the route-level skeleton.
@@ -183,6 +183,7 @@ final only when the owner marks the cat adopted.
 - 2026-07-14 · Added `@react-email/components` as dependency to build responsive RTL transactional email templates.
 - 2026-07-15 · (architect) Deletion policy fixed as §5a: archive is the default for anything ever published; hard delete only for never-published listings (owner), account-deletion cascade, or unlawful-content purge via service-role script. Mandates migration 0007 (`cats_delete_owner` RLS), `deleteCatAction` row-first ordering fix (found: cats had NO delete policy — the action purged media, silently no-oped the row delete, and reported success), admin archive-with-reason control, and auto-close of sibling requests on adopted/archived.
 - 2026-07-15 · Security hardening: migrations 0008–0009 make media private, constrain direct PostgREST/storage writes, enforce owner status transitions, and block blocked publishers; app adds signed media access, security headers, origin checks, bounded inputs, and production-safe email handling.
+- 2026-07-16 · (architect, decision authority delegated by Itzik) §10 product defaults settled: contact handoff = email both sides name+phone; questionnaire only before first request; adopter questionnaire stays admin-only; adopted cats stay hidden at launch ("סיפורי אימוץ" deferred post-launch); adopters 18+ with no parental-consent flow; trust copy must be process-true (no unverifiable claims); support contact via NEXT_PUBLIC_CONTACT_EMAIL set at deploy; video transcoding stays deferred (₪0 budget) with an upload-step privacy notice; HSTS preload deferred to post-launch. Implementation: prompt 06 items J8–J9, Q10–Q12.
 
 
 ## 12. Now / Next (update every session)

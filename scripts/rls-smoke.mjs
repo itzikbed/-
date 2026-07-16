@@ -27,6 +27,12 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
   process.exit(1)
 }
 
+const urlObj = new URL(supabaseUrl)
+if (urlObj.hostname !== 'localhost' && urlObj.hostname !== '127.0.0.1') {
+  console.error("Refusing to run rls-smoke: Target URL must be localhost/127.0.0.1 to prevent accidental production overwrite.")
+  process.exit(1)
+}
+
 const createAnonClient = () => createClient(supabaseUrl, supabaseAnonKey, {
   auth: { persistSession: false, autoRefreshToken: false }
 })
@@ -425,6 +431,13 @@ async function run() {
     user_id: adopterId,
     age: 30,
     city: 'ירושלים',
+    household_desc: 'דירת 3 חדרים עם מרפסת סגורה',
+    floor_type: 'floor_2',
+    adoption_reason: 'אוהב חתולים ומחפש חבר לחיים',
+    surrender_circumstances: 'לא יקרה מעולם',
+    has_other_pets: false,
+    has_cat_experience: true,
+    has_window_screens: true,
     completed_at: new Date().toISOString()
   })
   if (qErr) {
@@ -536,10 +549,24 @@ async function run() {
   // ============ TEST 11: Contact Handoff After Approval ============
   console.log("TEST 11: Contact Handoff After Approval...")
 
-  // 1. Admin approves request
+  const { data: adminProfile, error: adminProfileErr } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('role', 'admin')
+    .limit(1)
+    .single()
+  if (adminProfileErr || !adminProfile) {
+    console.error("Failed to query admin profile in test:", adminProfileErr?.message)
+    process.exit(1)
+  }
+
   const { error: adminApproveErr } = await supabaseAdmin
     .from('adoption_requests')
-    .update({ status: 'approved' })
+    .update({
+      status: 'approved',
+      decided_by: adminProfile.id,
+      decided_at: new Date().toISOString()
+    })
     .eq('id', requestId)
 
   if (adminApproveErr) {
@@ -728,6 +755,258 @@ async function run() {
 
   console.log("TEST 11.5c SUCCESS: Other user and anon delete attempts returned 0 rows.")
   await supabaseAdmin.from('cats').delete().eq('id', tempCat3.id)
+
+  // ============ TEST S7: Adversarial RLS Tests ============
+  console.log("TEST S7a: Non-admin trying to insert approved request...")
+  const { error: s7aError } = await supabaseUser
+    .from('adoption_requests')
+    .insert({
+      cat_id: publishedCatId,
+      adopter_id: userId,
+      message: 'הודעת בקשה תקינה באורך 20 תווים לפחות',
+      status: 'approved'
+    })
+  if (!s7aError) {
+    throw new Error("TEST S7a FAILED: Non-admin was able to insert approved request directly!")
+  }
+  console.log("TEST S7a SUCCESS: Direct insertion of approved request blocked as expected.")
+
+  console.log("TEST S7b: Non-admin trying to insert request with decided_by...")
+  const { error: s7bError } = await supabaseUser
+    .from('adoption_requests')
+    .insert({
+      cat_id: publishedCatId,
+      adopter_id: userId,
+      message: 'הודעת בקשה תקינה באורך 20 תווים לפחות',
+      decided_by: userId
+    })
+  if (!s7bError) {
+    throw new Error("TEST S7b FAILED: Non-admin was able to insert request with decided_by set!")
+  }
+  console.log("TEST S7b SUCCESS: Direct insertion of request with decided_by blocked as expected.")
+
+  console.log("TEST S7c: Non-admin trying to withdraw and tamper request fields...")
+  // Find another published cat to request
+  const { data: otherCats } = await supabaseAdmin
+    .from('cats')
+    .select('id')
+    .eq('status', 'published')
+    .neq('id', publishedCatId)
+    .limit(1)
+  const otherCatId = otherCats[0].id
+
+  // Create a pending request
+  const { data: s7cReq, error: s7cReqErr } = await supabaseAdopter
+    .from('adoption_requests')
+    .insert({
+      cat_id: otherCatId,
+      adopter_id: adopterId,
+      message: 'בקשה לבדיקת Trigger מניעת זיוף שדות'
+    })
+    .select('id')
+    .single()
+  
+  if (s7cReqErr || !s7cReq) {
+    throw new Error("Failed to insert pending request for S7c: " + s7cReqErr?.message)
+  }
+
+  // Try to update it by changing message as well (should trigger exception)
+  const { error: s7cError } = await supabaseAdopter
+    .from('adoption_requests')
+    .update({
+      status: 'withdrawn',
+      message: 'שינוי הודעה זדוני'
+    })
+    .eq('id', s7cReq.id)
+
+  // Clean up
+  await supabaseAdmin.from('adoption_requests').delete().eq('id', s7cReq.id)
+
+  if (!s7cError) {
+    throw new Error("TEST S7c FAILED: Non-admin was able to withdraw and modify message field in request!")
+  }
+  console.log("TEST S7c SUCCESS: Tampering during request withdrawal blocked as expected.")
+
+  console.log("TEST S7d: Setting completed_at on incomplete adopter profile...")
+  const { error: s7dError } = await supabaseThird
+    .from('adopter_profiles')
+    .insert({
+      user_id: thirdId,
+      completed_at: new Date().toISOString()
+    })
+  if (!s7dError) {
+    throw new Error("TEST S7d FAILED: User was able to complete questionnaire with missing required fields!")
+  }
+  console.log("TEST S7d SUCCESS: Completing incomplete questionnaire blocked as expected.")
+
+  console.log("TEST S7e: Owner trying to modify photos of a published cat...")
+  const { data: pubCat, error: pubCatErr } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'חתול מפורסם',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'תיאור של חתול מפורסם באורך מתאים בהחלט',
+      status: 'published',
+      published_at: new Date().toISOString()
+    })
+    .select('id')
+    .single()
+  if (pubCatErr || !pubCat) {
+    throw new Error("Failed to create pubCat for S7e: " + pubCatErr?.message)
+  }
+
+  const { error: s7eError } = await supabaseUser
+    .from('cat_photos')
+    .insert({
+      cat_id: pubCat.id,
+      path_card: `${pubCat.id}/81cbcd7b-c2e3-469b-9c71-33157a41a4a1-card.webp`,
+      path_full: `${pubCat.id}/81cbcd7b-c2e3-469b-9c71-33157a41a4a1-full.webp`,
+      sort_order: 0
+    })
+  
+  await supabaseAdmin.from('cats').delete().eq('id', pubCat.id)
+
+  if (!s7eError) {
+    throw new Error("TEST S7e FAILED: Owner was able to insert a photo record into a published cat!")
+  }
+  console.log("TEST S7e SUCCESS: Photo modification on published cat blocked as expected.")
+
+  console.log("TEST S7f: Owner trying to upload file to published cat folder in storage...")
+  const { data: pubCat2, error: pubCat2Err } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'חתול מפורסם ב',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'תיאור של חתול מפורסם באורך מתאים בהחלט ב',
+      status: 'published',
+      published_at: new Date().toISOString()
+    })
+    .select('id')
+    .single()
+  if (pubCat2Err || !pubCat2) {
+    throw new Error("Failed to create pubCat2 for S7f: " + pubCat2Err?.message)
+  }
+
+  const { error: s7fError } = await supabaseUser.storage
+    .from('cat-photos')
+    .upload(`${pubCat2.id}/test-photo-card.webp`, Buffer.from('RIFF....WEBP'), {
+      contentType: 'image/webp',
+      upsert: true
+    })
+
+  await supabaseAdmin.from('cats').delete().eq('id', pubCat2.id)
+
+  if (!s7fError) {
+    throw new Error("TEST S7f FAILED: Owner was able to upload a file to a published cat's folder!")
+  }
+  console.log("TEST S7f SUCCESS: Storage upload to published cat's folder blocked as expected.")
+
+  console.log("TEST S7g: get_handoff_contact RPC validation with null decided_by...")
+  const { data: reqS7g, error: reqS7gErr } = await supabaseAdmin
+    .from('adoption_requests')
+    .insert({
+      cat_id: publishedCatId,
+      adopter_id: userId,
+      message: 'הודעת בקשה תקינה באורך 20 תווים לפחות',
+      status: 'approved',
+      decided_by: null
+    })
+    .select('id')
+    .single()
+  
+  if (reqS7gErr || !reqS7g) {
+    throw new Error("Failed to insert reqS7g: " + reqS7gErr?.message)
+  }
+
+  const { data: handoffData, error: handoffError } = await supabaseUser
+    .rpc('get_handoff_contact', { request_id: reqS7g.id })
+
+  await supabaseAdmin.from('adoption_requests').delete().eq('id', reqS7g.id)
+
+  if (handoffError) {
+    throw new Error("TEST S7g FAILED (RPC error): " + handoffError.message)
+  }
+  if (handoffData && handoffData.length > 0) {
+    throw new Error("TEST S7g FAILED: get_handoff_contact returned contact details for request with null decided_by!")
+  }
+  console.log("TEST S7g SUCCESS: RPC returned nothing for null decided_by as expected.")
+
+  console.log("TEST S7h: DB trigger rejects pending requests on cat status transition...")
+  const { data: trgCat, error: trgCatErr } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'חתול מעבר',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'תיאור של חתול מעבר באורך מתאים בהחלט',
+      status: 'published',
+      published_at: new Date().toISOString()
+    })
+    .select('id')
+    .single()
+  
+  if (trgCatErr || !trgCat) {
+    throw new Error("Failed to insert trgCat: " + trgCatErr?.message)
+  }
+
+  const { data: trgReq, error: trgReqErr } = await supabaseAdmin
+    .from('adoption_requests')
+    .insert({
+      cat_id: trgCat.id,
+      adopter_id: thirdId,
+      message: 'אני מאוד רוצה לאמץ את החתול מעבר הזה',
+      status: 'pending'
+    })
+    .select('id')
+    .single()
+  
+  if (trgReqErr || !trgReq) {
+    await supabaseAdmin.from('cats').delete().eq('id', trgCat.id)
+    throw new Error("Failed to insert trgReq: " + trgReqErr?.message)
+  }
+
+  const { error: trgUpdateErr } = await supabaseAdmin
+    .from('cats')
+    .update({ status: 'adopted' })
+    .eq('id', trgCat.id)
+  
+  if (trgUpdateErr) {
+    await supabaseAdmin.from('cats').delete().eq('id', trgCat.id)
+    throw new Error("Failed to update trgCat status: " + trgUpdateErr.message)
+  }
+
+  const { data: updatedReq, error: updatedReqErr } = await supabaseAdmin
+    .from('adoption_requests')
+    .select('status, admin_note, decided_at')
+    .eq('id', trgReq.id)
+    .single()
+
+  await supabaseAdmin.from('cats').delete().eq('id', trgCat.id)
+
+  if (updatedReqErr) {
+    throw new Error("Failed to query updatedReq: " + updatedReqErr.message)
+  }
+  if (updatedReq.status !== 'rejected') {
+    throw new Error(`TEST S7h FAILED: Request status is ${updatedReq.status} (expected rejected)`)
+  }
+  if (updatedReq.admin_note !== 'המודעה כבר אינה זמינה') {
+    throw new Error(`TEST S7h FAILED: Request admin_note is '${updatedReq.admin_note}' (expected 'המודעה כבר אינה זמינה')`)
+  }
+  if (!updatedReq.decided_at) {
+    throw new Error("TEST S7h FAILED: Request decided_at is null")
+  }
+  console.log("TEST S7h SUCCESS: DB trigger auto-rejected pending request on status transition.")
 
 } catch (err) {
   // exiting here would skip the finally below (process.exit does not unwind);

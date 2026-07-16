@@ -15,7 +15,7 @@ export const getSubject = (catName?: string, catSex: 'male' | 'female' | 'unknow
 }
 
 export default function CatArchivedByAdmin({ catName = '', catSex = 'unknown', reason = '' }: CatArchivedByAdminProps) {
-  const publishUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/publish`
+  const publishUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'}/publish`
   const name = catName || strings.common.defaultCatName
   
   const heading = gendered('emails', 'catArchivedByAdminHeading', catSex).replace('{name}', name)

@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: CatDetailPageProps): Promise<
   }
 
   const coverPhoto = cat.cat_photos?.find((p) => p.sort_order === 0) || cat.cat_photos?.[0]
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'
   const ogImageUrl = coverPhoto
     ? `${siteUrl}/api/media?path=${encodeURIComponent(coverPhoto.path_card)}`
     : undefined
@@ -111,7 +111,7 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
 
   // Compute OG image for JSON-LD
   const coverPhoto = cat.cat_photos?.find((p: { sort_order: number }) => p.sort_order === 0) || cat.cat_photos?.[0]
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'
   const ogImageUrl = coverPhoto
     ? `${siteUrl}/api/media?path=${encodeURIComponent(coverPhoto.path_card)}`
     : undefined

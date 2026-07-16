@@ -15,7 +15,7 @@ export const getSubject = (catName?: string, catSex: 'male' | 'female' | 'unknow
 }
 
 export default function RequestRejected({ catName = '', catSex = 'unknown', adminNote = '' }: RequestRejectedProps) {
-  const catalogUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cats`
+  const catalogUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'}/cats`
   const name = catName || strings.common.defaultCatName
   
   const heading = gendered('emails', 'requestRejectedHeading', catSex).replace('{name}', name)

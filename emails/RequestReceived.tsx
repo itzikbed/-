@@ -14,7 +14,7 @@ export const getSubject = (catName?: string, catSex: 'male' | 'female' | 'unknow
 }
 
 export default function RequestReceived({ catName = '', catSex = 'unknown' }: RequestReceivedProps) {
-  const requestsUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/requests`
+  const requestsUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'}/requests`
   const name = catName || strings.common.defaultCatName
   
   const heading = gendered('emails', 'requestReceivedHeading', catSex).replace('{name}', name)

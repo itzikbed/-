@@ -210,14 +210,14 @@ export default async function HomePage() {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
             'name': strings.common.siteName,
-            'url': process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il',
+            'url': process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org',
             'description': strings.common.metaDesc,
             'inLanguage': 'he',
             'potentialAction': {
               '@type': 'SearchAction',
               'target': {
                 '@type': 'EntryPoint',
-                'urlTemplate': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'}/cats?search={search_term_string}`
+                'urlTemplate': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'}/cats?search={search_term_string}`
               },
               'query-input': 'required name=search_term_string'
             }

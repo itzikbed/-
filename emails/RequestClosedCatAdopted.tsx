@@ -14,7 +14,7 @@ export const getSubject = (catName?: string, catSex: 'male' | 'female' | 'unknow
 }
 
 export default function RequestClosedCatAdopted({ catName = '', catSex = 'unknown' }: RequestClosedCatAdoptedProps) {
-  const catalogUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cats`
+  const catalogUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'}/cats`
   const name = catName || strings.common.defaultCatName
   
   const heading = gendered('emails', 'requestClosedCatAdoptedHeading', catSex).replace('{name}', name)

@@ -10,7 +10,7 @@ export interface PublisherApprovedProps {
 export const getSubject = () => strings.emails.publisherApprovedSubject
 
 export default function PublisherApproved({ fullName = '' }: PublisherApprovedProps) {
-  const loginUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/login`
+  const loginUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'}/login`
 
   return (
     <Html lang="he" dir="rtl">

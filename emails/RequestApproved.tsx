@@ -28,7 +28,7 @@ export default function RequestApproved({
   counterpartName = '',
   counterpartPhone = ''
 }: RequestApprovedProps) {
-  const requestsUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/requests`
+  const requestsUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'}/requests`
   const name = catName || strings.common.defaultCatName
   
   const keyPrefix = recipientRole === 'adopter' ? 'requestApprovedAdopter' : 'requestApprovedPublisher'

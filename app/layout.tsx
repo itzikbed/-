@@ -26,7 +26,7 @@ const assistant = Assistant({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://homeforcats.org'),
   title: strings.common.metaTitle,
   description: strings.common.metaDesc,
   alternates: {

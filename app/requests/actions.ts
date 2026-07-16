@@ -54,6 +54,20 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
     return { ok: false, formError: 'הגעת למגבלת הבקשות היומית (מקסימום 5 בקשות ב-24 שעות).' }
   }
 
+  const { count: openCount, error: openCountErr } = await supabase
+    .from('adoption_requests')
+    .select('id', { count: 'exact', head: true })
+    .eq('adopter_id', user.id)
+    .eq('status', 'pending')
+
+  if (openCountErr) {
+    return { ok: false, formError: 'אירעה שגיאה בבדיקת מגבלת הבקשות.' }
+  }
+
+  if (openCount !== null && openCount >= 3) {
+    return { ok: false, formError: 'ניתן להחזיק עד 3 בקשות אימוץ ממתינות במקביל. ניתן לבטל בקשה קיימת או להמתין להחלטת המנהלים.' }
+  }
+
   const { data: existingRequest } = await supabase
     .from('adoption_requests')
     .select('id')

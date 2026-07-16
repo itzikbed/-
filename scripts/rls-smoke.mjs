@@ -1008,6 +1008,71 @@ async function run() {
   }
   console.log("TEST S7h SUCCESS: DB trigger auto-rejected pending request on status transition.")
 
+  console.log("TEST S7i: Owner-session status transition with pending sibling is fail-closed...")
+  // The S5 safety-net trigger rejects siblings via an UPDATE that guard_request_update
+  // blocks for non-admin sessions — so an owner-session transition with a pending
+  // sibling must fail AS A WHOLE (fail-closed), leaving both rows unchanged. App flows
+  // are unaffected: closeSiblings (service role) clears pending requests BEFORE the
+  // status update. This test pins that behavior.
+  const { data: fcCat, error: fcCatErr } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'חתול נעילה',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'תיאור של חתול נעילה באורך מתאים בהחלט',
+      status: 'published',
+      published_at: new Date().toISOString()
+    })
+    .select('id')
+    .single()
+
+  if (fcCatErr || !fcCat) {
+    throw new Error("Failed to insert fcCat for S7i: " + fcCatErr?.message)
+  }
+
+  const { data: fcReq, error: fcReqErr } = await supabaseAdmin
+    .from('adoption_requests')
+    .insert({
+      cat_id: fcCat.id,
+      adopter_id: thirdId,
+      message: 'בקשה לחתול הנעילה עם מספיק תווים',
+      status: 'pending'
+    })
+    .select('id')
+    .single()
+
+  if (fcReqErr || !fcReq) {
+    await supabaseAdmin.from('cats').delete().eq('id', fcCat.id)
+    throw new Error("Failed to insert fcReq for S7i: " + fcReqErr?.message)
+  }
+
+  const { data: fcUpdated, error: fcUpdateErr } = await supabaseUser
+    .from('cats')
+    .update({ status: 'adopted', adopted_at: new Date().toISOString() })
+    .eq('id', fcCat.id)
+    .select()
+
+  const { data: fcCatAfter } = await supabaseAdmin.from('cats').select('status').eq('id', fcCat.id).single()
+  const { data: fcReqAfter } = await supabaseAdmin.from('adoption_requests').select('status').eq('id', fcReq.id).single()
+
+  await supabaseAdmin.from('adoption_requests').delete().eq('id', fcReq.id)
+  await supabaseAdmin.from('cats').delete().eq('id', fcCat.id)
+
+  if (!fcUpdateErr && fcUpdated && fcUpdated.length > 0) {
+    throw new Error("TEST S7i FAILED: Owner-session transition succeeded despite pending sibling — safety net is not fail-closed!")
+  }
+  if (fcCatAfter?.status !== 'published') {
+    throw new Error(`TEST S7i FAILED: Cat status is ${fcCatAfter?.status} (expected still published)`)
+  }
+  if (fcReqAfter?.status !== 'pending') {
+    throw new Error(`TEST S7i FAILED: Sibling request is ${fcReqAfter?.status} (expected still pending)`)
+  }
+  console.log("TEST S7i SUCCESS: Owner-session transition with pending sibling failed closed; state unchanged.")
+
 } catch (err) {
   // exiting here would skip the finally below (process.exit does not unwind);
   // flag the failure and exit only after cleanup has run.

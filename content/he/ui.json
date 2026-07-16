@@ -17,7 +17,14 @@
     "yes": "כן",
     "no": "לא",
     "logoLabel": "🐾 בית לחתול",
-    "emailFooter": "אימייל זה נשלח באופן אוטומטי מפורטל \"בית לחתול\". נא לא להשיב למייל זה."
+    "emailFooter": "אימייל זה נשלח באופן אוטומטי מפורטל \"בית לחתול\". נא לא להשיב למייל זה.",
+    "support": "תמיכה",
+    "show": "הצג",
+    "hide": "הסתר",
+    "skipToMain": "דלג לתוכן המרכזי",
+    "closeDialog": "סגור דיאלוג",
+    "openMenu": "פתח תפריט ניווט",
+    "closeMenu": "סגור תפריט"
   },
   "nav": {
     "home": "דף הבית",
@@ -41,7 +48,8 @@
     "fullNameLabel": "שם מלא",
     "phoneLabel": "מספר טלפון",
     "emailPlaceholder": "example@domain.com",
-    "passwordPlaceholder": "לפחות 6 תווים",
+    "passwordPlaceholder": "לפחות 8 תווים",
+    "forgotPasswordLink": "שכחת סיסמה?",
     "fullNamePlaceholder": "ישראל ישראלי",
     "phonePlaceholder": "050-1234567",
     "loginSubmitBtn": "התחבר",
@@ -53,7 +61,21 @@
     "weakPassword": "הסיסמה חלשה מדי. נדרשים לפחות 6 תווים.",
     "invalidEmail": "כתובת האימייל אינה תקינה.",
     "invalidPhone": "מספר הטלפון חייב להכיל ספרות בלבד ולהיות תקין.",
-    "emailExists": "כתובת האימייל כבר רשומה במערכת."
+    "emailExists": "כתובת האימייל כבר רשומה במערכת.",
+    "forgotPasswordTitle": "שחזור סיסמה",
+    "forgotPasswordSuccess": "קישור לשחזור הסיסמה נשלח בהצלחה לכתובת המייל שלכם. אנא בדקו את תיבת הדואר הנכנס (והספאם).",
+    "backToLogin": "חזרה לדף ההתחברות",
+    "forgotPasswordIntro": "הזינו את כתובת האימייל שלכם ונשלח לכם קישור מאובטח לשחזור הסיסמה.",
+    "invalidEmailInput": "אנא הזן כתובת אימייל תקינה",
+    "forgotPasswordError": "אירעה שגיאה בשליחת קישור השחזור. אנא נסו שנית.",
+    "sendResetLink": "שלח קישור שחזור",
+    "resetPasswordTitle": "בחירת סיסמה חדשה",
+    "resetPasswordSuccess": "הסיסמה שלך עודכנה בהצלחה! מועברים כעת לדף ההתחברות...",
+    "resetPasswordIntro": "בחרו סיסמה חדשה ומאובטחת עבור החשבון שלכם.",
+    "resetPasswordError": "אירעה שגיאה בעדכון הסיסמה. ייתכן שפג תוקפו של קישור השחזור.",
+    "updatePasswordBtn": "עדכן סיסמה",
+    "newPasswordLabel": "סיסמה חדשה",
+    "weakPasswordReset": "הסיסמה חייבת להכיל לפחות 8 תווים"
   },
   "home": {
     "heroDesc": "פלטפורמה ארצית מפוקחת ומאובטחת לאימוץ ומסירת חתולים בישראל. כל החתולים באתר עוברים בדיקה ואישור מנהל.",
@@ -128,10 +150,22 @@
     "goodWithCatsMale": "מסתדר עם חתולים",
     "goodWithCatsFemale": "מסתדרת עם חתולים",
     "goodWithCatsUnknown": "מסתדר/ת עם חתולים",
+    "goodWithCatsFalseMale": "לא מסתדר עם חתולים",
+    "goodWithCatsFalseFemale": "לא מסתדרת עם חתולים",
+    "goodWithCatsFalseUnknown": "לא מסתדר/ת עם חתולים",
+    "goodWithCatsNullMale": "לא ידוע לגבי חתולים",
+    "goodWithCatsNullFemale": "לא ידוע לגבי חתולים",
+    "goodWithCatsNullUnknown": "לא ידוע לגבי חתולים",
     "filterGoodWithCats": "מסתדר עם חתולים",
     "goodWithDogsMale": "מסתדר עם כלבים",
     "goodWithDogsFemale": "מסתדרת עם כלבים",
     "goodWithDogsUnknown": "מסתדר/ת עם כלבים",
+    "goodWithDogsFalseMale": "לא מסתדר עם כלבים",
+    "goodWithDogsFalseFemale": "לא מסתדרת עם כלבים",
+    "goodWithDogsFalseUnknown": "לא מסתדר/ת עם כלבים",
+    "goodWithDogsNullMale": "לא ידוע לגבי כלבים",
+    "goodWithDogsNullFemale": "לא ידוע לגבי כלבים",
+    "goodWithDogsNullUnknown": "לא ידוע לגבי כלבים",
     "filterGoodWithDogs": "מסתדר עם כלבים",
     "goodWithNeitherMale": "לא מסתדר עם חתולים/כלבים",
     "goodWithNeitherFemale": "לא מסתדרת עם חתולים/כלבים",
@@ -197,7 +231,12 @@
     "detailTitleUnknown": "{name} מחפש/ת בית חם — בית לחתול",
     "detailDescriptionMale": "{name}, זכר מתוק לאימוץ באזור {regionLabel}. {description}",
     "detailDescriptionFemale": "{name}, נקבה מתוקה לאימוץ באזור {regionLabel}. {description}",
-    "detailDescriptionUnknown": "{name}, {sexLabel} מתוק/ה לאימוץ באזור {regionLabel}. {description}"
+    "detailDescriptionUnknown": "{name}, {sexLabel} מתוק/ה לאימוץ באזור {regionLabel}. {description}",
+    "searchPlaceholder": "חפשו חתול לפי שם...",
+    "sortBy": "מיין לפי:",
+    "sortNewest": "הכי חדש",
+    "sortYoungest": "הכי צעיר",
+    "sortOldest": "הכי מבוגר"
   },
   "badges": {
     "adopted": "אומץ! 🎉",
@@ -271,6 +310,14 @@
     "selectFloor": "בחרו קומה..."
   },
   "publish": {
+    "loadError": "לא הצלחנו לטעון את פרטי המשתמש.",
+    "retryBtn": "נסו לטעון מחדש",
+    "rejectionReasonLabel": "סיבת הדחייה:",
+    "supportContactIntro": "לשאלות נוספות ובירור הנושא, ניתן לפנות לתמיכה בכתובת:",
+    "draftNameSentinel": "טיוטה",
+    "draftDescSentinel": "טיוטה זמנית של תיאור החתול ללא תוכן",
+    "draftCitySentinel": "עיר_זמנית",
+    "validationError": "נא לתקן את השגיאות בטופס.",
     "title": "למסירת חתול",
     "applyTitle": "בקשת הצטרפות כמוסר",
     "applyDesc": "כדי לפרסם חתולים למסירה, עליך להגיש בקשה קצרה שתאושר על ידי מנהל.",
@@ -427,7 +474,6 @@
     "catApprovedTextFemale": "המודעה עבור {name} אושרה ומפורסמת כעת במאגר החתולים. אנו מאחלים לה למצוא בית חם במהירות!",
     "catApprovedTextUnknown": "המודעה עבור {name} אושרה ומפורסמת כעת במאגר החתולים. אנו מאחלים לו/ה למצוא בית חם במהירות!",
     "catApprovedCta": "צפייה במודעה",
-
     "catRejectedSubjectMale": "עדכון לגבי המודעה של {name} 🐾",
     "catRejectedSubjectFemale": "עדכון לגבי המודעה של {name} 🐾",
     "catRejectedSubjectUnknown": "עדכון לגבי המודעה של {name} 🐾",
@@ -439,7 +485,6 @@
     "catRejectedTextUnknown": "המודעה של {name} נבדקה על ידי מנהלי המערכת ונמצאה כלא מתאימה לפרסום במצבה הנוכחי. באפשרותך לערוך אותה ולהגישה מחדש.",
     "catRejectedReasonLabel": "סיבת הדחייה:",
     "catRejectedCta": "עריכת המודעה",
-
     "requestReceivedSubjectMale": "בקשתך לאמץ את {name} התקבלה",
     "requestReceivedSubjectFemale": "בקשתך לאמץ את {name} התקבלה",
     "requestReceivedSubjectUnknown": "בקשתך לאמץ את {name} התקבלה",
@@ -450,7 +495,6 @@
     "requestReceivedTextFemale": "איזה יופי! פנייתך לאימוץ {name} התקבלה במערכת ותיבחן על ידי מנהל בהקדם. נעדכן אותך ברגע שיהיו התפתחויות.",
     "requestReceivedTextUnknown": "איזה יופי! פנייתך לאימוץ {name} התקבלה במערכת ותיבחן על ידי מנהל בהקדם. נעדכן אותך ברגע שיהיו התפתחויות.",
     "requestReceivedCta": "לצפייה בבקשות שלי",
-
     "requestApprovedAdopterSubjectMale": "איזה כיף! אושר אימוץ {name} 🎉",
     "requestApprovedAdopterSubjectFemale": "איזה כיף! אושר אימוץ {name} 🎉",
     "requestApprovedAdopterSubjectUnknown": "איזה כיף! אושר אימוץ {name} 🎉",
@@ -473,7 +517,6 @@
     "requestApprovedDetailsName": "שם:",
     "requestApprovedDetailsPhone": "טלפון:",
     "requestApprovedDetailsCta": "לצפייה בבקשות",
-
     "requestRejectedSubjectMale": "עדכון לגבי בקשת האימוץ של {name}",
     "requestRejectedSubjectFemale": "עדכון לגבי בקשת האימוץ של {name}",
     "requestRejectedSubjectUnknown": "עדכון לגבי בקשת האימוץ של {name}",
@@ -672,7 +715,30 @@
       "section3Title": "3. הגבלת אחריות",
       "section3Text": "השירות באתר ניתן כפי שהוא (As-Is). למרות מאמצי הפיקוח והסינון של מנהלי האתר, הנהלת האתר אינה נושאת באחריות ישירה או עקיפה להתנהגותם של המשתמשים, למצבם הרפואי או ההתנהגותי של החתולים שנמסרו, או לכל נזק שעלול להיגרם כתוצאה מהמפגש או האימוץ."
     }
+  },
+  "account": {
+    "title": "ניהול החשבון",
+    "myAccount": "החשבון שלי",
+    "profileHeader": "פרטי החשבון שלי",
+    "fullName": "שם מלא",
+    "email": "כתובת אימייל",
+    "phone": "מספר טלפון",
+    "role": "סוג חשבון",
+    "adminRole": "מנהל מערכת",
+    "userRole": "משתמש רשום",
+    "dangerZone": "⚠️ אזור מסוכן (Danger Zone)",
+    "deleteWarning": "מחיקת החשבון היא פעולה סופית ובלתי הפיכה.",
+    "bullet1": "כל מודעות החתולים שפרסמת יימחקו לצמיתות, כולל התמונות והסרטונים.",
+    "bullet2": "כל בקשות האימוץ שהגשת יימחקו לחלוטין מהמערכת.",
+    "bullet3": "פרופיל המשתמש ופרטי הקשר שלכם יימחקו מיידית.",
+    "deleteBtn": "מחק את החשבון שלי לצמיתות",
+    "confirmTitle": "מחיקת החשבון לצמיתות",
+    "confirmPrompt": "האם אתם בטוחים לחלוטין שברצונכם למחוק את החשבון?",
+    "confirmWarning": "בלחיצה על כפתור המחיקה, כל הנתונים שלכם יימחקו מיידית ולא תוכלו לשחזר אותם או להיכנס לחשבון זה שוב.",
+    "confirmBtn": "כן, מחק את החשבון שלי",
+    "notLoggedIn": "משתמש לא מחובר",
+    "deleteError": "אירעה שגיאה במחיקת החשבון.",
+    "unexpectedError": "אירעה שגיאה לא צפויה במחיקת החשבון.",
+    "systemError": "אירעה שגיאה במחיקת החשבון במערכת האימות."
   }
 }
-
-

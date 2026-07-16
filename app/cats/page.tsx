@@ -28,21 +28,29 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   // 1. Count query
   let countQuery = supabase
     .from('cats')
-    .select('*', { head: true, count: 'exact' })
+    .select('id', { head: true, count: 'exact' })
     .eq('status', 'published')
-
+ 
   // 2. Data query
   let dataQuery = supabase
     .from('cats')
     .select('id, name, sex, birth_est, region, city, is_special, status, video_path, cat_photos(path_card, path_full, sort_order)')
     .eq('status', 'published')
     .eq('cat_photos.sort_order', 0)
-    .order('published_at', { ascending: false })
-    .order('id', { ascending: true }) // stable tiebreak for pagination
-
+ 
   // Apply parsed filters
   countQuery = applyFiltersToQuery(countQuery, filters)
   dataQuery = applyFiltersToQuery(dataQuery, filters)
+ 
+  // Apply sorting
+  if (filters.sort === 'youngest') {
+    dataQuery = dataQuery.order('birth_est', { ascending: false })
+  } else if (filters.sort === 'oldest') {
+    dataQuery = dataQuery.order('birth_est', { ascending: true })
+  } else {
+    dataQuery = dataQuery.order('published_at', { ascending: false })
+  }
+  dataQuery = dataQuery.order('id', { ascending: true })
 
   // Apply pagination range
   const limit = 24

@@ -53,7 +53,9 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
       good_with: [],
       special: false,
       sex: 'all',
-      page: 1
+      page: 1,
+      search: '',
+      sort: 'newest'
     })
   }
 

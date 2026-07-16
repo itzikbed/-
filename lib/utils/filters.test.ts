@@ -93,7 +93,8 @@ describe('applyFiltersToQuery', () => {
     const mockQuery = {
       in: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      or: vi.fn().mockReturnThis()
+      or: vi.fn().mockReturnThis(),
+      ilike: vi.fn().mockReturnThis()
     }
 
     const filters = parseFilters({

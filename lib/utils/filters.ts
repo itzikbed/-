@@ -1,17 +1,16 @@
-import { z } from 'zod'
-import { AGE_BUCKETS } from '../constants'
+import { getAgeBucketRange } from './age-bucket'
 
-export const filterSchema = z.object({
-  region: z.array(z.enum(['north', 'south', 'center', 'jerusalem', 'yosh'])).default([]),
-  age: z.array(z.enum(['0-3m', '3-6m', '6-12m', '1-8y', '8y+'])).default([]),
-  health: z.array(z.enum(['full', 'partial', 'none'])).default([]),
-  good_with: z.array(z.enum(['cats', 'dogs', 'neither'])).default([]),
-  special: z.boolean().default(false),
-  sex: z.enum(['male', 'female', 'all']).default('all'),
-  page: z.number().int().positive().default(1)
-})
-
-export type Filters = z.infer<typeof filterSchema>
+export interface Filters {
+  region: ('north' | 'south' | 'center' | 'jerusalem' | 'yosh')[]
+  age: ('0-3m' | '3-6m' | '6-12m' | '1-8y' | '8y+')[]
+  health: ('full' | 'partial' | 'none')[]
+  good_with: ('cats' | 'dogs' | 'neither')[]
+  special: boolean
+  sex: 'male' | 'female' | 'all'
+  page: number
+  search: string
+  sort: 'newest' | 'youngest' | 'oldest'
+}
 
 export function parseFilters(params: Record<string, string | string[] | undefined>): Filters {
   const getArray = (val: string | string[] | undefined): string[] => {
@@ -43,22 +42,20 @@ export function parseFilters(params: Record<string, string | string[] | undefine
     }
   }
 
-  const result = filterSchema.safeParse({
+  const search = typeof params.search === 'string' ? params.search.trim() : ''
+  const sort = (params.sort === 'youngest' || params.sort === 'oldest') ? params.sort : 'newest'
+
+  return {
     region,
     age,
     health,
     good_with,
     special,
     sex,
-    page
-  })
-
-  if (result.success) {
-    return result.data
+    page,
+    search,
+    sort
   }
-
-  // fallback to defaults
-  return filterSchema.parse({})
 }
 
 export function serializeFilters(filters: Partial<Filters>): string {
@@ -84,38 +81,20 @@ export function serializeFilters(filters: Partial<Filters>): string {
   if (filters.page && filters.page > 1) {
     params.set('page', filters.page.toString())
   }
+  if (filters.search) {
+    params.set('search', filters.search)
+  }
+  if (filters.sort && filters.sort !== 'newest') {
+    params.set('sort', filters.sort)
+  }
   return params.toString()
-}
-
-export function getAgeBucketRange(bucket: string, referenceDate: Date = new Date()): { gte?: string; lt?: string } {
-  const d = new Date(referenceDate)
-  
-  const subtract = (months: number) => {
-    const res = new Date(d)
-    res.setMonth(res.getMonth() - months)
-    return res.toISOString().split('T')[0]
-  }
-  
-  switch (bucket) {
-    case '0-3m':
-      return { gte: subtract(3) }
-    case '3-6m':
-      return { gte: subtract(6), lt: subtract(3) }
-    case '6-12m':
-      return { gte: subtract(12), lt: subtract(6) }
-    case '1-8y':
-      return { gte: subtract(8 * 12), lt: subtract(12) }
-    case '8y+':
-      return { lt: subtract(8 * 12) }
-    default:
-      return {}
-  }
 }
 
 interface PostgrestQuery {
   in(column: string, values: string[]): this
   eq(column: string, value: string | boolean): this
   or(filters: string): this
+  ilike(column: string, pattern: string): this
 }
 
 export function applyFiltersToQuery<T extends PostgrestQuery>(
@@ -187,25 +166,11 @@ export function applyFiltersToQuery<T extends PostgrestQuery>(
     }
   }
 
+  // 7. Search by name (case-insensitive)
+  if (filters.search) {
+    q = q.ilike('name', `%${filters.search}%`)
+  }
+
   return q
 }
-
-export function getAgeBucketId(birthEst: string | Date): string {
-  const birth = new Date(birthEst)
-  const now = new Date()
-  const diffMs = now.getTime() - birth.getTime()
-  const diffMonths = diffMs / (1000 * 60 * 60 * 24 * 30.4375)
-  
-  if (diffMonths < 3) return '0-3m'
-  if (diffMonths < 6) return '3-6m'
-  if (diffMonths < 12) return '6-12m'
-  if (diffMonths < 96) return '1-8y'
-  return '8y+'
-}
-
-export function getAgeBucketLabel(birthEst: string | Date): string {
-  const bucketId = getAgeBucketId(birthEst)
-  const bucket = AGE_BUCKETS.find(b => b.id === bucketId)
-  return bucket ? bucket.label : ''
-}
-
+export { getAgeBucketId, getAgeBucketLabel, getAgeBucketRange } from './age-bucket'

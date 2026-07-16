@@ -12,38 +12,7 @@ import { UploadStep3 } from './UploadStep3'
 import { UploadStep4 } from './UploadStep4'
 import { UploadSuccessState } from './UploadSuccessState'
 import { WizardNavigation } from './WizardNavigation'
-
-interface PhotoItem {
-  id?: string
-  path_card: string
-  path_full: string
-  sort_order: number
-  localUrl?: string
-}
-
-interface InitialCatInput {
-  id: string
-  name: string
-  sex: 'male' | 'female' | 'unknown'
-  birth_est: string
-  vaccinations: number
-  neutered: boolean
-  health_notes: string | null
-  is_special: boolean
-  special_needs: string | null
-  good_with_cats: boolean | null
-  good_with_dogs: boolean | null
-  fee_amount: number | null
-  description: string
-  region: string
-  city: string | null
-  cat_photos?: Array<{
-    path_card: string
-    path_full: string
-    sort_order: number
-  }>
-  video_path?: string | null
-}
+import { PhotoItem, InitialCatInput } from './types'
 
 interface CatUploadWizardProps {
   initialCat?: InitialCatInput
@@ -59,8 +28,8 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   const [isDraftFinished, setIsDraftFinished] = useState(false)
 
   let defaultPhotos: PhotoItem[] = []
-  let defaultAgeYears = 0
-  let defaultAgeMonths = 0
+  let defaultAgeYears: number | undefined = undefined
+  let defaultAgeMonths: number | undefined = undefined
 
   if (initialCat) {
     if (initialCat.cat_photos) {
@@ -70,11 +39,13 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
         sort_order: p.sort_order
       }))
     }
-    const birthDate = new Date(initialCat.birth_est)
-    const today = new Date()
-    const totalMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth())
-    defaultAgeYears = Math.max(0, Math.floor(totalMonths / 12))
-    defaultAgeMonths = Math.max(0, totalMonths % 12)
+    if (initialCat.birth_est && initialCat.birth_est !== '2099-01-01') {
+      const birthDate = new Date(initialCat.birth_est)
+      const today = new Date()
+      const totalMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth())
+      defaultAgeYears = Math.max(0, Math.floor(totalMonths / 12))
+      defaultAgeMonths = Math.max(0, totalMonths % 12)
+    }
   }
 
   const {
@@ -84,11 +55,12 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
     control,
     setValue,
     getValues,
+    setError,
     formState: { errors }
   } = useForm<CatInput>({
     resolver: zodResolver(catSchema),
     defaultValues: {
-      name: initialCat?.name || '',
+      name: initialCat?.name === strings.publish.draftNameSentinel ? '' : (initialCat?.name || ''),
       sex: initialCat?.sex || 'male',
       ageYears: defaultAgeYears,
       ageMonths: defaultAgeMonths,
@@ -101,9 +73,9 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
       good_with_dogs: initialCat?.good_with_dogs || false,
       fee_required: !!initialCat?.fee_amount,
       fee_amount: initialCat?.fee_amount || null,
-      description: initialCat?.description || '',
+      description: initialCat?.description === strings.publish.draftDescSentinel ? '' : (initialCat?.description || ''),
       region: (initialCat?.region || 'center') as 'north' | 'south' | 'center' | 'jerusalem' | 'yosh',
-      city: initialCat?.city || '',
+      city: initialCat?.city === strings.publish.draftCitySentinel ? '' : (initialCat?.city || ''),
       photos: defaultPhotos,
       video_path: initialCat?.video_path || null
     }
@@ -186,7 +158,12 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
       if (res.ok) {
         setIsFinished(true)
       } else {
-        setWizardError(res.formError || strings.common.errorOccurred)
+        if (res.fieldErrors) {
+          Object.entries(res.fieldErrors).forEach(([field, messages]) => {
+            setError(field as keyof CatInput, { message: messages?.[0] })
+          })
+        }
+        setWizardError(res.formError || strings.publish.validationError)
       }
     } catch {
       setWizardError(strings.common.errorOccurred)

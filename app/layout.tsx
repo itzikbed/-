@@ -4,6 +4,7 @@ import "./globals.css"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { strings } from "@/lib/strings"
+import { Header } from "@/components/nav/Header"
 import { initHebrewValidation } from "@/lib/schemas/he-errors"
 import { RouteTransitionTrigger } from "@/lib/utils/view-transition-navigation"
 
@@ -25,8 +26,12 @@ const assistant = Assistant({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'),
   title: strings.common.metaTitle,
   description: strings.common.metaDesc,
+  alternates: {
+    canonical: '/'
+  }
 }
 
 export default async function RootLayout({
@@ -54,112 +59,17 @@ export default async function RootLayout({
       className={`${rubik.variable} ${assistant.variable}`}
     >
       <body className="min-h-screen flex flex-col bg-paper text-ink font-sans">
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:start-4 focus:z-50 focus:bg-marmalade focus:text-ink focus:px-4 focus:py-2.5 focus:rounded-btn focus:font-bold focus:shadow-resting focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+        >
+          {strings.common.skipToMain}
+        </a>
         <RouteTransitionTrigger />
-        {/* Header App Shell */}
-        <header className="bg-surface border-b border-border shadow-resting sticky top-0 z-40 select-none">
-          <div className="app-container h-16 flex items-center justify-between">
-            {/* Logo */}
-            <Link 
-              href="/" 
-              className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
-              aria-label={`${strings.common.siteName} — ${strings.nav.home}`}
-            >
-              <span className="font-display font-extrabold text-2xl text-pine tracking-tight flex items-center select-none" aria-hidden="true">
-                <span>{strings.common.siteName.slice(0, 5)}</span>
-                <span className="inline-flex items-center mx-[0.02em] relative top-[0.03em]">
-                  <svg
-                    className="w-[0.72em] h-[0.85em] inline-block"
-                    viewBox="0 0 24 28"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    {/* Left Ear */}
-                    <path
-                      d="M4.5 9L1.5 2.5L7 5.5Z"
-                      fill="currentColor"
-                      className="logo-left-ear"
-                    />
-                    {/* Right Ear */}
-                    <path
-                      d="M19.5 9L22.5 2.5L17 5.5Z"
-                      fill="currentColor"
-                      className="logo-right-ear"
-                    />
-                    {/* Outline for Het */}
-                    <path
-                      d="M5 26V9.5C5 7 7 5.5 9.5 5.5H14.5C17 5.5 19 7 19 9.5V26"
-                      stroke="currentColor"
-                      strokeWidth="3.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <span>{strings.common.siteName.slice(6)}</span>
-              </span>
-              <span className="sr-only">{strings.common.siteName}</span>
-            </Link>
-
-            {/* Navigation links */}
-            <nav className="hidden md:flex items-center gap-6 font-semibold">
-              <Link href="/cats" className="text-ink-soft hover:text-pine transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-                {strings.nav.catalog}
-              </Link>
-              <Link href="/publish" className="text-ink-soft hover:text-pine transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-                {strings.nav.publish}
-              </Link>
-              {user && (
-                <Link href="/requests" className="text-ink-soft hover:text-pine transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-                  {strings.nav.requests}
-                </Link>
-              )}
-              {profile?.role === 'admin' && (
-                <Link href="/admin" className="text-ink hover:text-pine transition-colors font-bold text-pine border-s border-border ps-6 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-                  {strings.nav.admin}
-                </Link>
-              )}
-            </nav>
-
-            {/* Auth Slot */}
-            <div className="flex items-center gap-3">
-              {user ? (
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-semibold text-ink-soft hidden sm:inline">
-                    {strings.nav.greeting} <bdi>{profile?.full_name || user.email}</bdi>
-                  </span>
-                  
-                  {/* Logout Button */}
-                  <form action="/api/auth/signout" method="POST">
-                    <button
-                      type="submit"
-                      className="text-pine hover:underline text-sm font-semibold cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
-                    >
-                      {strings.common.logout}
-                    </button>
-                  </form>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/login"
-                    className="text-pine hover:underline text-sm font-semibold px-3 py-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
-                  >
-                    {strings.nav.login}
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="bg-marmalade text-ink hover:bg-marmalade-dp text-sm font-bold px-4 py-2 rounded-btn shadow-resting transition-all active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
-                  >
-                    {strings.nav.signup}
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
+        <Header user={user} profile={profile} />
 
         {/* Main Content Area */}
-        <main className="flex-grow flex flex-col">
+        <main id="main-content" className="flex-grow flex flex-col">
           {children}
         </main>
 
@@ -168,6 +78,14 @@ export default async function RootLayout({
           <div className="app-container flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-ink-soft font-sans">
             <div>
               &copy; {new Date().getFullYear()} {strings.common.siteName}. {strings.nav.allRightsReserved}
+              {process.env.NEXT_PUBLIC_CONTACT_EMAIL && (
+                <span className="ms-2 select-none">
+                  | {strings.common.support}:{' '}
+                  <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`} className="text-pine font-bold hover:underline">
+                    {process.env.NEXT_PUBLIC_CONTACT_EMAIL}
+                  </a>
+                </span>
+              )}
             </div>
             
             {/* Regulatory Compliance Links */}

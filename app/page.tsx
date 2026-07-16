@@ -202,6 +202,28 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            'name': strings.common.siteName,
+            'url': process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il',
+            'description': strings.common.metaDesc,
+            'inLanguage': 'he',
+            'potentialAction': {
+              '@type': 'SearchAction',
+              'target': {
+                '@type': 'EntryPoint',
+                'urlTemplate': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'}/cats?search={search_term_string}`
+              },
+              'query-input': 'required name=search_term_string'
+            }
+          })
+        }}
+      />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { ActiveFilterChips } from './ActiveFilterChips'
 import { CatalogPagination } from './CatalogPagination'
 import { CatGrid } from './CatGrid'
 import { strings } from '@/lib/strings'
-import { Filter } from 'lucide-react'
+import { Filter, Search } from 'lucide-react'
 
 interface CatListing {
   id: string
@@ -40,15 +40,49 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [searchVal, setSearchVal] = useState(filters.search)
+  const [prevSearch, setPrevSearch] = useState(filters.search)
+
+  if (filters.search !== prevSearch) {
+    setPrevSearch(filters.search)
+    setSearchVal(filters.search)
+  }
 
   const limit = 24
   const totalPages = Math.ceil(totalCount / limit) || 1
+
+  const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  React.useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [])
 
   const handleFiltersChange = (newFilters: Filters) => {
     const queryString = serializeFilters(newFilters)
     startTransition(() => {
       router.replace(`/cats?${queryString}`, { scroll: false })
     })
+  }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    setSearchVal(val)
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      handleFiltersChange({ ...filters, search: val, page: 1 })
+    }, 300)
+  }
+
+  const handleSortChange = (sort: 'newest' | 'youngest' | 'oldest') => {
+    handleFiltersChange({ ...filters, sort, page: 1 })
   }
 
   const handlePageChange = (page: number) => {
@@ -79,6 +113,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
   }
 
   const handleClearAll = () => {
+    setSearchVal('')
     startTransition(() => {
       router.replace('/cats', { scroll: false })
     })
@@ -90,7 +125,9 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
     filters.health.length > 0 ||
     filters.good_with.length > 0 ||
     filters.special ||
-    filters.sex !== 'all'
+    filters.sex !== 'all' ||
+    filters.search !== '' ||
+    filters.sort !== 'newest'
 
   return (
     <div className="flex flex-col flex-grow select-none">
@@ -114,6 +151,37 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
             <Filter className="w-4 h-4" />
             <span>{strings.catalog.openFiltersBtn}</span>
           </button>
+        </div>
+
+        {/* Search and Sort Bar */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center bg-surface border border-border rounded-card p-4 shadow-resting">
+          {/* Search Input */}
+          <div className="relative flex-grow max-w-md">
+            <input
+              type="text"
+              placeholder={strings.catalog.searchPlaceholder}
+              value={searchVal}
+              onChange={handleSearchChange}
+              className="w-full bg-paper border border-border rounded-input py-2.5 ps-10 pe-4 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            />
+            <span className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-ink-soft">
+              <Search className="w-4 h-4" />
+            </span>
+          </div>
+
+          {/* Sort Selection */}
+          <div className="flex items-center gap-2 flex-shrink-0 justify-between sm:justify-end">
+            <span className="text-sm font-semibold text-ink-soft whitespace-nowrap">{strings.catalog.sortBy}</span>
+            <select
+              value={filters.sort}
+              onChange={(e) => handleSortChange(e.target.value as 'newest' | 'youngest' | 'oldest')}
+              className="bg-paper border border-border rounded-input py-2 px-3 text-sm font-bold text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine min-w-[120px]"
+            >
+              <option value="newest">{strings.catalog.sortNewest}</option>
+              <option value="youngest">{strings.catalog.sortYoungest}</option>
+              <option value="oldest">{strings.catalog.sortOldest}</option>
+            </select>
+          </div>
         </div>
 
         {/* Main Grid Layout */}

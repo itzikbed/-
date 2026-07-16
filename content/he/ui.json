@@ -593,7 +593,7 @@
       "actor": "אדמין מבצע",
       "entityType": "סוג ישות",
       "action": "פעולה",
-      "entityId": "מזהה ישות",
+      "entityId": "ישות",
       "details": "פירוט / סיבה"
     },
     "publisher": {

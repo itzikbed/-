@@ -13,6 +13,7 @@ interface AdminDashboardClientProps {
   pendingCats: React.ComponentPropsWithoutRef<typeof CatQueue>['cats']
   pendingRequests: React.ComponentPropsWithoutRef<typeof RequestQueue>['requests']
   logs: React.ComponentPropsWithoutRef<typeof LogTable>['logs']
+  entityNames: React.ComponentPropsWithoutRef<typeof LogTable>['entityNames']
   success?: string
 }
 
@@ -23,6 +24,7 @@ export default function AdminDashboardClient({
   pendingCats,
   pendingRequests,
   logs,
+  entityNames,
   success
 }: AdminDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>('publishers')
@@ -75,7 +77,7 @@ export default function AdminDashboardClient({
         {activeTab === 'publishers' && <PublisherQueue publishers={pendingPublishers} />}
         {activeTab === 'cats' && <CatQueue cats={pendingCats} />}
         {activeTab === 'requests' && <RequestQueue requests={pendingRequests} />}
-        {activeTab === 'logs' && <LogTable logs={logs} />}
+        {activeTab === 'logs' && <LogTable logs={logs} entityNames={entityNames} />}
         {activeTab === 'management' && <AdminPromoteCard />}
       </div>
     </div>

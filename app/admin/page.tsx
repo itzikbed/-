@@ -75,6 +75,42 @@ export default async function AdminPage({
     .order('created_at', { ascending: false })
     .limit(50)
 
+  // Resolve entity ids to human-readable names for the log table
+  const logRows = logs || []
+  const catEntityIds = [...new Set(logRows.filter((l) => l.entity_type === 'cat').map((l) => l.entity_id))]
+  const profileEntityIds = [
+    ...new Set(
+      logRows
+        .filter((l) => l.entity_type === 'publisher' || l.entity_type === 'profile')
+        .map((l) => l.entity_id)
+    ),
+  ]
+  const requestEntityIds = [...new Set(logRows.filter((l) => l.entity_type === 'request').map((l) => l.entity_id))]
+
+  const [catNameRows, profileNameRows, requestNameRows] = await Promise.all([
+    catEntityIds.length
+      ? supabase.from('cats').select('id, name').in('id', catEntityIds)
+      : Promise.resolve({ data: null }),
+    profileEntityIds.length
+      ? supabase.from('profiles').select('id, full_name').in('id', profileEntityIds)
+      : Promise.resolve({ data: null }),
+    requestEntityIds.length
+      ? supabase.from('adoption_requests').select('id, cat:cats(name)').in('id', requestEntityIds)
+      : Promise.resolve({ data: null }),
+  ])
+
+  const entityNames: Record<string, string> = {}
+  for (const row of catNameRows.data || []) {
+    if (row.name) entityNames[row.id] = row.name
+  }
+  for (const row of profileNameRows.data || []) {
+    if (row.full_name) entityNames[row.id] = row.full_name
+  }
+  for (const row of requestNameRows.data || []) {
+    const cat = Array.isArray(row.cat) ? row.cat[0] : row.cat
+    if (cat?.name) entityNames[row.id] = cat.name
+  }
+
   return (
     <div className="flex-grow bg-paper py-10">
       <div className="app-container max-w-6xl space-y-8">
@@ -95,6 +131,7 @@ export default async function AdminPage({
           pendingCats={pendingCats || []}
           pendingRequests={pendingRequests || []}
           logs={logs || []}
+          entityNames={entityNames}
           success={success}
         />
       </div>

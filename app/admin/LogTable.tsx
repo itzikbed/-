@@ -18,9 +18,10 @@ interface LogRow {
 
 interface LogTableProps {
   logs: LogRow[]
+  entityNames?: Record<string, string>
 }
 
-export default function LogTable({ logs }: LogTableProps) {
+export default function LogTable({ logs, entityNames = {} }: LogTableProps) {
   const getActionLabel = (action: string) => {
     switch (action) {
       case 'approve':
@@ -81,8 +82,19 @@ export default function LogTable({ logs }: LogTableProps) {
                       {getActionLabel(log.action)}
                     </span>
                   </td>
-                  <td className="p-4 font-mono text-xs">
-                    <span dir="ltr">{log.entity_id}</span>
+                  <td className="p-4">
+                    {entityNames[log.entity_id] ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-ink">{entityNames[log.entity_id]}</span>
+                        <span dir="ltr" className="font-mono text-xs text-ink-soft/60" title={log.entity_id}>
+                          {log.entity_id.slice(0, 8)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span dir="ltr" className="font-mono text-xs" title={log.entity_id}>
+                        {log.entity_id.slice(0, 8)}…
+                      </span>
+                    )}
                   </td>
                   <td className="p-4 max-w-xs truncate" title={log.reason || ''}>
                     {log.reason || '—'}

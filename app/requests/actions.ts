@@ -36,7 +36,7 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
     .maybeSingle()
 
   if (profileErr || !profile || !profile.completed_at) {
-    return { ok: false, formError: 'יש למלא את שאלון המאמץ תחילה' }
+    return { ok: false, formError: 'יש למלא את שאלון האימוץ תחילה' }
   }
 
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()

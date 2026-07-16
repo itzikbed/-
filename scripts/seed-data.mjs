@@ -27,6 +27,12 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1)
 }
 
+const urlObj = new URL(supabaseUrl)
+if (urlObj.hostname !== 'localhost' && urlObj.hostname !== '127.0.0.1') {
+  console.error("Refusing to run seed-data: Target URL must be localhost/127.0.0.1 to prevent accidental production overwrite.")
+  process.exit(1)
+}
+
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     persistSession: false,

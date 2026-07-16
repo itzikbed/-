@@ -27,11 +27,17 @@ export default async function PublishPage() {
     .single()
 
   if (!profile) {
-    // Fallback if profile trigger delayed
+    // Retry UI on profile fetch failure
     return (
       <div className="flex-grow bg-paper py-16 flex items-center justify-center">
-        <div className="text-center font-semibold text-ink-soft">
-          {strings.common.loading}
+        <div className="text-center font-semibold text-ink-soft space-y-4">
+          <p>{strings.publish.loadError}</p>
+          <a 
+            href="/publish" 
+            className="inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[40px] px-6 text-sm bg-marmalade text-ink hover:bg-marmalade-dp transition-colors shadow-resting active:scale-98 cursor-pointer"
+          >
+            {strings.publish.retryBtn}
+          </a>
         </div>
       </div>
     )
@@ -43,6 +49,23 @@ export default async function PublishPage() {
   if (status === 'approved') {
     redirect('/publish/my-cats')
   }
+
+  let rejectionReason = null
+  if (status === 'blocked') {
+    const { data: latestLog } = await supabase
+      .from('moderation_log')
+      .select('reason')
+      .eq('entity_id', user.id)
+      .eq('entity_type', 'publisher')
+      .in('action', ['reject', 'block'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    
+    rejectionReason = latestLog?.reason || null
+  }
+
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@example.com'
 
   return (
     <div className="flex-grow bg-paper py-10 md:py-16 select-none">
@@ -83,9 +106,21 @@ export default async function PublishPage() {
             <h2 className="text-2xl font-display font-extrabold text-danger">
               {strings.publish.blockedTitle}
             </h2>
-            <p className="text-base font-semibold text-ink-soft leading-relaxed max-w-md mx-auto">
+            <p className="text-base font-semibold text-ink-soft leading-relaxed max-w-md mx-auto mb-2">
               {strings.publish.blockedDesc}
             </p>
+            {rejectionReason && (
+              <div className="bg-danger/10 border border-danger/20 rounded-input p-4 text-start">
+                <span className="font-bold text-danger block mb-1">{strings.publish.rejectionReasonLabel}</span>
+                <p className="text-sm text-ink-soft font-semibold">{rejectionReason}</p>
+              </div>
+            )}
+            <div className="pt-4 border-t border-border/40 text-sm text-ink-soft leading-relaxed">
+              {strings.publish.supportContactIntro}{' '}
+              <a href={`mailto:${contactEmail}`} className="text-pine font-bold hover:underline">
+                {contactEmail}
+              </a>
+            </div>
           </div>
         )}
       </div>

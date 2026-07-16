@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Mascot } from '@/components/mascot/Mascot'
 import { strings } from '@/lib/strings'
-import { deleteCatAction, markAsAdoptedAction, archiveCatAction } from '@/app/publish/cat-actions'
+import { deleteCatAction, markAsAdoptedAction, archiveCatAction } from '@/app/publish/cat-status-actions'
 import { MyCatCard, Cat } from './MyCatCard'
 
 interface MyCatsListProps {

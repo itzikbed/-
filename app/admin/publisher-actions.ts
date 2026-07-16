@@ -30,25 +30,28 @@ export async function approvePublisherAction(publisherId: string): Promise<Actio
 
     const publisher = updated[0]
 
-    await supabase.from('moderation_log').insert({
+    const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'publisher',
       entity_id: publisherId,
       action: 'approve'
     })
+    if (logErr) {
+      console.error('Failed to insert moderation log:', logErr)
+    }
 
-    void (async () => {
-      try {
-        const email = await getUserEmail(publisherId)
-        await sendEmail({
-          to: email,
-          subject: getPubApprovedSub(),
-          react: React.createElement(PublisherApproved, { fullName: publisher.full_name })
-        })
-      } catch (e) {
-        console.error('Failed to send publisher approval email:', e)
-      }
-    })()
+    try {
+      const email = await getUserEmail(publisherId)
+      await sendEmail({
+        to: email,
+        subject: getPubApprovedSub(),
+        react: React.createElement(PublisherApproved, { fullName: publisher.full_name }),
+        template: 'publisher_approved',
+        recipientUserId: publisherId
+      })
+    } catch (e) {
+      console.error('Failed to send publisher approval email:', e)
+    }
 
     revalidatePath('/admin')
     return { ok: true }
@@ -78,13 +81,16 @@ export async function rejectPublisherAction(publisherId: string, reason: string)
       return { ok: false, formError: strings.admin.conflictError }
     }
 
-    await supabase.from('moderation_log').insert({
+    const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'publisher',
       entity_id: publisherId,
       action: 'reject',
       reason
     })
+    if (logErr) {
+      console.error('Failed to insert moderation log:', logErr)
+    }
 
     revalidatePath('/admin')
     return { ok: true }

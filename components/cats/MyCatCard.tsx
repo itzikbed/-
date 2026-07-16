@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/Badge'
 import { strings } from '@/lib/strings'
 import { getMediaUrl } from '@/lib/security/media'
 import { REGIONS, RegionId } from '@/lib/constants'
-import { getAgeBucketLabel } from '@/lib/utils/filters'
+import { getAgeBucketLabel } from '@/lib/utils/age-bucket'
 import { Edit, Trash2, Heart, Award } from 'lucide-react'
 
 export interface CatPhoto {

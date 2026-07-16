@@ -8,39 +8,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { FLOOR_TYPES, FloorTypeId } from '@/lib/constants'
 import { strings } from '@/lib/strings'
 
-interface AdopterProfile {
-  age: number | null
-  city: string | null
-  household_desc: string | null
-  has_other_pets: boolean | null
-  other_pets_desc: string | null
-  has_cat_experience: boolean | null
-  vet_clinic: string | null
-  adoption_reason: string | null
-  surrender_circumstances: string | null
-  floor_type: string | null
-  has_window_screens: boolean | null
-}
-
-interface Request {
-  id: string
-  cat_id: string
-  adopter_id: string
-  message: string
-  status: string
-  created_at: string
-  cats: {
-    id: string
-    name: string
-    sex: string
-  } | null
-  adopter?: {
-    id: string
-    full_name: string
-    phone: string | null
-    adopter_profiles: AdopterProfile | AdopterProfile[] | null
-  } | null
-}
+import { Request } from './types'
 
 interface RequestQueueProps {
   requests: Request[]
@@ -111,9 +79,11 @@ export default function RequestQueue({ requests }: RequestQueueProps) {
             return (
               <div key={req.id} className="flex flex-col">
                 {/* Summary Row */}
-                <div 
+                <button 
+                  type="button"
                   onClick={() => toggleExpand(req.id)}
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-paper/10 transition-colors"
+                  aria-expanded={isExpanded}
+                  className="w-full text-start flex items-center justify-between p-4 cursor-pointer hover:bg-paper/10 transition-colors border-0 bg-transparent font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 rounded-sm"
                 >
                   <div className="flex flex-col gap-1 text-start">
                     <h3 className="text-base font-bold text-ink">
@@ -128,7 +98,7 @@ export default function RequestQueue({ requests }: RequestQueueProps) {
                   <div className="flex items-center gap-3">
                     {isExpanded ? <ChevronUp className="w-5 h-5 text-ink-soft" /> : <ChevronDown className="w-5 h-5 text-ink-soft" />}
                   </div>
-                </div>
+                </button>
 
                 {/* Expanded Details */}
                 {isExpanded && (

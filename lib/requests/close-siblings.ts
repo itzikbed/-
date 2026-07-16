@@ -69,26 +69,28 @@ export async function closeSiblings(catId: string) {
 
     // 4. Fire-and-log rejection emails to adopters
     for (const req of pendingRequests) {
-      void (async () => {
-        try {
-          const { data, error: userError } = await supabaseAdmin.auth.admin.getUserById(req.adopter_id)
-          if (userError || !data || !data.user || !data.user.email) {
-            console.error('[CLOSE SIBLINGS EMAIL] Failed to resolve adopter email:', userError?.message)
-            return
-          }
-
-          await sendEmail({
-            to: data.user.email,
-            subject: getClosedSubject(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-            react: React.createElement(RequestClosedCatAdopted, {
-              catName: cat.name,
-              catSex: cat.sex as 'male' | 'female' | 'unknown'
-            })
-          })
-        } catch (e) {
-          console.error('[CLOSE SIBLINGS EMAIL] Failed to send auto-close email:', e instanceof Error ? e.message : String(e))
+      try {
+        const { data, error: userError } = await supabaseAdmin.auth.admin.getUserById(req.adopter_id)
+        if (userError || !data || !data.user || !data.user.email) {
+          console.error('[CLOSE SIBLINGS EMAIL] Failed to resolve adopter email:', userError?.message)
+          continue
         }
-      })()
+
+        await sendEmail({
+          to: data.user.email,
+          subject: getClosedSubject(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+          react: React.createElement(RequestClosedCatAdopted, {
+            catName: cat.name,
+            catSex: cat.sex as 'male' | 'female' | 'unknown'
+          }),
+          template: 'request_closed_cat_adopted',
+          recipientUserId: req.adopter_id,
+          catId: catId,
+          requestId: req.id
+        })
+      } catch (e) {
+        console.error('[CLOSE SIBLINGS EMAIL] Failed to send auto-close email:', e instanceof Error ? e.message : String(e))
+      }
     }
   } catch (err) {
     console.error('[CLOSE SIBLINGS EXCEPTION] Failed:', err instanceof Error ? err.message : String(err))

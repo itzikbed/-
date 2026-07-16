@@ -33,54 +33,61 @@ export async function approveAdoptionRequestAction(requestId: string): Promise<A
     const req = updated
     const cat = req.cats as unknown as { name: string; sex: string; owner_id: string }
 
-    await supabase.from('moderation_log').insert({
+    const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'request',
       entity_id: requestId,
       action: 'approve'
     })
+    if (logErr) {
+      console.error('Failed to insert moderation log:', logErr)
+    }
 
     const { data: adopter } = await supabase.from('profiles').select('full_name, phone').eq('id', req.adopter_id).single()
     const { data: owner } = await supabase.from('profiles').select('full_name, phone').eq('id', cat.owner_id).single()
 
     if (adopter && owner) {
-      void (async () => {
-        try {
-          const adopterEmail = await getUserEmail(req.adopter_id)
-          await sendEmail({
-            to: adopterEmail,
-            subject: getReqApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown', 'adopter'),
-            react: React.createElement(RequestApproved, {
-              catName: cat.name,
-              catSex: cat.sex as 'male' | 'female' | 'unknown',
-              recipientRole: 'adopter',
-              counterpartName: owner.full_name,
-              counterpartPhone: owner.phone || ''
-            })
-          })
-        } catch (e) {
-          console.error('Failed to send adopter request approval email:', e)
-        }
-      })()
+      try {
+        const adopterEmail = await getUserEmail(req.adopter_id)
+        await sendEmail({
+          to: adopterEmail,
+          subject: getReqApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown', 'adopter'),
+          react: React.createElement(RequestApproved, {
+            catName: cat.name,
+            catSex: cat.sex as 'male' | 'female' | 'unknown',
+            recipientRole: 'adopter',
+            counterpartName: owner.full_name,
+            counterpartPhone: owner.phone || ''
+          }),
+          template: 'request_approved_adopter',
+          recipientUserId: req.adopter_id,
+          catId: req.cat_id,
+          requestId: req.id
+        })
+      } catch (e) {
+        console.error('Failed to send adopter request approval email:', e)
+      }
 
-      void (async () => {
-        try {
-          const ownerEmail = await getUserEmail(cat.owner_id)
-          await sendEmail({
-            to: ownerEmail,
-            subject: getReqApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown', 'publisher'),
-            react: React.createElement(RequestApproved, {
-              catName: cat.name,
-              catSex: cat.sex as 'male' | 'female' | 'unknown',
-              recipientRole: 'publisher',
-              counterpartName: adopter.full_name,
-              counterpartPhone: adopter.phone || ''
-            })
-          })
-        } catch (e) {
-          console.error('Failed to send owner request approval email:', e)
-        }
-      })()
+      try {
+        const ownerEmail = await getUserEmail(cat.owner_id)
+        await sendEmail({
+          to: ownerEmail,
+          subject: getReqApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown', 'publisher'),
+          react: React.createElement(RequestApproved, {
+            catName: cat.name,
+            catSex: cat.sex as 'male' | 'female' | 'unknown',
+            recipientRole: 'publisher',
+            counterpartName: adopter.full_name,
+            counterpartPhone: adopter.phone || ''
+          }),
+          template: 'request_approved_publisher',
+          recipientUserId: cat.owner_id,
+          catId: req.cat_id,
+          requestId: req.id
+        })
+      } catch (e) {
+        console.error('Failed to send owner request approval email:', e)
+      }
     } else {
       console.error('[REQUEST APPROVAL ERROR] Failed to resolve profiles for adopter or owner. Emails skipped.')
     }
@@ -123,26 +130,31 @@ export async function rejectAdoptionRequestAction(requestId: string, reason: str
     const req = updated
     const cat = req.cats as unknown as { name: string; sex: string }
 
-    await supabase.from('moderation_log').insert({
+    const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'request',
       entity_id: requestId,
       action: 'reject',
       reason
     })
+    if (logErr) {
+      console.error('Failed to insert moderation log:', logErr)
+    }
 
-    void (async () => {
-      try {
-        const adopterEmail = await getUserEmail(req.adopter_id)
-        await sendEmail({
-          to: adopterEmail,
-          subject: getReqRejectedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-          react: React.createElement(RequestRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', adminNote: reason })
-        })
-      } catch (e) {
-        console.error('Failed to send request rejection email:', e)
-      }
-    })()
+    try {
+      const adopterEmail = await getUserEmail(req.adopter_id)
+      await sendEmail({
+        to: adopterEmail,
+        subject: getReqRejectedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+        react: React.createElement(RequestRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', adminNote: reason }),
+        template: 'request_rejected',
+        recipientUserId: req.adopter_id,
+        catId: req.cat_id,
+        requestId: req.id
+      })
+    } catch (e) {
+      console.error('Failed to send request rejection email:', e)
+    }
 
     revalidatePath('/requests')
     revalidatePath('/admin')

@@ -26,7 +26,7 @@ export const catBaseSchema = z.object({
   region: z.enum(['north', 'south', 'center', 'jerusalem', 'yosh'], { message: 'נא לבחור אזור' }),
   city: z.string().trim().min(1, { message: 'שדה חובה' }).max(100),
   
-  // Step 4: Photos (paths returned from pipeline)
+  // Step 4: Photos
   photos: z.array(z.object({
     path_card: z.string().max(180),
     path_full: z.string().max(180),
@@ -37,14 +37,17 @@ export const catBaseSchema = z.object({
   video_path: z.string().max(180).optional().nullable()
 })
 
-const ageSpecialRefine = (
+const fullPublishRefine = (
   data: {
+    name: string
     ageYears: number
     ageMonths: number
     is_special: boolean
     special_needs?: string | null
     fee_required: boolean
     fee_amount?: number | null
+    description: string
+    city: string
   },
   ctx: z.RefinementCtx
 ) => {
@@ -72,16 +75,55 @@ const ageSpecialRefine = (
       path: ['fee_amount']
     })
   }
+  // Reject placeholder values when publishing
+  if (data.name === 'טיוטה') {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'נא להזין שם חתול תקין',
+      path: ['name']
+    })
+  }
+  if (data.city === 'עיר_זמנית') {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'נא להזין עיר תקינה',
+      path: ['city']
+    })
+  }
+  if (data.description === 'טיוטה זמנית של תיאור החתול ללא תוכן') {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'נא להזין תיאור חתול מפורט (לפחות 20 תווים)',
+      path: ['description']
+    })
+  }
 }
 
-export const catSchema = catBaseSchema.superRefine(ageSpecialRefine)
+export const catSchema = catBaseSchema.superRefine(fullPublishRefine)
 
-export const draftCatSchema = catBaseSchema.extend({
+export const draftCatSchema = z.object({
+  name: z.string().trim().max(40).optional().nullable(),
+  sex: z.enum(['male', 'female', 'unknown']).optional().nullable(),
+  ageYears: z.number().int().min(0).max(25).optional().nullable(),
+  ageMonths: z.number().int().min(0).max(11).optional().nullable(),
+  vaccinations: z.number().int().min(0).max(3).optional().nullable(),
+  neutered: z.boolean().optional().nullable(),
+  health_notes: z.string().max(3000).optional().nullable(),
+  is_special: z.boolean().optional().nullable(),
+  special_needs: z.string().max(2000).optional().nullable(),
+  good_with_cats: z.boolean().optional().nullable(),
+  good_with_dogs: z.boolean().optional().nullable(),
+  fee_required: z.boolean().optional().nullable(),
+  fee_amount: z.number().int().max(10000).optional().nullable(),
+  description: z.string().trim().max(5000).optional().nullable(),
+  region: z.enum(['north', 'south', 'center', 'jerusalem', 'yosh']).optional().nullable(),
+  city: z.string().trim().max(100).optional().nullable(),
   photos: z.array(z.object({
     path_card: z.string().max(180),
     path_full: z.string().max(180),
     sort_order: z.number().int().min(0).max(5)
-  })).max(6)
-}).superRefine(ageSpecialRefine)
+  })).max(6).optional().nullable(),
+  video_path: z.string().max(180).optional().nullable()
+})
 
 export type CatInput = z.infer<typeof catSchema>

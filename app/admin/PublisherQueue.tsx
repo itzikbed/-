@@ -89,9 +89,11 @@ export default function PublisherQueue({ publishers }: PublisherQueueProps) {
             return (
               <div key={pub.id} className="flex flex-col">
                 {/* Summary Row */}
-                <div 
+                <button 
+                  type="button"
                   onClick={() => toggleExpand(pub.id)}
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-paper/10 transition-colors"
+                  aria-expanded={isExpanded}
+                  className="w-full text-start flex items-center justify-between p-4 cursor-pointer hover:bg-paper/10 transition-colors border-0 bg-transparent font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 rounded-sm"
                 >
                   <div className="flex flex-col gap-1 text-start">
                     <h3 className="text-base font-bold text-ink">{pub.full_name}</h3>
@@ -105,7 +107,7 @@ export default function PublisherQueue({ publishers }: PublisherQueueProps) {
                     </span>
                     {isExpanded ? <ChevronUp className="w-5 h-5 text-ink-soft" /> : <ChevronDown className="w-5 h-5 text-ink-soft" />}
                   </div>
-                </div>
+                </button>
 
                 {/* Expanded details */}
                 {isExpanded && (

@@ -33,25 +33,29 @@ export async function approveCatAction(catId: string): Promise<ActionResult> {
 
     const cat = updated[0]
 
-    await supabase.from('moderation_log').insert({
+    const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'cat',
       entity_id: catId,
       action: 'approve'
     })
+    if (logErr) {
+      console.error('Failed to insert moderation log:', logErr)
+    }
 
-    void (async () => {
-      try {
-        const email = await getUserEmail(cat.owner_id)
-        await sendEmail({
-          to: email,
-          subject: getCatApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-          react: React.createElement(CatApproved, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', catId: cat.id })
-        })
-      } catch (e) {
-        console.error('Failed to send cat approval email:', e)
-      }
-    })()
+    try {
+      const email = await getUserEmail(cat.owner_id)
+      await sendEmail({
+        to: email,
+        subject: getCatApprovedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+        react: React.createElement(CatApproved, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', catId: cat.id }),
+        template: 'cat_approved',
+        recipientUserId: cat.owner_id,
+        catId: cat.id
+      })
+    } catch (e) {
+      console.error('Failed to send cat approval email:', e)
+    }
 
     revalidatePath('/cats')
     revalidatePath('/admin')
@@ -85,26 +89,30 @@ export async function rejectCatAction(catId: string, reason: string): Promise<Ac
 
     const cat = updated[0]
 
-    await supabase.from('moderation_log').insert({
+    const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'cat',
       entity_id: catId,
       action: 'reject',
       reason
     })
+    if (logErr) {
+      console.error('Failed to insert moderation log:', logErr)
+    }
 
-    void (async () => {
-      try {
-        const email = await getUserEmail(cat.owner_id)
-        await sendEmail({
-          to: email,
-          subject: getCatRejectedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-          react: React.createElement(CatRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', reason })
-        })
-      } catch (e) {
-        console.error('Failed to send cat rejection email:', e)
-      }
-    })()
+    try {
+      const email = await getUserEmail(cat.owner_id)
+      await sendEmail({
+        to: email,
+        subject: getCatRejectedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+        react: React.createElement(CatRejected, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown', reason }),
+        template: 'cat_rejected',
+        recipientUserId: cat.owner_id,
+        catId: cat.id
+      })
+    } catch (e) {
+      console.error('Failed to send cat rejection email:', e)
+    }
 
     revalidatePath('/admin')
     return { ok: true }
@@ -123,6 +131,9 @@ export async function archiveCatAdminAction(catId: string, reason: string): Prom
     const adminId = await checkAdmin()
     const supabase = await createClient()
 
+    // Sibling auto-close tail (must run before updating status to not conflict with trigger)
+    await closeSiblings(catId)
+
     const { data: updated, error } = await supabase
       .from('cats')
       .update({ status: 'archived' })
@@ -136,34 +147,35 @@ export async function archiveCatAdminAction(catId: string, reason: string): Prom
 
     const cat = updated[0]
 
-    await supabase.from('moderation_log').insert({
+    const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'cat',
       entity_id: catId,
       action: 'archive',
       reason
     })
-
-    // Sibling auto-close tail
-    await closeSiblings(catId)
+    if (logErr) {
+      console.error('Failed to insert moderation log:', logErr)
+    }
 
     // Fire-and-log email notification to the owner
-    void (async () => {
-      try {
-        const email = await getUserEmail(cat.owner_id)
-        await sendEmail({
-          to: email,
-          subject: getCatArchivedByAdminSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-          react: React.createElement(CatArchivedByAdmin, {
-            catName: cat.name,
-            catSex: cat.sex as 'male' | 'female' | 'unknown',
-            reason
-          })
-        })
-      } catch (e) {
-        console.error('Failed to send cat admin archival email:', e)
-      }
-    })()
+    try {
+      const email = await getUserEmail(cat.owner_id)
+      await sendEmail({
+        to: email,
+        subject: getCatArchivedByAdminSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+        react: React.createElement(CatArchivedByAdmin, {
+          catName: cat.name,
+          catSex: cat.sex as 'male' | 'female' | 'unknown',
+          reason
+        }),
+        template: 'cat_archived_by_admin',
+        recipientUserId: cat.owner_id,
+        catId: cat.id
+      })
+    } catch (e) {
+      console.error('Failed to send cat admin archival email:', e)
+    }
 
     revalidatePath('/cats')
     revalidatePath(`/cats/${catId}`)

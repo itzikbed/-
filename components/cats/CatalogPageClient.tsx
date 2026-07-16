@@ -162,6 +162,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
               placeholder={strings.catalog.searchPlaceholder}
               value={searchVal}
               onChange={handleSearchChange}
+              aria-label={strings.catalog.searchPlaceholder}
               className="w-full bg-paper border border-border rounded-input py-2.5 ps-10 pe-4 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
             />
             <span className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-ink-soft">
@@ -171,8 +172,9 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
 
           {/* Sort Selection */}
           <div className="flex items-center gap-2 flex-shrink-0 justify-between sm:justify-end">
-            <span className="text-sm font-semibold text-ink-soft whitespace-nowrap">{strings.catalog.sortBy}</span>
+            <label htmlFor="catalog-sort" className="text-sm font-semibold text-ink-soft whitespace-nowrap">{strings.catalog.sortBy}</label>
             <select
+              id="catalog-sort"
               value={filters.sort}
               onChange={(e) => handleSortChange(e.target.value as 'newest' | 'youngest' | 'oldest')}
               className="bg-paper border border-border rounded-input py-2 px-3 text-sm font-bold text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine min-w-[120px]"
@@ -225,7 +227,12 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
           <div className="flex-grow" onClick={() => setMobileOpen(false)} />
           
           {/* Drawer Content */}
-          <div className="bg-surface rounded-t-card border-t border-border p-6 shadow-hover max-h-[85vh] flex flex-col animate-slide-up">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={strings.catalog.filterTitle}
+            className="bg-surface rounded-t-card border-t border-border p-6 shadow-hover max-h-[85vh] flex flex-col animate-slide-up"
+          >
             <CatalogFilters
               filters={filters}
               totalCount={totalCount}

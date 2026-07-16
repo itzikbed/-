@@ -32,6 +32,9 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col flex-grow select-none">
+      {/* Preload hero poster for fast LCP */}
+      <link rel="preload" as="image" href="/hero/hero_1_poster.jpg" fetchPriority="high" />
+
       {/* Full-bleed Hero Section */}
       <section className="relative min-h-[85vh] flex items-center justify-center py-20 overflow-hidden">
         <HeroFilm />

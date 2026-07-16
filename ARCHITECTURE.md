@@ -184,7 +184,7 @@ final only when the owner marks the cat adopted.
 - 2026-07-15 · (architect) Deletion policy fixed as §5a: archive is the default for anything ever published; hard delete only for never-published listings (owner), account-deletion cascade, or unlawful-content purge via service-role script. Mandates migration 0007 (`cats_delete_owner` RLS), `deleteCatAction` row-first ordering fix (found: cats had NO delete policy — the action purged media, silently no-oped the row delete, and reported success), admin archive-with-reason control, and auto-close of sibling requests on adopted/archived.
 - 2026-07-15 · Security hardening: migrations 0008–0009 make media private, constrain direct PostgREST/storage writes, enforce owner status transitions, and block blocked publishers; app adds signed media access, security headers, origin checks, bounded inputs, and production-safe email handling.
 - 2026-07-16 · (architect, decision authority delegated by Itzik) §10 product defaults settled: contact handoff = email both sides name+phone; questionnaire only before first request; adopter questionnaire stays admin-only; adopted cats stay hidden at launch ("סיפורי אימוץ" deferred post-launch); adopters 18+ with no parental-consent flow; trust copy must be process-true (no unverifiable claims); support contact via NEXT_PUBLIC_CONTACT_EMAIL set at deploy; video transcoding stays deferred (₪0 budget) with an upload-step privacy notice; HSTS preload deferred to post-launch. Implementation: prompt 06 items J8–J9, Q10–Q12.
-
+- 2026-07-16 · Mobile Lighthouse scores measured: Landing (75 Performance, 94 Accessibility, 96 Best Practices, 100 SEO), Catalog (84 Performance, 94 Accessibility, 96 Best Practices, 100 SEO). Performance optimization is deferred to Phase 7/post-launch by architect decision.
 
 ## 12. Now / Next (update every session)
 
@@ -197,6 +197,6 @@ final only when the owner marks the cat adopted.
 | 3 | Questionnaire wizard · upload wizard · request flow | ☑ |
 | 4 | Admin queues + emails | ☑ |
 | 4.2 | Deletion & archive lifecycle per §5a: migration 0007, deleteCatAction fix, owner/admin archive controls, sibling-request auto-close + emails (prompt 04.2) | ☑ |
-| 5 | Polish: SEO/OG, a11y audit, privacy page | ☐ |
+| 5 | Polish: SEO/OG, a11y audit, privacy page | ☑ |
 | 6 | Seed, QA as all 4 roles, domain, admin handover | ☐ |
 | 7 | External-audit remediation — triage of SITE_AUDIT_REPORT.md (prompt 06) | ☐ |

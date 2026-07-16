@@ -9,7 +9,16 @@ export const metadata = {
   description: strings.admin.metaDesc
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const resolvedParams = await searchParams
+  const successParam = typeof resolvedParams.success === 'string' ? resolvedParams.success : undefined
+  const allowedSuccessValues = ['archived']
+  const success = successParam && allowedSuccessValues.includes(successParam) ? successParam : undefined
+
   const supabase = await createClient()
 
   // Guard: Authenticated & Admin check
@@ -86,6 +95,7 @@ export default async function AdminPage() {
           pendingCats={pendingCats || []}
           pendingRequests={pendingRequests || []}
           logs={logs || []}
+          success={success}
         />
       </div>
     </div>

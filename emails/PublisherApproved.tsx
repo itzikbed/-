@@ -1,6 +1,7 @@
 import React from 'react'
-import { Html, Head, Body, Container, Section, Text, Link, Preview, Heading } from '@react-email/components'
+import { Html, Head, Body, Container, Section, Text, Preview, Heading } from '@react-email/components'
 import { strings } from '../lib/strings'
+import { MsoButton } from './MsoButton'
 
 export interface PublisherApprovedProps {
   fullName?: string
@@ -27,18 +28,9 @@ export default function PublisherApproved({ fullName = '' }: PublisherApprovedPr
           <Text style={textStyle}>
             {strings.emails.publisherApprovedText}
           </Text>
-          <Section style={buttonContainerStyle} dir="rtl">
-            {/* Table-based bulletproof button */}
-            <table align="center" border={0} cellPadding={0} cellSpacing={0} style={buttonTableStyle} dir="rtl">
-              <tr>
-                <td align="center" style={buttonTdStyle}>
-                  <Link href={loginUrl} style={buttonLinkStyle}>
-                    {strings.emails.publisherApprovedCta}
-                  </Link>
-                </td>
-              </tr>
-            </table>
-          </Section>
+          
+          <MsoButton href={loginUrl} text={strings.emails.publisherApprovedCta} />
+
           <Section style={dividerStyle} dir="rtl" />
           <Text style={footerStyle}>
             {strings.common.emailFooter}
@@ -93,29 +85,6 @@ const textStyle = {
   marginBottom: '20px',
   textAlign: 'right' as const,
   margin: '0 0 20px 0',
-}
-
-const buttonContainerStyle = {
-  textAlign: 'center' as const,
-  margin: '30px 0',
-}
-
-const buttonTableStyle = {
-  margin: '0 auto',
-}
-
-const buttonTdStyle = {
-  backgroundColor: '#EBAF56',
-  borderRadius: '9999px',
-  padding: '12px 30px',
-}
-
-const buttonLinkStyle = {
-  color: '#1E2B25',
-  fontSize: '16px',
-  fontWeight: '600',
-  textDecoration: 'none',
-  display: 'inline-block',
 }
 
 const dividerStyle = {

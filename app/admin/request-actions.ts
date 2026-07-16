@@ -81,6 +81,8 @@ export async function approveAdoptionRequestAction(requestId: string): Promise<A
           console.error('Failed to send owner request approval email:', e)
         }
       })()
+    } else {
+      console.error('[REQUEST APPROVAL ERROR] Failed to resolve profiles for adopter or owner. Emails skipped.')
     }
 
     revalidatePath('/requests')

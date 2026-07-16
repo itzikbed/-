@@ -12,6 +12,7 @@ interface AdminDashboardClientProps {
   pendingCats: React.ComponentPropsWithoutRef<typeof CatQueue>['cats']
   pendingRequests: React.ComponentPropsWithoutRef<typeof RequestQueue>['requests']
   logs: React.ComponentPropsWithoutRef<typeof LogTable>['logs']
+  success?: string
 }
 
 type TabType = 'publishers' | 'cats' | 'requests' | 'logs'
@@ -20,7 +21,8 @@ export default function AdminDashboardClient({
   pendingPublishers,
   pendingCats,
   pendingRequests,
-  logs
+  logs,
+  success
 }: AdminDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>('publishers')
 
@@ -33,6 +35,12 @@ export default function AdminDashboardClient({
 
   return (
     <div className="space-y-6">
+      {success === 'archived' && (
+        <div className="bg-pine-soft border border-pine/20 text-pine rounded-card p-4 text-base font-semibold text-center select-none" role="alert">
+          {strings.admin.archiveCatSuccess}
+        </div>
+      )}
+
       {/* Tab Navigation */}
       <div className="flex border-b border-border/80 overflow-x-auto no-scrollbar scroll-smooth">
         {tabItems.map((tab) => {

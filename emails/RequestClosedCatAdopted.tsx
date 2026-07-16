@@ -1,6 +1,7 @@
 import React from 'react'
-import { Html, Head, Body, Container, Section, Text, Link, Preview, Heading } from '@react-email/components'
+import { Html, Head, Body, Container, Section, Text, Preview, Heading } from '@react-email/components'
 import { gendered, strings } from '../lib/strings'
+import { MsoButton } from './MsoButton'
 
 export interface RequestClosedCatAdoptedProps {
   catName?: string
@@ -33,17 +34,8 @@ export default function RequestClosedCatAdopted({ catName = '', catSex = 'unknow
             {bodyText}
           </Text>
 
-          <Section style={buttonContainerStyle} dir="rtl">
-            <table align="center" border={0} cellPadding={0} cellSpacing={0} style={buttonTableStyle} dir="rtl">
-              <tr>
-                <td align="center" style={buttonTdStyle}>
-                  <Link href={catalogUrl} style={buttonLinkStyle}>
-                    {gendered('emails', 'requestClosedCatAdoptedCta', catSex)}
-                  </Link>
-                </td>
-              </tr>
-            </table>
-          </Section>
+          <MsoButton href={catalogUrl} text={gendered('emails', 'requestClosedCatAdoptedCta', catSex)} />
+
           <Section style={dividerStyle} dir="rtl" />
           <Text style={footerStyle}>
             {strings.common.emailFooter}
@@ -61,18 +53,18 @@ const mainStyle = {
 }
 
 const containerStyle = {
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '#FDFCFA',
   border: '1px solid #E3E0D7',
-  borderRadius: '16px',
+  borderRadius: '20px',
   padding: '40px 30px',
-  maxWidth: '560px',
+  maxWidth: '600px',
+  width: '100%',
   margin: '0 auto',
 }
 
 const logoSectionStyle = {
-  borderBottom: '1px solid #E3E0D7',
-  paddingBottom: '20px',
-  marginBottom: '30px',
+  textAlign: 'center' as const,
+  marginBottom: '20px',
 }
 
 const logoStyle = {
@@ -98,29 +90,6 @@ const textStyle = {
   marginBottom: '20px',
   textAlign: 'right' as const,
   margin: '0 0 20px 0',
-}
-
-const buttonContainerStyle = {
-  textAlign: 'center' as const,
-  margin: '30px 0',
-}
-
-const buttonTableStyle = {
-  margin: '0 auto',
-}
-
-const buttonTdStyle = {
-  backgroundColor: '#EBAF56',
-  borderRadius: '9999px',
-  padding: '12px 30px',
-}
-
-const buttonLinkStyle = {
-  color: '#1E2B25',
-  fontSize: '16px',
-  fontWeight: '600',
-  textDecoration: 'none',
-  display: 'inline-block',
 }
 
 const dividerStyle = {

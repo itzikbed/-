@@ -1,6 +1,7 @@
 import React from 'react'
-import { Html, Head, Body, Container, Section, Text, Link, Preview, Heading } from '@react-email/components'
+import { Html, Head, Body, Container, Section, Text, Preview, Heading } from '@react-email/components'
 import { gendered, strings } from '../lib/strings'
+import { MsoButton } from './MsoButton'
 
 export interface CatArchivedByAdminProps {
   catName?: string
@@ -35,23 +36,14 @@ export default function CatArchivedByAdmin({ catName = '', catSex = 'unknown', r
           </Text>
 
           {reason && (
-            <Section style={noteBoxStyle} dir="rtl">
-              <Text style={noteLabelStyle}>{gendered('emails', 'catArchivedByAdminReasonLabel', catSex)}</Text>
-              <Text style={noteTextStyle}>{reason}</Text>
+            <Section style={reasonBoxStyle} dir="rtl">
+              <Text style={reasonLabelStyle}>{gendered('emails', 'catArchivedByAdminReasonLabel', catSex)}</Text>
+              <Text style={reasonTextStyle}>{reason}</Text>
             </Section>
           )}
 
-          <Section style={buttonContainerStyle} dir="rtl">
-            <table align="center" border={0} cellPadding={0} cellSpacing={0} style={buttonTableStyle} dir="rtl">
-              <tr>
-                <td align="center" style={buttonTdStyle}>
-                  <Link href={publishUrl} style={buttonLinkStyle}>
-                    {gendered('emails', 'catArchivedByAdminCta', catSex)}
-                  </Link>
-                </td>
-              </tr>
-            </table>
-          </Section>
+          <MsoButton href={publishUrl} text={gendered('emails', 'catArchivedByAdminCta', catSex)} />
+
           <Section style={dividerStyle} dir="rtl" />
           <Text style={footerStyle}>
             {strings.common.emailFooter}
@@ -69,18 +61,18 @@ const mainStyle = {
 }
 
 const containerStyle = {
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '#FDFCFA',
   border: '1px solid #E3E0D7',
-  borderRadius: '16px',
+  borderRadius: '20px',
   padding: '40px 30px',
-  maxWidth: '560px',
+  maxWidth: '600px',
+  width: '100%',
   margin: '0 auto',
 }
 
 const logoSectionStyle = {
-  borderBottom: '1px solid #E3E0D7',
-  paddingBottom: '20px',
-  marginBottom: '30px',
+  textAlign: 'center' as const,
+  marginBottom: '20px',
 }
 
 const logoStyle = {
@@ -108,49 +100,26 @@ const textStyle = {
   margin: '0 0 20px 0',
 }
 
-const noteBoxStyle = {
+const reasonBoxStyle = {
   backgroundColor: '#F7F5F0',
-  borderRight: '4px solid #1C6650',
+  borderRight: '4px solid #D97706',
   padding: '15px 20px',
   borderRadius: '8px',
   marginBottom: '25px',
 }
 
-const noteLabelStyle = {
+const reasonLabelStyle = {
   fontSize: '14px',
   fontWeight: '700',
-  color: '#1C6650',
+  color: '#D97706',
   margin: '0 0 5px 0',
 }
 
-const noteTextStyle = {
+const reasonTextStyle = {
   fontSize: '15px',
   lineHeight: '1.5',
   color: '#1E2B25',
   margin: '0',
-}
-
-const buttonContainerStyle = {
-  textAlign: 'center' as const,
-  margin: '30px 0',
-}
-
-const buttonTableStyle = {
-  margin: '0 auto',
-}
-
-const buttonTdStyle = {
-  backgroundColor: '#EBAF56',
-  borderRadius: '9999px',
-  padding: '12px 30px',
-}
-
-const buttonLinkStyle = {
-  color: '#1E2B25',
-  fontSize: '16px',
-  fontWeight: '600',
-  textDecoration: 'none',
-  display: 'inline-block',
 }
 
 const dividerStyle = {

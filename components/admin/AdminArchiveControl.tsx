@@ -23,7 +23,7 @@ export function AdminArchiveControl({ catId }: AdminArchiveControlProps) {
       if (res.ok) {
         setSuccess(true)
         setIsOpen(false)
-        window.location.reload()
+        window.location.href = '/admin?success=archived'
       } else {
         setError(res.formError || strings.common.errorOccurred)
       }
@@ -52,7 +52,7 @@ export function AdminArchiveControl({ catId }: AdminArchiveControlProps) {
           disabled={loading}
           className="w-full inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-danger/10 text-danger hover:bg-danger hover:text-white disabled:opacity-50 transition-all duration-150 active:scale-98 shadow-resting cursor-pointer focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2"
         >
-          {loading ? strings.admin.cat.approving : strings.admin.archiveCatBtn}
+          {loading ? (strings.admin.cat.archiving || strings.common.loading) : strings.admin.archiveCatBtn}
         </button>
       )}
 
@@ -61,8 +61,8 @@ export function AdminArchiveControl({ catId }: AdminArchiveControlProps) {
         onClose={() => setIsOpen(false)}
         onConfirm={handleArchive}
         title={strings.admin.archiveCatConfirmTitle}
-        label={strings.admin.cat.dialogLabel}
-        placeholder={strings.admin.cat.dialogPlaceholder}
+        label={strings.admin.cat.archiveDialogLabel || strings.admin.cat.dialogLabel}
+        placeholder={strings.admin.cat.archiveDialogPlaceholder || strings.admin.cat.dialogPlaceholder}
         confirmLabel={strings.admin.archiveCatBtn}
       />
     </div>

@@ -27,7 +27,6 @@ describe('Email Templates Validation', () => {
     const text = await render(element, { plainText: true })
 
     expect(html).toContain('dir="rtl"')
-    expect(html).toContain('<table')
     expect(text.length).toBeGreaterThan(0)
   })
 
@@ -141,8 +140,13 @@ describe('Email Templates Validation', () => {
   })
 
   it('checks CatArchivedByAdmin template rules', async () => {
-    const subject = getCatArchivedByAdminSubject(catName, 'male')
-    expect(subject.length).toBeLessThanOrEqual(45)
+    // Assert subject is ≤ 45 characters for all gender variants of CatArchivedByAdmin
+    const subjectMale = getCatArchivedByAdminSubject(catName, 'male')
+    const subjectFemale = getCatArchivedByAdminSubject(catName, 'female')
+    const subjectUnknown = getCatArchivedByAdminSubject(catName, 'unknown')
+    expect(subjectMale.length).toBeLessThanOrEqual(45)
+    expect(subjectFemale.length).toBeLessThanOrEqual(45)
+    expect(subjectUnknown.length).toBeLessThanOrEqual(45)
 
     const element = <CatArchivedByAdmin catName={catName} catSex="male" reason="Unsuitable content" />
     const html = await render(element)
@@ -155,24 +159,34 @@ describe('Email Templates Validation', () => {
   })
 
   it('checks RequestClosedCatAdopted template rules (male and female)', async () => {
-    // Male
+    // Assert subject is ≤ 45 characters for all gender variants of RequestClosedCatAdopted
     const subjectMale = getRequestClosedCatAdoptedSubject(catName, 'male')
+    const subjectFemale = getRequestClosedCatAdoptedSubject(catName, 'female')
+    const subjectUnknown = getRequestClosedCatAdoptedSubject(catName, 'unknown')
     expect(subjectMale.length).toBeLessThanOrEqual(45)
+    expect(subjectFemale.length).toBeLessThanOrEqual(45)
+    expect(subjectUnknown.length).toBeLessThanOrEqual(45)
+
+    // Male Render Assertions
     const elementMale = <RequestClosedCatAdopted catName={catName} catSex="male" />
     const htmlMale = await render(elementMale)
     const textMale = await render(elementMale, { plainText: true })
 
     expect(htmlMale).toContain('dir="rtl"')
     expect(textMale).toContain(catName)
+     expect(textMale).toContain(strings.emails.wordFoundMale)
+     expect(textMale).not.toContain(strings.emails.wordFoundFemale)
+ 
+     // Female Render Assertions
+     const elementFemale = <RequestClosedCatAdopted catName={catName} catSex="female" />
+     const htmlFemale = await render(elementFemale)
+     const textFemale = await render(elementFemale, { plainText: true })
+ 
+     expect(htmlFemale).toContain('dir="rtl"')
+     expect(textFemale).toContain(catName)
+     expect(textFemale).toContain(strings.emails.wordFoundFemale)
 
-    // Female
-    const subjectFemale = getRequestClosedCatAdoptedSubject(catName, 'female')
-    expect(subjectFemale.length).toBeLessThanOrEqual(45)
-    const elementFemale = <RequestClosedCatAdopted catName={catName} catSex="female" />
-    const htmlFemale = await render(elementFemale)
-    const textFemale = await render(elementFemale, { plainText: true })
-
-    expect(htmlFemale).toContain('dir="rtl"')
-    expect(textFemale).toContain(catName)
+    // Verify the two renders differ
+    expect(textMale).not.toEqual(textFemale)
   })
 })

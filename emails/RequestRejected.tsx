@@ -1,6 +1,7 @@
 import React from 'react'
-import { Html, Head, Body, Container, Section, Text, Link, Preview, Heading } from '@react-email/components'
+import { Html, Head, Body, Container, Section, Text, Preview, Heading } from '@react-email/components'
 import { gendered, strings } from '../lib/strings'
+import { MsoButton } from './MsoButton'
 
 export interface RequestRejectedProps {
   catName?: string
@@ -41,17 +42,8 @@ export default function RequestRejected({ catName = '', catSex = 'unknown', admi
             </Section>
           )}
 
-          <Section style={buttonContainerStyle} dir="rtl">
-            <table align="center" border={0} cellPadding={0} cellSpacing={0} style={buttonTableStyle} dir="rtl">
-              <tr>
-                <td align="center" style={buttonTdStyle}>
-                  <Link href={catalogUrl} style={buttonLinkStyle}>
-                    {gendered('emails', 'requestRejectedCta', catSex)}
-                  </Link>
-                </td>
-              </tr>
-            </table>
-          </Section>
+          <MsoButton href={catalogUrl} text={gendered('emails', 'requestRejectedCta', catSex)} />
+
           <Section style={dividerStyle} dir="rtl" />
           <Text style={footerStyle}>
             {strings.common.emailFooter}
@@ -128,29 +120,6 @@ const noteTextStyle = {
   lineHeight: '1.5',
   color: '#1E2B25',
   margin: '0',
-}
-
-const buttonContainerStyle = {
-  textAlign: 'center' as const,
-  margin: '30px 0',
-}
-
-const buttonTableStyle = {
-  margin: '0 auto',
-}
-
-const buttonTdStyle = {
-  backgroundColor: '#EBAF56',
-  borderRadius: '9999px',
-  padding: '12px 30px',
-}
-
-const buttonLinkStyle = {
-  color: '#1E2B25',
-  fontSize: '16px',
-  fontWeight: '600',
-  textDecoration: 'none',
-  display: 'inline-block',
 }
 
 const dividerStyle = {

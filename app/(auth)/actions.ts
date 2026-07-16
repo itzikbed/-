@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { loginSchema, signupSchema, LoginInput, SignupInput } from '@/lib/schemas/auth'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import uiStrings from '@/content/he/ui.json'
 
 export type ActionResult<T = unknown> =
@@ -67,3 +68,45 @@ export async function signupAction(formData: SignupInput): Promise<ActionResult>
 
   return { ok: true, data: { success: true } }
 }
+
+export async function forgotPasswordAction(email: string): Promise<ActionResult> {
+  if (!email || !email.includes('@')) {
+    return { ok: false, formError: 'אנא הזן כתובת אימייל תקינה' }
+  }
+
+  const supabase = await createClient()
+  
+  // Construct the redirect URL for reset password token landing page
+  const headersList = await headers()
+  const host = headersList.get('host')
+  const protocol = host?.includes('localhost') || host?.includes('127.0.0.1') ? 'http' : 'https'
+  const redirectUrl = `${protocol}://${host}/api/auth/callback?next=/reset-password`
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectUrl
+  })
+
+  if (error) {
+    return { ok: false, formError: 'אירעה שגיאה בשליחת קישור השחזור. אנא נסו שנית.' }
+  }
+
+  return { ok: true, data: { success: true } }
+}
+
+export async function resetPasswordAction(password: string): Promise<ActionResult> {
+  if (!password || password.length < 8) {
+    return { ok: false, formError: 'הסיסמה חייבת להכיל לפחות 8 תווים' }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({
+    password
+  })
+
+  if (error) {
+    return { ok: false, formError: 'אירעה שגיאה בעדכון הסיסמה. ייתכן שפג תוקפו של קישור השחזור.' }
+  }
+
+  return { ok: true, data: { success: true } }
+}
+

@@ -39,6 +39,21 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
     return { ok: false, formError: 'יש למלא את שאלון המאמץ תחילה' }
   }
 
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const { count, error: countErr } = await supabase
+    .from('adoption_requests')
+    .select('id', { count: 'exact', head: true })
+    .eq('adopter_id', user.id)
+    .gt('created_at', oneDayAgo)
+
+  if (countErr) {
+    return { ok: false, formError: 'אירעה שגיאה בבדיקת מגבלת הבקשות.' }
+  }
+
+  if (count !== null && count >= 5) {
+    return { ok: false, formError: 'הגעת למגבלת הבקשות היומית (מקסימום 5 בקשות ב-24 שעות).' }
+  }
+
   const { data: existingRequest } = await supabase
     .from('adoption_requests')
     .select('id')
@@ -61,7 +76,7 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
     return { ok: false, formError: 'החתול אינו זמין לאימוץ כרגע' }
   }
 
-  const { error: insertErr } = await supabase
+  const { data: inserted, error: insertErr } = await supabase
     .from('adoption_requests')
     .insert({
       adopter_id: user.id,
@@ -69,9 +84,11 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
       message,
       status: 'pending'
     })
+    .select('id')
+    .single()
 
-  if (insertErr) {
-    if (insertErr.code === '23505') {
+  if (insertErr || !inserted) {
+    if (insertErr?.code === '23505') {
       return { ok: false, formError: 'כבר שלחת בקשת אימוץ לחתול זה, והיא ממתינה לטיפול.' }
     }
     return { ok: false, formError: 'אירעה שגיאה בשליחת הבקשה. אנא נסה שנית.' }
@@ -79,11 +96,19 @@ export async function submitAdoptionRequestAction(data: AdoptionRequestInput): P
 
   // Send confirmation email to adopter
   if (user.email) {
-    void sendEmail({
-      to: user.email,
-      subject: getReqReceivedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
-      react: React.createElement(RequestReceived, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown' })
-    }).catch((e) => console.error('[REQUEST EMAIL] send failed:', e instanceof Error ? e.message : String(e)))
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: getReqReceivedSub(cat.name, cat.sex as 'male' | 'female' | 'unknown'),
+        react: React.createElement(RequestReceived, { catName: cat.name, catSex: cat.sex as 'male' | 'female' | 'unknown' }),
+        template: 'request_received',
+        recipientUserId: user.id,
+        catId,
+        requestId: inserted.id
+      })
+    } catch (e) {
+      console.error('[REQUEST EMAIL] send failed:', e instanceof Error ? e.message : String(e))
+    }
   }
 
   revalidatePath('/requests')

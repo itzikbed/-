@@ -88,20 +88,30 @@ export default function LoginForm() {
               type="password"
               label={strings.auth.passwordLabel}
               placeholder={strings.auth.passwordPlaceholder}
+              autoComplete="current-password"
               error={errors.password?.message}
               disabled={loading}
               {...register('password')}
             />
 
+            <div className="flex justify-end -mt-2">
+              <Link 
+                href={`/forgot-password${searchParams.toString() ? '?' + searchParams.toString() : ''}`} 
+                className="text-xs text-pine font-semibold hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+              >
+                {strings.auth.forgotPasswordLink}
+              </Link>
+            </div>
+ 
             <Button type="submit" variant="primary" loading={loading} className="w-full mt-2">
               {strings.auth.loginSubmitBtn}
             </Button>
           </form>
-
+ 
           <div className="mt-6 text-center text-sm select-none">
             <span className="text-ink-soft">{strings.auth.noAccountPrompt} </span>
             <Link 
-              href="/signup" 
+              href={`/signup${searchParams.toString() ? '?' + searchParams.toString() : ''}`} 
               className="text-pine font-semibold hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
             >
               {strings.nav.signup}

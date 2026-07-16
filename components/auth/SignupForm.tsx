@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,6 +16,7 @@ export default function SignupForm() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const {
     register,
@@ -41,7 +42,7 @@ export default function SignupForm() {
       } else {
         setSuccess(true)
         setTimeout(() => {
-          router.push('/login')
+          router.push(`/login${searchParams.toString() ? '?' + searchParams.toString() : ''}`)
         }, 2000)
       }
     } catch {
@@ -112,6 +113,7 @@ export default function SignupForm() {
                 type="password"
                 label={strings.auth.passwordLabel}
                 placeholder={strings.auth.passwordPlaceholder}
+                autoComplete="new-password"
                 error={errors.password?.message}
                 disabled={loading}
                 {...register('password')}
@@ -126,7 +128,7 @@ export default function SignupForm() {
           <div className="mt-6 text-center text-sm select-none">
             <span className="text-ink-soft">{strings.auth.hasAccountPrompt} </span>
             <Link 
-              href="/login" 
+              href={`/login${searchParams.toString() ? '?' + searchParams.toString() : ''}`} 
               className="text-pine font-semibold hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
             >
               {strings.nav.login}

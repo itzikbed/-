@@ -38,13 +38,13 @@ export default async function QuestionnairePage() {
   }
 
   return (
-    <main className="flex-grow py-12 px-4 md:px-8 bg-paper">
+    <div className="flex-grow py-12 px-4 md:px-8 bg-paper">
       <div className="app-container max-w-3xl mx-auto">
         <QuestionnaireWizard
           defaultValues={defaultValues}
           isCompletedInitially={isCompletedInitially}
         />
       </div>
-    </main>
+    </div>
   )
 }

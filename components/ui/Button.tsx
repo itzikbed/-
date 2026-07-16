@@ -2,7 +2,7 @@ import React from 'react'
 import { strings } from '@/lib/strings'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'tertiary'
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'draft'
   loading?: boolean
 }
 
@@ -13,7 +13,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const variants = {
       primary: 'bg-marmalade text-ink hover:bg-marmalade-dp hover:-translate-y-0.5 shadow-resting hover:shadow-hover',
       secondary: 'bg-pine text-white hover:bg-pine/90 hover:-translate-y-0.5 shadow-resting hover:shadow-hover',
-      tertiary: 'bg-transparent text-pine hover:bg-pine-soft hover:-translate-y-0.5'
+      tertiary: 'bg-transparent text-pine hover:bg-pine-soft hover:-translate-y-0.5',
+      danger: 'bg-danger text-white hover:opacity-90 hover:-translate-y-0.5 shadow-resting hover:shadow-hover',
+      draft: 'bg-surface border border-border text-ink-soft hover:bg-ink-soft/10 hover:-translate-y-0.5 shadow-resting hover:shadow-hover'
     }
 
     return (

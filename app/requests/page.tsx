@@ -11,7 +11,11 @@ import { strings } from '@/lib/strings'
 
 export const metadata = {
   title: strings.requests.metaTitle,
-  description: strings.requests.metaDesc
+  description: strings.requests.metaDesc,
+  robots: {
+    index: false,
+    follow: false
+  }
 }
 
 export default async function RequestsPage() {

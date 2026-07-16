@@ -44,3 +44,7 @@ export function createAdminClient() {
     }
   )
 }
+
+export function getServiceRoleKey() {
+  return process.env.SUPABASE_SERVICE_ROLE_KEY!
+}

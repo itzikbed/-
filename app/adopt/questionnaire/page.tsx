@@ -4,6 +4,13 @@ import { createClient } from '@/lib/supabase/server'
 import { QuestionnaireInput } from '@/lib/schemas/questionnaire'
 import QuestionnaireWizard from './QuestionnaireWizard'
 
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false
+  }
+}
+
 export default async function QuestionnairePage() {
   const supabase = await createClient()
 

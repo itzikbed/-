@@ -52,7 +52,7 @@ export default function AccessibilityPage() {
           </p>
           <ul className="list-none ps-0 text-base text-ink-soft space-y-1">
             <li><strong>{content.nameLabel}</strong> {content.coordinatorName}</li>
-            <li><strong>{content.emailLabel}</strong> <bdi className="dir-ltr select-all">{process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@lachatul.org.il'}</bdi></li>
+            <li><strong>{content.emailLabel}</strong> <bdi className="dir-ltr select-all">{process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'cheirut@gmail.com'}</bdi></li>
           </ul>
         </section>
       </div>

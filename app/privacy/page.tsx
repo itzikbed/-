@@ -69,7 +69,7 @@ export default function PrivacyPage() {
           <p className="text-base text-ink leading-relaxed">
             {content.section5Text}{' '}
             <bdi className="dir-ltr select-all text-pine font-semibold">
-              {process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@lachatul.org.il'}
+              {process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'cheirut@gmail.com'}
             </bdi>
           </p>
         </section>

@@ -113,7 +113,7 @@ export async function downloadAndProcessVideo(supabaseAdmin, url, catId) {
       localMp4
     ])
     
-    const pathBase = `${catId}/${photoUuid}-clip`
+    const pathBase = `${catId}/${photoUuid}-video`
     const pathWebm = `${pathBase}.webm`
     const pathMp4 = `${pathBase}.mp4`
     

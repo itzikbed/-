@@ -26,7 +26,7 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  ...(isDevelopment ? [] : ['upgrade-insecure-requests'])
+  ...(isDevelopment || supabaseUrl.hostname === '127.0.0.1' || supabaseUrl.hostname === 'localhost' ? [] : ['upgrade-insecure-requests'])
 ].join('; ')
 
 const securityHeaders = [

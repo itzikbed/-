@@ -5,6 +5,7 @@ import PublisherQueue from './PublisherQueue'
 import CatQueue from './CatQueue'
 import RequestQueue from './RequestQueue'
 import LogTable from './LogTable'
+import { AdminPromoteCard } from '@/components/admin/AdminPromoteCard'
 import { strings } from '@/lib/strings'
 
 interface AdminDashboardClientProps {
@@ -15,7 +16,7 @@ interface AdminDashboardClientProps {
   success?: string
 }
 
-type TabType = 'publishers' | 'cats' | 'requests' | 'logs'
+type TabType = 'publishers' | 'cats' | 'requests' | 'logs' | 'management'
 
 export default function AdminDashboardClient({
   pendingPublishers,
@@ -30,7 +31,8 @@ export default function AdminDashboardClient({
     { id: 'publishers' as TabType, label: strings.admin.tabs.publishers, count: pendingPublishers.length },
     { id: 'cats' as TabType, label: strings.admin.tabs.cats, count: pendingCats.length },
     { id: 'requests' as TabType, label: strings.admin.tabs.requests, count: pendingRequests.length },
-    { id: 'logs' as TabType, label: strings.admin.tabs.logs, count: null }
+    { id: 'logs' as TabType, label: strings.admin.tabs.logs, count: null },
+    { id: 'management' as TabType, label: strings.admin.tabs.management, count: null }
   ]
 
   return (
@@ -74,6 +76,7 @@ export default function AdminDashboardClient({
         {activeTab === 'cats' && <CatQueue cats={pendingCats} />}
         {activeTab === 'requests' && <RequestQueue requests={pendingRequests} />}
         {activeTab === 'logs' && <LogTable logs={logs} />}
+        {activeTab === 'management' && <AdminPromoteCard />}
       </div>
     </div>
   )

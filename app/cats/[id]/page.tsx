@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: CatDetailPageProps) {
 
   const coverPhoto = cat.cat_photos?.find((p) => p.sort_order === 0) || cat.cat_photos?.[0]
   const ogImageUrl = coverPhoto
-    ? new URL(getMediaUrl(coverPhoto.path_full), process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').toString()
+    ? new URL(getMediaUrl(coverPhoto.path_card), process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').toString()
     : undefined
 
   const sexLabel = cat.sex === 'male' 
@@ -54,11 +54,12 @@ export async function generateMetadata({ params }: CatDetailPageProps) {
   return {
     title,
     description,
-    openGraph: ogImageUrl
-      ? {
-          images: [{ url: ogImageUrl }]
-        }
-      : undefined
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: ogImageUrl ? [{ url: ogImageUrl }] : undefined
+    }
   }
 }
 

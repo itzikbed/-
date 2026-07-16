@@ -5,6 +5,17 @@ import { CatGrid } from '@/components/cats/CatGrid'
 import { HeroFilm } from '@/components/ui/HeroFilm'
 import { strings } from '@/lib/strings'
 import { Heart, Sparkles } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: `${strings.common.siteName} — ${strings.common.siteSubtitle}`,
+  description: strings.common.metaDesc,
+  openGraph: {
+    title: `${strings.common.siteName} — ${strings.common.siteSubtitle}`,
+    description: strings.common.metaDesc,
+    type: 'website',
+  }
+}
 
 export default async function HomePage() {
   const supabase = await createClient()

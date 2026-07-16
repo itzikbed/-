@@ -66,7 +66,7 @@ export function MyCatCard({
           {coverPhoto ? (
             <Image
               src={getMediaUrl(coverPhoto.path_card)}
-              alt={cat.name}
+              alt={`${cat.name}, ${cat.sex === 'female' ? strings.catalog.genderFemaleNoun : strings.catalog.genderMaleNoun}`}
               fill
               sizes="96px"
               className="object-cover"

@@ -1,9 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import { parseFilters, applyFiltersToQuery } from '@/lib/utils/filters'
 import { CatalogPageClient } from '@/components/cats/CatalogPageClient'
+import { strings } from '@/lib/strings'
+import type { Metadata } from 'next'
 
 interface CatalogPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export const metadata: Metadata = {
+  title: `${strings.nav.catalog} — ${strings.common.siteName}`,
+  description: strings.common.metaDesc,
+  openGraph: {
+    title: `${strings.nav.catalog} — ${strings.common.siteName}`,
+    description: strings.common.metaDesc,
+    type: 'website',
+  }
 }
 
 export default async function CatalogPage({ searchParams }: CatalogPageProps) {

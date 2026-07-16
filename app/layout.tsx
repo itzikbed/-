@@ -179,6 +179,10 @@ export default async function RootLayout({
               <Link href="/accessibility" className="hover:text-pine hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
                 {strings.nav.accessibilityDeclaration}
               </Link>
+              <span className="text-border">|</span>
+              <Link href="/terms" className="hover:text-pine hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
+                {strings.nav.terms}
+              </Link>
             </div>
           </div>
         </footer>

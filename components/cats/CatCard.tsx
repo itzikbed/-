@@ -132,7 +132,7 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
       <div className="relative w-full aspect-[4/3] bg-paper overflow-hidden">
         <Image
           src={imageUrl}
-          alt={strings.catalog.cardImageAlt.replace('{name}', cat.name)}
+          alt={`${cat.name}, ${cat.sex === 'female' ? strings.catalog.genderFemaleNoun : strings.catalog.genderMaleNoun} ${strings.catalog.forAdoption}`}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           style={{ viewTransitionName: `cat-photo-${cat.id}` }}

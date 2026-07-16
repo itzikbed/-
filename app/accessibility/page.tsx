@@ -11,7 +11,7 @@ export default function AccessibilityPage() {
   const content = strings.compliance.accessibility
 
   return (
-    <div className="flex-grow bg-paper py-12 select-none">
+    <div className="flex-grow bg-paper py-12">
       <div className="app-container max-w-3xl bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-start space-y-6">
         <h1 className="text-3xl font-display font-extrabold text-ink border-b border-border/60 pb-4">
           {strings.nav.accessibilityDeclaration}
@@ -52,7 +52,7 @@ export default function AccessibilityPage() {
           </p>
           <ul className="list-none ps-0 text-base text-ink-soft space-y-1">
             <li><strong>{content.nameLabel}</strong> {content.coordinatorName}</li>
-            <li><strong>{content.emailLabel}</strong> <bdi className="dir-ltr select-all">{content.emailValue}</bdi></li>
+            <li><strong>{content.emailLabel}</strong> <bdi className="dir-ltr select-all">{process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@lachatul.org.il'}</bdi></li>
           </ul>
         </section>
       </div>

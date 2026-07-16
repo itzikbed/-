@@ -1,31 +1,34 @@
 # Hero Media Licenses
 
-All hero video clips are sourced from [Mixkit](https://mixkit.co/) and are covered by the
-[Mixkit Stock Video Free License](https://mixkit.co/license/#videoFree), which permits
-free use in personal and commercial projects without attribution.
+All hero video clips were fetched from Mixkit's asset CDN (`assets.mixkit.co`) and are
+covered by the [Mixkit Stock Video Free License](https://mixkit.co/license/#videoFree),
+which permits free use in personal and commercial projects without attribution.
 
-## Clip inventory
+## Clip inventory (4-clip rotation)
 
-| File       | Source                                                    | Content                          | Duration | License      |
-|------------|-----------------------------------------------------------|----------------------------------|----------|--------------|
-| hero_1.*   | [Mixkit #1544](https://mixkit.co/free-stock-video/1544/)  | Orange tabby cat close-up        | 8s       | Mixkit Free  |
-| hero_2.*   | [Mixkit #1241](https://mixkit.co/free-stock-video/1241/)  | Cat face close-up portrait       | 7s       | Mixkit Free  |
-| hero_3.*   | [Mixkit #1547](https://mixkit.co/free-stock-video/1547/)  | Cat grooming medium shot         | 8s       | Mixkit Free  |
-| hero_4.*   | [Mixkit #1545](https://mixkit.co/free-stock-video/1545/)  | Kitten playing close-up          | 8s       | Mixkit Free  |
-| hero_5.*   | [Mixkit #1543](https://mixkit.co/free-stock-video/1543/)  | Cat resting on blanket           | 8s       | Mixkit Free  |
+| File     | Content (verified visually by architect, 2026-07-16) | License     | Source page |
+|----------|------------------------------------------------------|-------------|-------------|
+| hero_1.* | Cream/orange cat face, extreme close-up              | Mixkit Free | not recorded at original download (Phase 2.5) |
+| hero_2.* | Woman petting a black cat through a frame, medium    | Mixkit Free | not recorded at original download (Phase 2.5) |
+| hero_3.* | Cat eye, extreme close-up (portrait orientation)     | Mixkit Free | not recorded at download |
+| hero_4.* | Woman holding a black cat in a chair, medium         | Mixkit Free | not recorded at download |
+
+## History note (2026-07-16, architect)
+
+A fifth clip (previous `hero_2`, Mixkit asset #1241) was removed from the rotation:
+it turned out to be a **portrait of a person, not a cat** — it was downloaded without
+visual verification and the earlier version of this document described it incorrectly
+("Cat face close-up portrait"). The earlier per-clip source-page links were likewise
+not verified and have been replaced with "not recorded". The rotation now has 4 clips,
+which satisfies DESIGN.md §6b.3 (4–5 clips). If the client supplies real cat footage,
+prefer it for the fifth slot (prompt 06 Q13).
+
+Pre-launch checklist item: re-trace the exact Mixkit source pages for the four clips
+(search Mixkit by content) and record the URLs above, so license provenance is fully
+documented.
 
 ## Processing
 
-Each source clip was:
-1. Downloaded as 720p MP4 from Mixkit.
-2. Trimmed to 7–8 seconds.
-3. Transcoded to **960px-wide** WebM (VP9, CRF 32, 300kbps cap) and MP4 (H.264, CRF 28).
-4. Audio stripped (`-an`).
-5. Poster frame extracted as JPEG (`-q:v 2`).
-
-All hero clips are lazy-loaded except clip #1 which preloads its poster for LCP.
-
-## Compliance with DESIGN.md §6b.3
-
-All clips meet the mobile-legibility bar: close-up or medium shots only, cat fills ≥ 40%
-of frame height at 390px width. No wide establishing shots.
+Each source clip was downloaded as 720p MP4 from `assets.mixkit.co`, trimmed to ≤8s,
+scaled to 960px width (H.264 MP4 + VP9 WebM), muted, and given a JPEG poster frame.
+All files are within the DESIGN.md §6b budget (≤1.2MB per clip).

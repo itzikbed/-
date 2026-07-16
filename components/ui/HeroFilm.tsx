@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { shouldDisableVideo } from '@/lib/utils/video-playback'
 import { PlaybackDirector } from '@/lib/utils/playback-director'
 
@@ -13,7 +14,6 @@ export const HeroFilm: React.FC = () => {
   const video2Ref = useRef<HTMLVideoElement>(null)
   const video3Ref = useRef<HTMLVideoElement>(null)
   const video4Ref = useRef<HTMLVideoElement>(null)
-  const video5Ref = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     // Defer state update to avoid synchronous cascades in effect body
@@ -32,12 +32,12 @@ export const HeroFilm: React.FC = () => {
     }
   }, [])
 
-  // Slide cycle logic (8 seconds per clip, 5 clips total)
+  // Slide cycle logic (8 seconds per clip, 4 clips total)
   useEffect(() => {
     if (disableVideo) return
 
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev === 4 ? 0 : prev + 1))
+      setActiveIndex((prev) => (prev === 3 ? 0 : prev + 1))
     }, 8000)
 
     return () => clearInterval(interval)
@@ -51,8 +51,7 @@ export const HeroFilm: React.FC = () => {
       { index: 0, ref: video1Ref.current },
       { index: 1, ref: video2Ref.current },
       { index: 2, ref: video3Ref.current },
-      { index: 3, ref: video4Ref.current },
-      { index: 4, ref: video5Ref.current }
+      { index: 3, ref: video4Ref.current }
     ]
 
     videos.forEach(({ index, ref }) => {
@@ -84,7 +83,6 @@ export const HeroFilm: React.FC = () => {
     const v2 = video2Ref.current
     const v3 = video3Ref.current
     const v4 = video4Ref.current
-    const v5 = video5Ref.current
 
     return () => {
       PlaybackDirector.unregister('hero')
@@ -92,16 +90,30 @@ export const HeroFilm: React.FC = () => {
       v2?.pause()
       v3?.pause()
       v4?.pause()
-      v5?.pause()
     }
   }, [activeIndex, disableVideo])
 
+  // Base poster is the first child of the same container in both branches, so React
+  // keeps it mounted across the disableVideo swap and the LCP paints from SSR HTML
+  // instead of waiting for hydration.
+  const basePoster = (
+    <Image
+      src="/hero/hero_1_poster.jpg"
+      alt=""
+      aria-hidden="true"
+      priority
+      fetchPriority="high"
+      unoptimized
+      fill
+      sizes="100vw"
+      className="object-cover z-0"
+    />
+  )
+
   if (disableVideo) {
     return (
-      <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
-        style={{ backgroundImage: "url('/hero/hero_1_poster.jpg')" }}
-      >
+      <div className="absolute inset-0 z-0 bg-paper" data-hero-section>
+        {basePoster}
         {/* Gradient Overlay for Text Contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/40 to-transparent z-20 pointer-events-none" />
       </div>
@@ -112,12 +124,12 @@ export const HeroFilm: React.FC = () => {
     { id: 1, preload: 'metadata' as const, ref: video1Ref },
     { id: 2, preload: isLoaded ? ('metadata' as const) : ('none' as const), ref: video2Ref },
     { id: 3, preload: isLoaded ? ('metadata' as const) : ('none' as const), ref: video3Ref },
-    { id: 4, preload: isLoaded ? ('metadata' as const) : ('none' as const), ref: video4Ref },
-    { id: 5, preload: isLoaded ? ('metadata' as const) : ('none' as const), ref: video5Ref }
+    { id: 4, preload: isLoaded ? ('metadata' as const) : ('none' as const), ref: video4Ref }
   ]
 
   return (
     <div className="absolute inset-0 z-0 bg-paper" data-hero-section>
+      {basePoster}
       {clips.map((clip, index) => {
         const isActive = index === activeIndex
         return (

@@ -86,7 +86,7 @@ Suggested landing H1: **"לכל חתול מגיע בית."** Sub: one sentence, 
 ## 6. Photography & imagery
 
 - Listing photos only in the catalog — no stock. Upload UI coaches: "תמונה בגובה עיני החתול, אור טבעי, בלי פילטרים".
-- Cover crops locked to 4:3, `object-cover`. Adopted cats stay visible with badge + slight `grayscale(0.3)` — social proof.
+- Cover crops locked to 4:3, `object-cover`. Adopted cats are hidden from the public site at launch (settled 2026-07-16, ARCHITECTURE §11); the "סיפורי אימוץ" showcase — and any badge/grayscale treatment for it — is deferred post-launch.
 - Mascot SVGs live in `components/mascot/`; single ink stroke width site-wide (2px at 1x).
 
 ### 6a. Landing hero media — the site must feel ALIVE (not optional)
@@ -144,8 +144,12 @@ the card photo morphs into the detail hero (shared element). 250–300ms, transf
 only. Zero bytes; this is the "feels like an app" moment on mobile. Falls back to a normal
 navigation on unsupported browsers — never polyfill.
 
-**3. Hero film sequence.** 3 warm clips crossfading (6–8s each, 1.5s fade). Only clip #1
-loads eagerly; #2–#3 lazy after `load`. Each ≤ 1.2MB, 960px is enough. Poster-first always.
+**3. Hero film sequence.** 4–5 warm clips crossfading (6–8s each, 1.5s fade). Only clip #1
+loads eagerly; the rest lazy after `load`. Each ≤ 1.2MB, 960px is enough. Poster-first always.
+**Mobile legibility (client feedback via Itzik, 2026-07-16):** the hero is watched on a
+6-inch screen — every clip must read at 390px wide: close-up/medium shots only, the cat
+filling roughly ≥ 40% of frame height; no wide establishing shots. Visibly over-compressed
+sources fail this bar too (the original `hero_2` is the canonical example to replace).
 
 **4. Self-drawing mascot.** Peeking Cat ink strokes draw themselves (CSS
 `stroke-dashoffset`, ~700ms) when their section enters the viewport — used in

@@ -145,11 +145,19 @@ only. Zero bytes; this is the "feels like an app" moment on mobile. Falls back t
 navigation on unsupported browsers — never polyfill.
 
 **3. Hero film sequence.** 4–5 warm clips crossfading (6–8s each, 1.5s fade). Only clip #1
-loads eagerly; the rest lazy after `load`. Each ≤ 1.2MB, 960px is enough. Poster-first always.
-**Mobile legibility (client feedback via Itzik, 2026-07-16):** the hero is watched on a
-6-inch screen — every clip must read at 390px wide: close-up/medium shots only, the cat
-filling roughly ≥ 40% of frame height; no wide establishing shots. Visibly over-compressed
-sources fail this bar too (the original `hero_2` is the canonical example to replace).
+loads eagerly; the rest lazy after `load`. Each ≤ 1.2MB, 960px wide is enough (portrait
+clips: 720px tall is enough). Poster-first always.
+**Two viewport clip sets (client feedback via Itzik, 2026-07-16):** the hero serves TWO
+sets, selected with `matchMedia('(min-width: 768px)')` at hydration and re-selected on
+breakpoint change:
+- **Desktop set** — landscape 16:9; medium or close shots, the cat(s) unmistakably the
+  subject; no wide establishing shots.
+- **Mobile set** — portrait (~9:16), close-ups only: every clip must read at 390px wide,
+  the cat filling roughly ≥ 40% of frame height. Landscape sources are art-direction
+  cropped to portrait at encode time — never rely on CSS `object-cover` to find the cat.
+Clip #1 is shared by both sets and must match the SSR base poster (it is the LCP element —
+do not change one without the other). Visibly over-compressed sources fail this bar too
+(the original `hero_2` is the canonical example that was replaced).
 
 **4. Self-drawing mascot.** Peeking Cat ink strokes draw themselves (CSS
 `stroke-dashoffset`, ~700ms) when their section enters the viewport — used in

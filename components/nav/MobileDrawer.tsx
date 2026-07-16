@@ -100,6 +100,9 @@ export function MobileDrawer({ isOpen, onClose, user, profile }: MobileDrawerPro
       {/* Drawer Content */}
       <div
         ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={strings.common.openMenu}
         tabIndex={-1}
         className="relative w-72 max-w-full bg-surface h-full shadow-hover border-s border-border flex flex-col justify-between p-6 animate-fade-slide-rtl focus-visible:outline-none"
       >

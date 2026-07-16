@@ -26,8 +26,9 @@ export async function generateMetadata({ params }: CatDetailPageProps): Promise<
   }
 
   const coverPhoto = cat.cat_photos?.find((p) => p.sort_order === 0) || cat.cat_photos?.[0]
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'
   const ogImageUrl = coverPhoto
-    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/cat-photos/${coverPhoto.path_full || coverPhoto.path_card}`
+    ? `${siteUrl}/api/media?path=${encodeURIComponent(coverPhoto.path_card)}`
     : undefined
 
   const sexLabel = cat.sex === 'male' 
@@ -108,14 +109,41 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
     ? `/cats/${cat.id}/request`
     : `/adopt/questionnaire?cat=${cat.id}`
 
+  // Compute OG image for JSON-LD
+  const coverPhoto = cat.cat_photos?.find((p: { sort_order: number }) => p.sort_order === 0) || cat.cat_photos?.[0]
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cats-adoption.co.il'
+  const ogImageUrl = coverPhoto
+    ? `${siteUrl}/api/media?path=${encodeURIComponent(coverPhoto.path_card)}`
+    : undefined
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    'name': cat.name,
+    'description': cat.description.substring(0, 200),
+    'image': ogImageUrl || undefined,
+    'offers': {
+      '@type': 'Offer',
+      'price': cat.fee_amount || 0,
+      'priceCurrency': 'ILS',
+      'availability': 'https://schema.org/InStock'
+    }
+  }
+
   return (
-    <CatDetails
-      cat={cat}
-      adoptionLink={adoptionLink}
-      regionLabel={regionLabel}
-      ageLabel={ageLabel}
-      sexLabel={sexLabel}
-      isAdmin={isAdmin}
-    />
+    <>
+      <CatDetails
+        cat={cat}
+        adoptionLink={adoptionLink}
+        regionLabel={regionLabel}
+        ageLabel={ageLabel}
+        sexLabel={sexLabel}
+        isAdmin={isAdmin}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+    </>
   )
 }

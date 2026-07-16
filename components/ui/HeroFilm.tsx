@@ -1,15 +1,15 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import { shouldDisableVideo } from '@/lib/utils/video-playback'
 import { PlaybackDirector } from '@/lib/utils/playback-director'
 
-// Two clip sets (DESIGN §6b.3): landscape clips for desktop, portrait close-up
-// crops for mobile. Clip #1 is shared by both sets because its first frame must
-// match the SSR base poster (the LCP element).
+// Two clip sets (DESIGN §6b.3): landscape clips for desktop, portrait wide-framed
+// crops for mobile that keep the full cat in frame (no face-only close-ups).
+// Each set's first clip has a matching SSR base poster (the LCP element),
+// art-directed per viewport via <picture> below.
 const DESKTOP_CLIPS = ['hero_1', 'hero_d2', 'hero_d3', 'hero_d4', 'hero_d5']
-const MOBILE_CLIPS = ['hero_1', 'hero_3', 'hero_m2', 'hero_m3', 'hero_m4']
+const MOBILE_CLIPS = ['hero_m1', 'hero_m5', 'hero_m6', 'hero_m7']
 
 export const HeroFilm: React.FC = () => {
   const [disableVideo, setDisableVideo] = useState(true)
@@ -104,17 +104,18 @@ export const HeroFilm: React.FC = () => {
   // keeps it mounted across the disableVideo swap and the LCP paints from SSR HTML
   // instead of waiting for hydration.
   const basePoster = (
-    <Image
-      src="/hero/hero_1_poster.jpg"
-      alt=""
-      aria-hidden="true"
-      priority
-      fetchPriority="high"
-      unoptimized
-      fill
-      sizes="100vw"
-      className="object-cover z-0"
-    />
+    <picture>
+      <source media="(max-width: 767px)" srcSet="/hero/hero_m1_poster.jpg" />
+      <img
+        src="/hero/hero_1_poster.jpg"
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        loading="eager"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover z-0"
+      />
+    </picture>
   )
 
   if (disableVideo || !clips) {

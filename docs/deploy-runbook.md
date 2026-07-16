@@ -104,9 +104,40 @@ npm run check:rls
 | `SUPABASE_SERVICE_ROLE_KEY` | מפתח Service Role סודי (לא נחשף לדפדפן!) | `eyJhbGciOiJIUzI1...` |
 | `RESEND_API_KEY` | מפתח אימות לשליחת מיילים דרך שירות Resend | `re_123456789...` |
 | `NEXT_PUBLIC_SITE_URL` | הכתובת הציבורית של האתר שלכם | `https://your-domain.co.il` |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | כתובת אימייל ליצירת קשר ותמיכה משפטית (נגישות/פרטיות) | `contact@your-domain.co.il` |
 
 ### פריסה רציפה באמצעות GitHub
 1. חברו את מאגר הקוד (Repository) ב-GitHub ל-Netlify/Vercel.
 2. הגדירו את פקודת הבנייה (Build command): `npm run build`.
 3. הגדירו את תיקיית הפלט (Publish directory): `.next`.
 4. בכל ביצוע Push לענף הראשי (`main`), שרת הפריסה יבנה ויפרוס את האתר מחדש באופן אוטומטי תוך הרצת בדיקות האיכות.
+
+---
+
+## 5. צ'קליסט אבטחה והשקה (Security Launch Checklist)
+
+לפני עלייה מלאה לאוויר, יש לבצע את השלבים הבאים **יחד עם בעל האתר** (אין לבקש או להחזיק בפרטי הגישה האישיים שלו לחשבונות השונים):
+
+### שלב א': החלת מיגרוציות אבטחה ב-Supabase Production
+ודאו שכל מיגרוציות בסיס הנתונים (עד `0009_storage_insert_policy_fix.sql`) מוחלות במלואן על פרויקט הייצור בענן:
+```bash
+npx supabase db push --db-url "postgres://postgres:[YOUR-PROD-PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres"
+```
+
+### שלב ב': הגדרות אימות ב-Supabase Auth
+היכנסו לפורטל הניהול של Supabase -> Auth -> Providers:
+1. **Email Confirmations:** הפעילו חובת אישור אימייל (`Confirm Email`) בעת הרשמה כדי למנוע הרשמות של כתובות פיקטיביות.
+2. **Password Policy:** הגדירו אורך סיסמה מינימלי של 8 תווים לפחות והפעילו הגנת סיסמאות דלופות (Leaked passwords protection).
+3. **Redirect URLs:** הגדירו את רשימת הכתובות המורשות להפניה (Redirect URLs) כך שיכילו אך ורק את הדומיין הרשמי של האתר בייצור (לדוגמה `https://your-domain.co.il/**`) ומחקו כתובות בדיקה זמניות.
+
+### שלב ג': הגנת בוטים וספאם (CAPTCHA)
+1. היכנסו ל-Supabase -> Auth -> Security:
+2. הפעילו הגנת CAPTCHA (כגון Cloudflare Turnstile או hCaptcha) על טפסי ההרשמה הציבוריים כדי למנוע יצירת משתמשים פיקטיביים אוטומטית.
+
+### שלב ד': אבטחת חשבונות מנהל (MFA)
+1. כל מנהל מערכת (Admin) בעל גישה לפאנל הניהול `/admin` נדרש להפעיל אימות דו-שלבי (MFA/2FA) בחשבונו בתוך האתר/הדשבורד כדי להגן על מידע המאמצים הרגיש במקרה של גניבת סיסמה.
+
+### שלב ה': הגדרת אימות דוא"ל ב-Resend
+1. היכנסו לחשבון ה-Resend של בעל האתר.
+2. הגדירו את הדומיין הייצורי תחת `Domains` והוסיפו את רשומות ה-DNS הנדרשות (רשומות **SPF** ו-**DKIM**) אצל רשם הדומיינים שלו על מנת להבטיח מעבר תקין של המיילים לתיבת הדואר הנכנס (Inbox) ומניעת הגעתם לספאם.
+

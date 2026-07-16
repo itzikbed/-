@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: CatDetailPageProps) {
   const regionObj = REGIONS.find((r) => r.id === cat.region as RegionId)
   const regionLabel = regionObj ? regionObj.label : cat.region
 
-  const description = strings.catalog.detailDescription
+  const description = gendered('catalog', 'detailDescription', cat.sex)
     .replace('{name}', cat.name)
     .replace('{sexLabel}', sexLabel)
     .replace('{regionLabel}', regionLabel)

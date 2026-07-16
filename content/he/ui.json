@@ -195,7 +195,9 @@
     "detailTitleMale": "{name} מחפש בית חם — בית לחתול",
     "detailTitleFemale": "{name} מחפשת בית חם — בית לחתול",
     "detailTitleUnknown": "{name} מחפש/ת בית חם — בית לחתול",
-    "detailDescription": "{name}, {sexLabel} מתוק/ה לאימוץ באזור {regionLabel}. {description}"
+    "detailDescriptionMale": "{name}, זכר מתוק לאימוץ באזור {regionLabel}. {description}",
+    "detailDescriptionFemale": "{name}, נקבה מתוקה לאימוץ באזור {regionLabel}. {description}",
+    "detailDescriptionUnknown": "{name}, {sexLabel} מתוק/ה לאימוץ באזור {regionLabel}. {description}"
   },
   "badges": {
     "adopted": "אומץ! 🎉",

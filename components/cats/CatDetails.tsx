@@ -5,6 +5,7 @@ import { strings, gendered } from '@/lib/strings'
 import { Info, Coins, Stethoscope, Compass, ChevronLeft } from 'lucide-react'
 import { AdminArchiveControl } from '@/components/admin/AdminArchiveControl'
 import { CatGallery } from '@/components/cats/CatGallery'
+import { ShareButtons } from '@/components/cats/ShareButtons'
 
 interface CatPhoto {
   path_card: string
@@ -206,6 +207,10 @@ export function CatDetails({
               >
                 {strings.catalog.adoptCta.replace('{name}', cat.name)}
               </Link>
+
+              <div className="pt-3 border-t border-border/40">
+                <ShareButtons catId={cat.id} catName={cat.name} catSex={cat.sex} />
+              </div>
 
               {isAdmin && (
                 <div className="pt-2 border-t border-border/20">

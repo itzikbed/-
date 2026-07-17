@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   title: strings.common.metaTitle,
   description: strings.common.metaDesc,
   alternates: {
-    canonical: '/'
+    canonical: './'
   }
 }
 

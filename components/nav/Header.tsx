@@ -68,6 +68,14 @@ export function Header({ user, profile }: HeaderProps) {
           >
             {strings.nav.publish}
           </Link>
+          <Link
+            href="/about"
+            className={`text-ink-soft hover:text-pine transition-colors py-1.5 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine rounded-xs ${
+              pathname === '/about' ? 'border-pine text-pine font-bold' : 'border-transparent'
+            }`}
+          >
+            {strings.nav.about}
+          </Link>
           {user && (
             <Link 
               href="/requests" 

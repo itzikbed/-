@@ -136,6 +136,13 @@ export function MobileDrawer({ isOpen, onClose, user, profile }: MobileDrawerPro
             >
               {strings.nav.publish}
             </Link>
+            <Link
+              href="/about"
+              onClick={onClose}
+              className="px-3 py-2 text-ink-soft hover:text-pine hover:bg-ink-light/10 rounded-btn transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            >
+              {strings.nav.about}
+            </Link>
             {user && (
               <Link
                 href="/requests"

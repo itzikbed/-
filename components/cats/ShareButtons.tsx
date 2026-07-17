@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useSyncExternalStore } from 'react'
 import { Link2, Check, Share2 } from 'lucide-react'
 import { strings, gendered } from '@/lib/strings'
 
@@ -21,13 +21,18 @@ function WhatsAppIcon({ className }: { className?: string }) {
 const buttonClass =
   'inline-flex items-center justify-center gap-2 font-sans font-bold rounded-btn min-h-[42px] px-4 text-sm bg-surface border border-border text-ink hover:bg-pine-soft hover:border-pine/30 transition-all duration-150 active:scale-98 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2'
 
+// Hydration-safe capability check: false on the server, real value after mount.
+const emptySubscribe = () => () => {}
+const useCanNativeShare = () =>
+  useSyncExternalStore(
+    emptySubscribe,
+    () => typeof navigator.share === 'function',
+    () => false
+  )
+
 export function ShareButtons({ catId, catName, catSex }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false)
-  const [canNativeShare, setCanNativeShare] = useState(false)
-
-  useEffect(() => {
-    setCanNativeShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function')
-  }, [])
+  const canNativeShare = useCanNativeShare()
 
   const getShareUrl = () => `${window.location.origin}/cats/${catId}`
   const shareText = gendered('catalog', 'shareMessage', catSex).replace('{name}', catName)

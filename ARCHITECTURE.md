@@ -64,6 +64,8 @@ supabase/
 | `cat_photos` | 2 files per photo | cat_id, `path_card` (480px), `path_full` (1600px), sort_order (0 = cover) |
 | `adoption_requests` | adopter → cat | cat_id, adopter_id, message, `status`, admin_note, decided_by/at · **unique open request per (cat, adopter)** |
 | `moderation_log` | audit, append-only | actor_id, entity_type, entity_id, action, reason |
+| `support_conversations` | support chat, one per user | user_id, `status` open/closed (**unique open conversation per user**), last_message_at (trigger-bumped) |
+| `support_messages` | chat messages, append-only | conversation_id, sender_id, body (≤2000 CHECK), read_by_user_at / read_by_admin_at (each side stamps only its own; content immutable via trigger; 20 msgs/hour cap per non-admin; in `supabase_realtime` publication) |
 
 Storage: private bucket `cat-photos`; `/api/media` issues 60-second signed URLs after
 storage RLS verifies published/owner/admin access. Path `{cat_id}/{uuid}-{card|full}.webp`.
@@ -194,6 +196,8 @@ final only when the owner marks the cat adopted.
 - 2026-07-16 · A11y deltas: sort select now uses `<label htmlFor>` instead of presentational `<span>`; search input has aria-label; MobileDrawer and CatalogPageClient filter drawer have role="dialog" + aria-modal="true"; Dialog.tsx already had them.
 - 2026-07-16 · SEO deltas: per-cat JSON-LD (Product schema) on /cats/[id]; noindex added to /adopt/questionnaire (last auth-gated page missing it); hero poster preload link for LCP.
 - 2026-07-16 · (architect) Hero film v2.2 — two viewport clip sets per client feedback ("clips illegible on phones"): DESIGN §6b.3 amended (both copies); HeroFilm selects desktop (5 landscape: hero_1/d2–d5) or mobile (5 portrait close-ups: hero_1/3/m2–m4) via matchMedia(min-width:768px). Mobile clips are art-direction cropped to 404×720 at encode time. hero_2 (client: low quality) and hero_4 (cat ≈30% of frame) deleted. All 7 new clips sourced from named Mixkit pages, every poster visually verified before wiring; hero_1/hero_3 sources re-traced (#1538/#1545) — licenses doc now has full provenance. Clip #1 (hero_1) shared by both sets so the SSR base poster (LCP element) is untouched.
+
+- 2026-07-17 · Support chat (migration 0016): in-site chat between registered users and admins. One conversation per user — a user message into a conversation an admin closed REOPENS it (chosen over new-conversation-per-close: keeps history in one thread, simplest client logic). Floating launcher hidden for admins (they answer from the /admin "פניות" tab; also avoids the read-receipt guard, which maps admin updates to read_by_admin_at only). Admin "new chat" email goes to all admins, throttled: only when the team has no other unread message in that conversation AND no `support_chat_new` email was sent for it in the last hour (email_log gained nullable conversation_id). Realtime on support_messages with WALRUS/RLS; clients also poll every 15s while a thread is visibly open because a channel can report SUBSCRIBED yet silently drop events (observed right after ALTER PUBLICATION).
 
 ## 12. Now / Next (update every session)
 

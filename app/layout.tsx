@@ -5,6 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { strings } from "@/lib/strings"
 import { Header } from "@/components/nav/Header"
+import { SupportChatLauncher } from "@/components/support/SupportChatLauncher"
 import { initHebrewValidation } from "@/lib/schemas/he-errors"
 import { RouteTransitionTrigger } from "@/lib/utils/view-transition-navigation"
 
@@ -72,6 +73,9 @@ export default async function RootLayout({
         <main id="main-content" className="flex-grow flex flex-col">
           {children}
         </main>
+
+        {/* Support chat: users + guests; admins answer from the dashboard */}
+        {profile?.role !== 'admin' && <SupportChatLauncher userId={user?.id ?? null} />}
 
         {/* Footer */}
         <footer className="bg-surface border-t border-border py-8 mt-auto select-none">

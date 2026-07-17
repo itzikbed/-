@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import React from 'react'
 import AdminDashboardClient from './AdminDashboardClient'
 import { strings } from '@/lib/strings'
+import { fetchAdminConversations, fetchAdminUnreadMap } from '@/lib/support/chat'
 
 export const metadata = {
   title: strings.admin.metaTitle,
@@ -68,6 +69,12 @@ export default async function AdminPage({
     .eq('cats.status', 'published')
     .order('created_at', { ascending: true })
 
+  // Support chat: conversation queue + unread counters (empty on fetch failure)
+  const [supportConversations, supportUnreadMap] = await Promise.all([
+    fetchAdminConversations(supabase).catch(() => []),
+    fetchAdminUnreadMap(supabase).catch(() => ({}))
+  ])
+
   // Fetch latest 50 logs
   const { data: logs } = await supabase
     .from('moderation_log')
@@ -130,6 +137,9 @@ export default async function AdminPage({
           pendingPublishers={pendingPublishers || []}
           pendingCats={pendingCats || []}
           pendingRequests={pendingRequests || []}
+          supportConversations={supportConversations}
+          supportUnreadMap={supportUnreadMap}
+          adminId={user.id}
           logs={logs || []}
           entityNames={entityNames}
           success={success}

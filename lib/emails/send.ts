@@ -18,6 +18,7 @@ export interface SendEmailOptions {
   recipientUserId?: string | null
   catId?: string | null
   requestId?: string | null
+  conversationId?: string | null
 }
 
 export async function sendEmail({
@@ -28,7 +29,8 @@ export async function sendEmail({
   template,
   recipientUserId = null,
   catId = null,
-  requestId = null
+  requestId = null,
+  conversationId = null
 }: SendEmailOptions) {
   const run = async () => {
     try {
@@ -98,6 +100,7 @@ export async function sendEmail({
         recipient_user_id: recipientUserId || null,
         cat_id: catId || null,
         request_id: requestId || null,
+        conversation_id: conversationId || null,
         status,
         error_text: errorText
       })

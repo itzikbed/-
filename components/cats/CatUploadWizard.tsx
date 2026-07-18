@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { catSchema, CatInput } from '@/lib/schemas/cat'
 import { upsertCatAction } from '@/app/publish/cat-actions'
 import { strings } from '@/lib/strings'
+import { UnpublishConsentCard } from './UnpublishConsentCard'
 import { UploadStep1 } from './UploadStep1'
 import { UploadStep2 } from './UploadStep2'
 import { UploadStep3 } from './UploadStep3'
@@ -26,6 +27,12 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   const [wizardError, setWizardError] = useState<string | null>(null)
   const [isFinished, setIsFinished] = useState(false)
   const [isDraftFinished, setIsDraftFinished] = useState(false)
+  // Any save of a published listing flips it to pending (moderation rule, §11).
+  // The flip is real and immediate, so it must be confirmed before the first
+  // save — not discovered after the listing already left the catalog.
+  const [pendingUnpublish, setPendingUnpublish] = useState<'next' | 'draft' | null>(null)
+  const [unpublishConfirmed, setUnpublishConfirmed] = useState(false)
+  const needsUnpublishConsent = initialCat?.status === 'published' && !unpublishConfirmed
 
   let defaultPhotos: PhotoItem[] = []
   let defaultAgeYears: number | undefined = undefined
@@ -84,7 +91,11 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   const photos = useWatch({ control, name: 'photos' }) || []
   const videoPath = useWatch({ control, name: 'video_path' })
 
-  const handleNextStep = async () => {
+  const handleNextStep = async (skipUnpublishGate = false) => {
+    if (step === 3 && needsUnpublishConsent && !skipUnpublishGate) {
+      setPendingUnpublish('next')
+      return
+    }
     let fieldsToValidate: Array<keyof CatInput> = []
     if (step === 1) {
       fieldsToValidate = ['name', 'sex', 'ageYears', 'ageMonths']
@@ -124,7 +135,11 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
     }
   }
 
-  const handleSaveDraft = async () => {
+  const handleSaveDraft = async (skipUnpublishGate = false) => {
+    if (needsUnpublishConsent && !skipUnpublishGate) {
+      setPendingUnpublish('draft')
+      return
+    }
     if (!getValues('is_special')) setValue('special_needs', '')
     if (!getValues('fee_required')) setValue('fee_amount', null)
 
@@ -172,6 +187,14 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
     }
   }
 
+  const confirmUnpublish = () => {
+    const action = pendingUnpublish
+    setUnpublishConfirmed(true)
+    setPendingUnpublish(null)
+    if (action === 'next') void handleNextStep(true)
+    else if (action === 'draft') void handleSaveDraft(true)
+  }
+
   if (isFinished || isDraftFinished) {
     return <UploadSuccessState isFinished={isFinished} />
   }
@@ -190,7 +213,6 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
       {step === 4 && catId && (
         <UploadStep4
           catId={catId}
-          initialStatus={initialCat?.status || null}
           photos={photos}
           setPhotos={(newPhotos) => setValue('photos', newPhotos, { shouldValidate: true })}
           videoPath={videoPath || null}
@@ -200,13 +222,17 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
         />
       )}
 
+      {pendingUnpublish && (
+        <UnpublishConsentCard onConfirm={confirmUnpublish} onCancel={() => setPendingUnpublish(null)} />
+      )}
+
       <WizardNavigation
         step={step}
         isProcessing={isProcessing}
         isSubmitting={isSubmitting}
         onPrev={() => setStep(prev => prev - 1)}
-        onSaveDraft={handleSaveDraft}
-        onNext={handleNextStep}
+        onSaveDraft={() => handleSaveDraft()}
+        onNext={() => handleNextStep()}
         onFinalSubmit={handleFinalSubmit}
       />
     </div>

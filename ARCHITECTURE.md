@@ -215,3 +215,4 @@ final only when the owner marks the cat adopted.
 | 5 | Polish: SEO/OG, a11y audit, privacy page | ☑ |
 | 6 | Seed, QA as all 4 roles, domain, admin handover | ☐ |
 | 7 | External-audit remediation — triage of SITE_AUDIT_REPORT.md (prompt 06) | ☑ |
+| 8 | Capture guidance panel + photo crop/rotate in the upload wizard's media step (prompt 07) | ☐ |

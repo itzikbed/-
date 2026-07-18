@@ -31,6 +31,7 @@ export default function TermsPage() {
         <section className="space-y-3">
           <h2 className="text-xl font-display font-bold text-pine">{content.section2Title}</h2>
           <ul className="list-disc list-inside ps-4 text-base text-ink-soft space-y-2">
+            <li>{content.useRuleAge}</li>
             <li>{content.useRule1}</li>
             <li>{content.useRule2}</li>
             <li>{content.useRule3}</li>
@@ -41,6 +42,20 @@ export default function TermsPage() {
           <h2 className="text-xl font-display font-bold text-pine">{content.section3Title}</h2>
           <p className="text-base text-ink leading-relaxed">
             {content.section3Text}
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl font-display font-bold text-pine">{content.section4Title}</h2>
+          <p className="text-base text-ink leading-relaxed">
+            {content.section4Text}
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl font-display font-bold text-pine">{content.section5Title}</h2>
+          <p className="text-base text-ink leading-relaxed">
+            {content.section5Text}
           </p>
         </section>
       </div>

@@ -14,7 +14,8 @@ export const signupSchema = z.object({
   email: z.string().trim().max(254).email({ message: 'כתובת אימייל לא תקינה' }),
   password: z.string().min(8, { message: 'הסיסמה חייבת להכיל לפחות 8 תווים' }).max(128),
   fullName: z.string().trim().min(2, { message: 'יש להזין שם מלא בן 2 תווים לפחות' }).max(100),
-  phone: z.string().regex(/^05\d-?\d{7}$/, { message: 'מספר טלפון נייד לא תקין (למשל 0501234567)' })
+  phone: z.string().regex(/^05\d-?\d{7}$/, { message: 'מספר טלפון נייד לא תקין (למשל 0501234567)' }),
+  consent: z.boolean().refine((v) => v === true, { message: 'כדי להמשיך יש לאשר את תנאי השימוש ומדיניות הפרטיות' })
 })
 
 export type SignupInput = z.infer<typeof signupSchema>

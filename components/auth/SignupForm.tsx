@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Mascot } from '@/components/mascot/Mascot'
 import { signupAction } from '@/app/(auth)/actions'
 import { signupSchema, SignupInput } from '@/lib/schemas/auth'
@@ -24,7 +25,8 @@ export default function SignupForm() {
     setError,
     formState: { errors }
   } = useForm<SignupInput>({
-    resolver: zodResolver(signupSchema)
+    resolver: zodResolver(signupSchema),
+    defaultValues: { consent: false }
   })
 
   const onSubmit = async (data: SignupInput) => {
@@ -118,6 +120,28 @@ export default function SignupForm() {
                 disabled={loading}
                 {...register('password')}
               />
+
+              <Checkbox
+                label={
+                  <span className="text-sm">
+                    {strings.auth.consentPrefix}
+                    <Link href="/terms" target="_blank" className="text-pine font-semibold hover:underline">
+                      {strings.auth.consentTerms}
+                    </Link>
+                    {strings.auth.consentAnd}
+                    <Link href="/privacy" target="_blank" className="text-pine font-semibold hover:underline">
+                      {strings.auth.consentPrivacy}
+                    </Link>
+                  </span>
+                }
+                error={errors.consent?.message}
+                disabled={loading}
+                {...register('consent')}
+              />
+
+              <p className="text-xs text-ink-soft leading-relaxed">
+                {strings.auth.privacyNotice}
+              </p>
 
               <Button type="submit" variant="primary" loading={loading} className="w-full mt-2">
                 {strings.auth.signupSubmitBtn}

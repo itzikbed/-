@@ -10,6 +10,7 @@ import StepOneFields from './StepOneFields'
 import StepTwoFields from './StepTwoFields'
 import StepThreeFields from './StepThreeFields'
 import SuccessState from './SuccessState'
+import ConsentSection from './ConsentSection'
 import { Button } from '@/components/ui/Button'
 
 interface WizardProps {
@@ -28,6 +29,8 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
   const [isSuccess, setIsSuccess] = useState(isCompletedInitially)
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [consentChecked, setConsentChecked] = useState(isCompletedInitially)
+  const [consentError, setConsentError] = useState<string | null>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   const {
@@ -113,6 +116,10 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
   }
 
   const onSubmit = async (data: QuestionnaireInput) => {
+    if (!consentChecked) {
+      setConsentError(strings.questionnaire.consentError)
+      return
+    }
     setServerError(null)
     setIsSaving(true)
     try {
@@ -178,6 +185,18 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
           />
         )}
         {step === 3 && <StepThreeFields register={register} errors={errors} />}
+
+        {step === 3 && (
+          <ConsentSection
+            checked={consentChecked}
+            error={consentError}
+            disabled={isSaving}
+            onChange={(checked) => {
+              setConsentChecked(checked)
+              if (checked) setConsentError(null)
+            }}
+          />
+        )}
 
         {/* Navigation Buttons */}
         <div className="flex justify-between items-center gap-4 pt-4 border-t border-border">

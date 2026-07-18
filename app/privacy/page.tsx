@@ -21,6 +21,14 @@ export default function PrivacyPage() {
           {content.intro.replace('{siteName}', strings.common.siteName)}
         </p>
 
+        <p className="text-base text-ink leading-relaxed font-semibold">
+          {content.operatorLine}
+        </p>
+
+        <p className="text-base text-ink leading-relaxed">
+          {content.noticeText}
+        </p>
+
         <section className="space-y-3">
           <h2 className="text-xl font-display font-bold text-pine">{content.section1Title}</h2>
           <p className="text-base text-ink leading-relaxed">
@@ -30,6 +38,7 @@ export default function PrivacyPage() {
             <li>{content.infoUser}</li>
             <li>{content.infoPublisher}</li>
             <li>{content.infoAdopter}</li>
+            <li>{content.infoSupport}</li>
           </ul>
         </section>
 
@@ -54,6 +63,7 @@ export default function PrivacyPage() {
             <li>{content.visibilityAdminOnly}</li>
             <li>{content.visibilityContact}</li>
             <li>{content.visibilityNoCommercial}</li>
+            <li>{content.visibilityProcessors}</li>
           </ul>
         </section>
 
@@ -67,12 +77,23 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="text-xl font-display font-bold text-pine">{content.section5Title}</h2>
           <p className="text-base text-ink leading-relaxed">
-            {content.section5Text}{' '}
+            {content.section5CookiesText}
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl font-display font-bold text-pine">{content.section6Title}</h2>
+          <p className="text-base text-ink leading-relaxed">
+            {content.section6Text}{' '}
             <bdi className="dir-ltr select-all text-pine font-semibold">
               {process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'cheirut@gmail.com'}
             </bdi>
           </p>
         </section>
+
+        <p className="text-sm text-ink-soft pt-2 border-t border-border/60">
+          {content.updatedLine}
+        </p>
       </div>
     </div>
   )

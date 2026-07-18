@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { publisherApplicationSchema, PublisherApplicationInput } from '@/lib/schemas/publisher'
 import { applyAsPublisherAction } from '@/app/publish/publisher-actions'
 import { strings } from '@/lib/strings'
 import { REGIONS, PUBLISHER_TYPES } from '@/lib/constants'
+import { Checkbox } from '@/components/ui/Checkbox'
 
 interface PublisherApplicationFormProps {
   initialData: {
@@ -31,7 +33,8 @@ export function PublisherApplicationForm({ initialData }: PublisherApplicationFo
       age: undefined,
       publisherType: 'private',
       region: undefined,
-      city: ''
+      city: '',
+      consent: false
     }
   })
 
@@ -190,6 +193,29 @@ export function PublisherApplicationForm({ initialData }: PublisherApplicationFo
             </p>
           )}
         </div>
+      </div>
+
+      <div className="pt-1">
+        <Checkbox
+          label={
+            <span className="text-sm">
+              {strings.auth.consentPrefix}
+              <Link href="/terms" target="_blank" className="text-pine font-semibold hover:underline">
+                {strings.auth.consentTerms}
+              </Link>
+              {strings.auth.consentAnd}
+              <Link href="/privacy" target="_blank" className="text-pine font-semibold hover:underline">
+                {strings.auth.consentPrivacy}
+              </Link>
+            </span>
+          }
+          error={errors.consent?.message}
+          disabled={isSubmitting}
+          {...register('consent')}
+        />
+        <p className="text-xs text-ink-soft leading-relaxed mt-2">
+          {strings.auth.privacyNotice}
+        </p>
       </div>
 
       <button

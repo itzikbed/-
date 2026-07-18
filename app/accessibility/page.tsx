@@ -42,6 +42,10 @@ export default function AccessibilityPage() {
           </ul>
         </section>
 
+        <p className="text-base text-ink leading-relaxed">
+          {content.disclaimerText}
+        </p>
+
         <section className="space-y-3">
           <h2 className="text-xl font-display font-bold text-pine">{content.coordinatorTitle}</h2>
           <p className="text-base text-ink leading-relaxed">

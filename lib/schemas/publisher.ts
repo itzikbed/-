@@ -8,8 +8,9 @@ export const publisherApplicationSchema = z.object({
   phone: z.string().regex(/^05\d-?\d{7}$/, { message: 'מספר טלפון נייד לא תקין (למשל 0501234567)' }),
   age: z.number()
     .int({ message: 'הגיל חייב להיות מספר שלם' })
-    .min(16, { message: 'הגיל חייב להיות לפחות 16' })
+    .min(18, { message: 'מסירת חתול דרך האתר מותרת מגיל 18 ומעלה' })
     .max(120, { message: 'הגיל אינו תקין' }),
+  consent: z.boolean().refine((v) => v === true, { message: 'כדי להמשיך יש לאשר את תנאי השימוש ומדיניות הפרטיות' }),
   publisherType: z.enum(['private', 'organization'], { message: 'נא לבחור סוג מוסר' }),
   region: z.enum(['north', 'south', 'center', 'jerusalem', 'yosh'], { message: 'נא לבחור אזור מגורים' }),
   city: z.string().trim().min(1, { message: 'שדה חובה' }).max(100)

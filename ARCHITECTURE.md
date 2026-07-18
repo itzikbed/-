@@ -201,6 +201,8 @@ final only when the owner marks the cat adopted.
 
 - 2026-07-18 · (architect) Hero film v3 — **all stock retired, hero is 100% client-owned footage** (7 clips supplied via WhatsApp, encoded per the §6b recipe): desktop set hero_c1–c3 (landscape 848×478, no upscaling), mobile set hero_cm1–cm4 (portrait 404×718). New file names chosen deliberately so CDN/browser caches of the old stock URLs can't serve stale clips. DESIGN §6b.3 amended (both copies): 3–5 clips, per-set art-directed SSR posters (the shared-clip-#1 rule was already untrue in code), client-footage-only note. docs/hero-media-licenses.md rewritten — no stock licensing applies anywhere in the hero anymore; the pre-launch license re-trace item is moot. Fallback poster path in CatCard/CatQueueItem updated to hero_c1_poster. Every poster frame visually verified by architect before wiring.
 
+- 2026-07-19 · (architect) Prompt 07 executed BY THE ARCHITECT (Itzik bypassed the agents): capture-tips coaching panel in the wizard media step + photo crop/rotate. New dependency `react-easy-crop` (MIT), loaded lazily only when the edit dialog opens; an edited photo becomes a NEW `{uuid}-card/full` pair — session-fresh old pairs are deleted, DB-referenced pairs are left for `cleanup-orphan-media.mjs` (rows point at them until submit rewrites `cat_photos`). Two defects found & fixed during E2E: (1) the wizard already flipped a published listing to pending SILENTLY on the step-3→4 draft upsert — now gated behind `UnpublishConsentCard` on both next-step and save-draft (the planned step-4 unlock server action was redundant and dropped; rls-smoke S7j pins the owner published→pending transition it relies on); (2) react-easy-crop computes zoom coverage from the unrotated media size, so rotation center-cropped ~1.5x — the dialog now pre-rotates the preview on canvas and passes rotation 0, final encode still from the original blob (verified lossless: 533×800 → 800×533). Wizard previews now use the small card blob as `localUrl`, revoked only on remove/replace (revoke-on-every-photos-change broke previews after reorder/step-back).
+
 ## 12. Now / Next (update every session)
 
 | Phase | Scope | Status |
@@ -215,4 +217,4 @@ final only when the owner marks the cat adopted.
 | 5 | Polish: SEO/OG, a11y audit, privacy page | ☑ |
 | 6 | Seed, QA as all 4 roles, domain, admin handover | ☐ |
 | 7 | External-audit remediation — triage of SITE_AUDIT_REPORT.md (prompt 06) | ☑ |
-| 8 | Capture guidance panel + photo crop/rotate in the upload wizard's media step (prompt 07) | ☐ |
+| 8 | Capture guidance panel + photo crop/rotate in the upload wizard's media step (prompt 07, executed by the architect) | ☑ |

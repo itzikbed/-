@@ -1,5 +1,10 @@
 # PROMPT 07 — Capture guidance + photo crop & rotate (§12 phase 8)
 
+> **STATUS: EXECUTED BY THE ARCHITECT, 2026-07-19 — DO NOT RUN.** Kept for the
+> record. Implementation deviated from E4 as specced (consent moved to the
+> save boundary; no server action) and from E2 (cropper receives a pre-rotated
+> preview) — ARCHITECTURE.md §11 (2026-07-19) is the authoritative account.
+
 **Runs only after prompt 06 is closed and architect-approved.** Read
 `00-orchestrator.md`, then ARCHITECTURE.md end-to-end and DESIGN.md. Skills:
 `image-upload-pipeline`, `forms-and-wizards`, `rtl-hebrew-webapp`, `code-quality`,

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { strings } from '@/lib/strings'
+import { CaptureTipsPanel } from './CaptureTipsPanel'
 import { PhotoUploadGrid } from './PhotoUploadGrid'
 import { VideoUploadSection } from './VideoUploadSection'
 import { useCatMediaUpload } from './useCatMediaUpload'
@@ -73,6 +74,8 @@ export function UploadStep4({
       <h3 className="text-xl font-display font-extrabold text-ink">
         {strings.publish.wizardStep.replace('{step}', '4').replace('{total}', '4')} — {strings.publish.wizardStep4Title}
       </h3>
+
+      <CaptureTipsPanel />
 
       {uploadError && (
         <div className="bg-danger/10 border border-danger/20 text-danger rounded-input p-3.5 text-sm font-semibold" role="alert">

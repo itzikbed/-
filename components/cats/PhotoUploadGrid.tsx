@@ -1,17 +1,10 @@
 'use client'
 
-import { Image as ImageIcon, X, ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react'
+import { Image as ImageIcon, X, ArrowLeft, ArrowRight, Pencil, RefreshCw } from 'lucide-react'
 import Image from 'next/image'
 import { strings } from '@/lib/strings'
 import { getMediaUrl } from '@/lib/security/media'
-
-interface PhotoItem {
-  id?: string
-  path_card: string
-  path_full: string
-  sort_order: number
-  localUrl?: string
-}
+import { PhotoItem } from './types'
 
 interface PhotoUploadGridProps {
   photos: PhotoItem[]
@@ -21,6 +14,7 @@ interface PhotoUploadGridProps {
   totalFiles: number
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>
   handleRemovePhoto: (index: number, pathCard: string, pathFull: string) => Promise<void>
+  onEditPhoto: (index: number) => void
 }
 
 export function PhotoUploadGrid({
@@ -30,7 +24,8 @@ export function PhotoUploadGrid({
   currentFileIndex,
   totalFiles,
   handleImageChange,
-  handleRemovePhoto
+  handleRemovePhoto,
+  onEditPhoto
 }: PhotoUploadGridProps) {
   const movePhoto = (index: number, direction: 'prev' | 'next') => {
     const newIndex = direction === 'prev' ? index - 1 : index + 1
@@ -78,7 +73,17 @@ export function PhotoUploadGrid({
                 </span>
               )}
               {/* Overlay controls */}
-              <div className="absolute inset-0 bg-ink/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+              <div className="absolute inset-0 bg-ink/40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onEditPhoto(idx)}
+                  disabled={isProcessing}
+                  className="p-1 bg-surface rounded-full text-ink hover:text-pine cursor-pointer disabled:opacity-50"
+                  title={strings.publish.editPhoto}
+                  aria-label={strings.publish.editPhoto}
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
                 {idx > 0 && (
                   <button
                     type="button"

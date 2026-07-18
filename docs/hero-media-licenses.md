@@ -1,53 +1,49 @@
 # Hero Media Licenses
 
-All hero video clips were fetched from Mixkit's asset CDN (`assets.mixkit.co`) and are
-covered by the [Mixkit Stock Video Free License](https://mixkit.co/license/#videoFree),
-which permits free use in personal and commercial projects without attribution.
+**As of 2026-07-18 every hero clip is original footage owned by the client** (the site
+owner), filmed by her and supplied to Itzik via WhatsApp on 2026-07-18. No stock license
+applies anywhere in the hero: the client holds full rights to all footage, no attribution
+is required, and there is nothing to re-trace. All previous Mixkit stock clips were
+removed from `/public/hero` on the same date (prompt 06 Q13 always preferred client
+footage over stock).
 
-Since 2026-07-16 the hero uses **two viewport clip sets** (DESIGN.md §6b.3): a landscape
-desktop set and a portrait close-up mobile set, with `hero_1` shared as clip #1 of both
-(its poster is the SSR base poster / LCP element).
+The hero uses **two viewport clip sets** (DESIGN.md §6b.3): a landscape desktop set and a
+portrait close-up mobile set. Each set's clip #1 has a matching SSR base poster,
+art-directed per viewport via `<picture>` in `HeroFilm.tsx` (the LCP element — do not
+change a clip #1 without its poster).
 
-## Desktop set (landscape 960×540)
+## Desktop set (landscape 848×478)
 
-| File      | Content (verified visually by architect, 2026-07-16) | Source page (Mixkit) |
-|-----------|-------------------------------------------------------|----------------------|
-| hero_1.*  | Cream/orange (flame-point) cat face, extreme close-up | [White, blue-eyed cat (#1538)](https://mixkit.co/free-stock-video/white-blue-eyed-cat-1538/) — re-traced 2026-07-16, same cat/wall/pose confirmed frame-by-frame |
-| hero_d2.* | Ginger kitten licking its paw, close-up               | [Cute kitten licking a claw (#14018)](https://mixkit.co/free-stock-video/cute-kitten-licking-a-claw-14018/) |
-| hero_d3.* | Pile of ginger + tuxedo kittens on a fur blanket      | [Little cats lying on an armchair (#32471)](https://mixkit.co/free-stock-video/little-cats-lying-on-an-armchair-32471/) |
-| hero_d4.* | Ginger-white cat peering through green grass          | [White cat lying among the grasses seen up close (#22732)](https://mixkit.co/free-stock-video/white-cat-lying-among-the-grasses-seen-up-close-22732/) |
-| hero_d5.* | Calico cat sitting outside a window, looking in       | [Beautiful cat meowing outside the window (#33154)](https://mixkit.co/free-stock-video/beautiful-cat-meowing-outside-the-window-33154/) |
+| File       | Content (every poster verified visually by architect, 2026-07-18) | Client source file |
+|------------|--------------------------------------------------------------------|--------------------|
+| hero_c1.*  | Tuxedo adult + tuxedo kitten side by side on kitchen floor, kitten looking up | וידאו למחשב 1.mp4 (full 5.1s) |
+| hero_c2.*  | Same pair; the adult reaches up at a toy while the kitten watches   | וידאו למחשב 2.mp4 (full 5.5s) |
+| hero_c3.*  | Long-haired tuxedo adult sitting on tiles, playing and looking up   | וידאו למחשב 3.mp4 (first 8s of 9s) |
 
-## Mobile set (portrait; hero_3 is 720×1280, crops are 404×720)
+## Mobile set (portrait 404×718)
 
-| File      | Content (verified visually by architect, 2026-07-16) | Source page (Mixkit) |
-|-----------|-------------------------------------------------------|----------------------|
-| hero_1.*  | Shared with desktop set (see above)                   | see above |
-| hero_3.*  | Cat eye, extreme close-up (native portrait)           | [White cat with blue eyes (#1545)](https://mixkit.co/free-stock-video/white-cat-with-blue-eyes-1545/) — re-traced 2026-07-16, same eye/fur confirmed frame-by-frame |
-| hero_m2.* | Black cat's yellow eye, extreme close-up (portrait crop) | [Black cat with yellow eyes (#1539)](https://mixkit.co/free-stock-video/black-cat-with-yellow-eyes-1539/) |
-| hero_m3.* | Ginger kitten licking its paw, face close-up (portrait crop of the hero_d2 source) | [Cute kitten licking a claw (#14018)](https://mixkit.co/free-stock-video/cute-kitten-licking-a-claw-14018/) |
-| hero_m4.* | Sleeping ginger kitten face, close-up (portrait crop) | [Cute red kitten sleeping in the couch (#32319)](https://mixkit.co/free-stock-video/cute-red-kitten-sleeping-in-the-couch-32319/) |
+| File       | Content (every poster verified visually by architect, 2026-07-18) | Client source file |
+|------------|--------------------------------------------------------------------|--------------------|
+| hero_cm1.* | Long-haired tuxedo face close-up, green eyes (mobile SSR base poster) | סרטון מלקוחה 1.mp4 (8s from 2s) |
+| hero_cm2.* | Tuxedo kitten sitting against a white wall, looking up              | וידאו לטלפון 2.mp4 (first 8s) |
+| hero_cm3.* | Tabby lying on floor tiles, medium close-up                         | וידאו לטלפון 1.mp4 (full 6.4s) |
+| hero_cm4.* | Long-haired tuxedo + tabby together on a wooden chair               | וידאו לטלפון 3.mp4 (8s from 2s) |
 
-## History notes
+## Processing (2026-07-18)
 
-- **2026-07-16 (viewport split):** previous `hero_2` (woman petting a black cat through a
-  frame — failed the mobile legibility bar, client reported low quality) and `hero_4`
-  (woman holding a black cat — cat ≈ 30% of frame height, below the ≥ 40% bar) were
-  **removed and deleted from `/public/hero`**. Their source pages were never recorded and
-  were not re-traced before deletion. Every clip now in the rotation was downloaded from a
-  named source page and its poster frame was verified visually before wiring.
-- **2026-07-16 (earlier):** a clip downloaded as Mixkit asset #1241 was removed from the
-  rotation: it turned out to be a **portrait of a person, not a cat** — it was downloaded
-  without visual verification and an earlier version of this document described it
-  incorrectly ("Cat face close-up portrait").
-- If the client supplies real cat footage, prefer it over stock (prompt 06 Q13) — replace
-  files in `/public/hero` and update this table.
+Each source clip was trimmed to ≤ 8s at 24fps and muted. Desktop clips kept their native
+848×478 (no upscaling); mobile clips were scaled from 478×850 to 404×718. Encoded as
+H.264 MP4 (crf 27, maxrate 1200k, faststart) + VP9 WebM (crf 40) with a JPEG poster frame
+per clip. All files are within the DESIGN.md §6b budget (≤ 1.2MB per clip; actual range
+148–562KB per file). Original client files remain with Itzik (Downloads, 2026-07-18) —
+keep a copy before clearing that folder.
 
-## Processing
+## History notes (stock era, retired 2026-07-18)
 
-Each source clip was downloaded as 720p MP4 from `assets.mixkit.co`, trimmed to ≤ 8s at
-24fps and muted. Desktop clips were scaled to 960×540; mobile clips were art-direction
-cropped to 404×720 portrait centered on the cat (crop offsets chosen per clip after
-frame-by-frame review). Encoded as H.264 MP4 (crf 27, maxrate 1200k) + VP9 WebM (crf 40)
-with a JPEG poster frame per clip. All files are within the DESIGN.md §6b budget
-(≤ 1.2MB per clip; actual range 100–660KB per file).
+- 2026-07-12 → 2026-07-18 the hero ran on Mixkit stock clips (Mixkit Stock Video Free
+  License). Provenance of the final stock set was fully documented in earlier versions of
+  this file (git history).
+- **2026-07-16:** a clip downloaded as Mixkit asset #1241 was removed from the rotation:
+  it turned out to be a **portrait of a person, not a cat** — it was downloaded without
+  visual verification. Lesson retained: every poster frame is verified visually before
+  wiring, client footage included.

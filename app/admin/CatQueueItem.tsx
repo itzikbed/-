@@ -73,7 +73,7 @@ export default function CatQueueItem({
   const coverPhoto = cat.cat_photos?.find(p => p.sort_order === 0) || cat.cat_photos?.[0]
   const imageUrl = coverPhoto
     ? getMediaUrl(coverPhoto.path_card)
-    : '/hero/hero_1_poster.jpg'
+    : '/hero/hero_c1_poster.jpg'
 
   return (
     <div className="flex flex-col">

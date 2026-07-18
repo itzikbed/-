@@ -39,7 +39,7 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
   const coverPhoto = cat.cat_photos?.find(p => p.sort_order === 0) || cat.cat_photos?.[0]
   const imageUrl = coverPhoto
     ? getMediaUrl(coverPhoto.path_card)
-    : '/hero/hero_1_poster.jpg' // fallback placeholder
+    : '/hero/hero_c1_poster.jpg' // fallback placeholder
 
   // Look up region label
   const regionObj = REGIONS.find(r => r.id === cat.region as RegionId)

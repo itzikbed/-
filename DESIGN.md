@@ -144,7 +144,7 @@ the card photo morphs into the detail hero (shared element). 250–300ms, transf
 only. Zero bytes; this is the "feels like an app" moment on mobile. Falls back to a normal
 navigation on unsupported browsers — never polyfill.
 
-**3. Hero film sequence.** 4–5 warm clips crossfading (6–8s each, 1.5s fade). Only clip #1
+**3. Hero film sequence.** 3–5 warm clips crossfading (5–8s each, 1.5s fade). Only clip #1
 loads eagerly; the rest lazy after `load`. Each ≤ 1.2MB, 960px wide is enough (portrait
 clips: 720px tall is enough). Poster-first always.
 **Two viewport clip sets (client feedback via Itzik, 2026-07-16):** the hero serves TWO
@@ -155,9 +155,12 @@ breakpoint change:
 - **Mobile set** — portrait (~9:16), close-ups only: every clip must read at 390px wide,
   the cat filling roughly ≥ 40% of frame height. Landscape sources are art-direction
   cropped to portrait at encode time — never rely on CSS `object-cover` to find the cat.
-Clip #1 is shared by both sets and must match the SSR base poster (it is the LCP element —
-do not change one without the other). Visibly over-compressed sources fail this bar too
-(the original `hero_2` is the canonical example that was replaced).
+Each set's clip #1 has its own SSR base poster, art-directed per viewport via `<picture>`
+(these are the LCP element — never change a clip #1 without its poster). Visibly
+over-compressed sources fail this bar too (the original `hero_2` is the canonical example
+that was replaced). **As of 2026-07-18 all hero clips are original client-owned footage**
+(docs/hero-media-licenses.md); stock is fully retired and must not be reintroduced
+without a client decision.
 
 **4. Self-drawing mascot.** Peeking Cat ink strokes draw themselves (CSS
 `stroke-dashoffset`, ~700ms) when their section enters the viewport — used in

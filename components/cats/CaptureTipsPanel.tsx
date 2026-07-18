@@ -19,17 +19,20 @@ export function CaptureTipsPanel() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY)
-      if (stored === null) {
+    const id = window.setTimeout(() => {
+      try {
+        const stored = window.localStorage.getItem(STORAGE_KEY)
+        if (stored === null) {
+          setOpen(true)
+          window.localStorage.setItem(STORAGE_KEY, '1')
+        } else if (stored === '1') {
+          setOpen(true)
+        }
+      } catch {
         setOpen(true)
-        window.localStorage.setItem(STORAGE_KEY, '1')
-      } else {
-        setOpen(stored === '1')
       }
-    } catch {
-      setOpen(true)
-    }
+    }, 0)
+    return () => window.clearTimeout(id)
   }, [])
 
   const toggle = () => {

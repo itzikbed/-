@@ -190,6 +190,7 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
       {step === 4 && catId && (
         <UploadStep4
           catId={catId}
+          initialStatus={initialCat?.status || null}
           photos={photos}
           setPhotos={(newPhotos) => setValue('photos', newPhotos, { shouldValidate: true })}
           videoPath={videoPath || null}

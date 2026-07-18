@@ -8,6 +8,7 @@ export interface PhotoItem {
 
 export interface InitialCatInput {
   id: string
+  status: string
   name: string
   sex: 'male' | 'female' | 'unknown'
   birth_est: string

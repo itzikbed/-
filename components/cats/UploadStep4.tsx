@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { strings } from '@/lib/strings'
+import { Button } from '@/components/ui/Button'
+import { unpublishForMediaEditAction } from '@/app/publish/media-edit-actions'
 import { CaptureTipsPanel } from './CaptureTipsPanel'
 import { PhotoUploadGrid } from './PhotoUploadGrid'
 import { VideoUploadSection } from './VideoUploadSection'
@@ -15,6 +17,7 @@ const PhotoCropDialog = dynamic(() => import('./PhotoCropDialog'), { ssr: false 
 
 interface UploadStep4Props {
   catId: string
+  initialStatus: string | null
   photos: PhotoItem[]
   setPhotos: (photos: PhotoItem[]) => void
   videoPath: string | null
@@ -25,6 +28,7 @@ interface UploadStep4Props {
 
 export function UploadStep4({
   catId,
+  initialStatus,
   photos,
   setPhotos,
   videoPath,
@@ -33,6 +37,11 @@ export function UploadStep4({
   setIsProcessing
 }: UploadStep4Props) {
   const [editIndex, setEditIndex] = useState<number | null>(null)
+  // Storage RLS freezes media of published cats for owners (migration 0011);
+  // media controls unlock only after an explicit, confirmed unpublish.
+  const [mediaUnlocked, setMediaUnlocked] = useState(initialStatus !== 'published')
+  const [unlockLoading, setUnlockLoading] = useState(false)
+  const [unlockError, setUnlockError] = useState(false)
 
   const {
     uploadError,
@@ -69,11 +78,49 @@ export function UploadStep4({
     return ok
   }
 
+  const handleUnlock = async () => {
+    setUnlockLoading(true)
+    setUnlockError(false)
+    try {
+      const res = await unpublishForMediaEditAction(catId)
+      if (res.ok) setMediaUnlocked(true)
+      else setUnlockError(true)
+    } catch {
+      setUnlockError(true)
+    } finally {
+      setUnlockLoading(false)
+    }
+  }
+
+  const heading = (
+    <h3 className="text-xl font-display font-extrabold text-ink">
+      {strings.publish.wizardStep.replace('{step}', '4').replace('{total}', '4')} — {strings.publish.wizardStep4Title}
+    </h3>
+  )
+
+  if (!mediaUnlocked) {
+    return (
+      <div className="space-y-6">
+        {heading}
+        <CaptureTipsPanel />
+        <div className="bg-marmalade-sf/40 border border-marmalade/30 rounded-input p-4 space-y-3">
+          <p className="text-sm font-semibold text-ink">{strings.publish.mediaEditLockedNotice}</p>
+          {unlockError && (
+            <p className="text-xs text-danger font-semibold" role="alert">
+              {strings.publish.mediaEditUnlockError}
+            </p>
+          )}
+          <Button type="button" variant="secondary" onClick={handleUnlock} loading={unlockLoading}>
+            {strings.publish.mediaEditUnlockBtn}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <h3 className="text-xl font-display font-extrabold text-ink">
-        {strings.publish.wizardStep.replace('{step}', '4').replace('{total}', '4')} — {strings.publish.wizardStep4Title}
-      </h3>
+      {heading}
 
       <CaptureTipsPanel />
 

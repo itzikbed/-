@@ -1073,6 +1073,58 @@ async function run() {
   }
   console.log("TEST S7i SUCCESS: Owner-session transition with pending sibling failed closed; state unchanged.")
 
+  console.log("TEST S7j: Owner unpublish-for-media-edit transition...")
+  const { data: pubCat3, error: pubCat3Err } = await supabaseAdmin
+    .from('cats')
+    .insert({
+      owner_id: userId,
+      name: 'חתול מפורסם ג',
+      sex: 'male',
+      birth_est: '2025-01-01',
+      region: 'center',
+      city: 'תל אביב',
+      description: 'תיאור של חתול מפורסם באורך מתאים בהחלט ג',
+      status: 'published',
+      published_at: new Date().toISOString()
+    })
+    .select('id')
+    .single()
+  if (pubCat3Err || !pubCat3) {
+    throw new Error("Failed to create pubCat3 for S7j: " + pubCat3Err?.message)
+  }
+
+  const { data: s7jFlip, error: s7jFlipErr } = await supabaseUser
+    .from('cats')
+    .update({ status: 'pending' })
+    .eq('id', pubCat3.id)
+    .eq('status', 'published')
+    .select('status')
+
+  if (s7jFlipErr || !s7jFlip || s7jFlip.length !== 1 || s7jFlip[0].status !== 'pending') {
+    await supabaseAdmin.from('cats').delete().eq('id', pubCat3.id)
+    throw new Error("TEST S7j FAILED: Owner could not flip own published cat to pending: " + (s7jFlipErr?.message ?? 'no row updated'))
+  }
+
+  const { error: s7jRepubErr } = await supabaseUser
+    .from('cats')
+    .update({ status: 'published' })
+    .eq('id', pubCat3.id)
+
+  const { error: s7jModErr } = await supabaseUser
+    .from('cats')
+    .update({ published_at: new Date().toISOString() })
+    .eq('id', pubCat3.id)
+
+  await supabaseAdmin.from('cats').delete().eq('id', pubCat3.id)
+
+  if (!s7jRepubErr) {
+    throw new Error("TEST S7j FAILED: Owner was able to set status back to published directly!")
+  }
+  if (!s7jModErr) {
+    throw new Error("TEST S7j FAILED: Owner was able to change published_at (moderation-owned field)!")
+  }
+  console.log("TEST S7j SUCCESS: Owner published→pending allowed; direct re-publish and moderation-owned fields blocked.")
+
 } catch (err) {
   // exiting here would skip the finally below (process.exit does not unwind);
   // flag the failure and exit only after cleanup has run.

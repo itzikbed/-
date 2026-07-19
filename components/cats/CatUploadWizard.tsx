@@ -92,10 +92,6 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
   const videoPath = useWatch({ control, name: 'video_path' })
 
   const handleNextStep = async (skipUnpublishGate = false) => {
-    if (step === 3 && needsUnpublishConsent && !skipUnpublishGate) {
-      setPendingUnpublish('next')
-      return
-    }
     let fieldsToValidate: Array<keyof CatInput> = []
     if (step === 1) {
       fieldsToValidate = ['name', 'sex', 'ageYears', 'ageMonths']
@@ -107,6 +103,11 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
 
     const isValid = await trigger(fieldsToValidate)
     if (!isValid) return
+
+    if (step === 3 && needsUnpublishConsent && !skipUnpublishGate) {
+      setPendingUnpublish('next')
+      return
+    }
 
     setWizardError(null)
 
@@ -120,7 +121,6 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
         const res = await upsertCatAction(values, catId || undefined, true)
         if (res.ok) {
           setCatId(res.data.catId)
-          setValue('photos', defaultPhotos)
           setStep(4)
         } else {
           setWizardError(res.formError || strings.common.errorOccurred)

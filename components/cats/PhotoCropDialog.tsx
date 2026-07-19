@@ -62,6 +62,8 @@ export default function PhotoCropDialog({ pathFull, onClose, onApply }: PhotoCro
     ctx.rotate((rot * Math.PI) / 180)
     ctx.drawImage(bitmap, -bitmap.width / 2, -bitmap.height / 2)
     canvas.toBlob((blob) => {
+      // The dialog may unmount while toBlob is in flight (bitmap closed there)
+      if (!bitmapRef.current) return
       if (!blob) {
         setLoadError(true)
         return
@@ -120,6 +122,9 @@ export default function PhotoCropDialog({ pathFull, onClose, onApply }: PhotoCro
     setRotation(next)
     setZoom(1)
     setCrop({ x: 0, y: 0 })
+    // The stored rect is in the previous rotation's coordinate space — apply
+    // stays disabled until the cropper measures against the new preview.
+    setCropArea(null)
     buildPreview(next)
   }
   const zoomBy = (delta: number) => {

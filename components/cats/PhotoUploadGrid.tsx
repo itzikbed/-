@@ -88,7 +88,8 @@ export function PhotoUploadGrid({
                   <button
                     type="button"
                     onClick={() => movePhoto(idx, 'prev')}
-                    className="p-1 bg-surface rounded-full text-ink hover:text-pine cursor-pointer"
+                    disabled={isProcessing}
+                    className="p-1 bg-surface rounded-full text-ink hover:text-pine cursor-pointer disabled:opacity-50"
                     title={strings.publish.movePrev}
                   >
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -98,7 +99,8 @@ export function PhotoUploadGrid({
                   <button
                     type="button"
                     onClick={() => movePhoto(idx, 'next')}
-                    className="p-1 bg-surface rounded-full text-ink hover:text-pine cursor-pointer"
+                    disabled={isProcessing}
+                    className="p-1 bg-surface rounded-full text-ink hover:text-pine cursor-pointer disabled:opacity-50"
                     title={strings.publish.moveNext}
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />

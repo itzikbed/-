@@ -200,11 +200,11 @@ export function CatDetails({
               </div>
             )}
 
-            {/* Primary CTA */}
+            {/* Primary CTA — desktop only; mobile gets the sticky action bar below */}
             <div className="pt-6 border-t border-border/40 space-y-3">
               <Link
                 href={adoptionLink}
-                className="w-full inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-marmalade text-ink hover:bg-marmalade-dp transition-all duration-150 active:scale-98 shadow-resting hover:-translate-y-0.5"
+                className="w-full hidden md:inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-marmalade text-ink hover:bg-marmalade-dp transition-all duration-150 active:scale-98 shadow-resting hover:-translate-y-0.5"
               >
                 {strings.catalog.adoptCta.replace('{name}', cat.name)}
               </Link>
@@ -222,6 +222,17 @@ export function CatDetails({
 
           </div>
         </div>
+      </div>
+
+      {/* Mobile sticky action bar: sticks inside the page flow so it never
+          covers the footer; ps clearance keeps the support launcher visible */}
+      <div className="sticky bottom-0 z-30 md:hidden mt-8 bg-surface/95 backdrop-blur-sm border-t border-border px-4 ps-24 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <Link
+          href={adoptionLink}
+          className="w-full inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-marmalade text-ink active:scale-98 transition-all duration-150 shadow-resting"
+        >
+          {strings.catalog.adoptCta.replace('{name}', cat.name)}
+        </Link>
       </div>
     </div>
   )

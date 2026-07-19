@@ -1,11 +1,17 @@
 import React from 'react'
+import Link from 'next/link'
+import { Cat, Sprout, Warehouse, HeartPulse } from 'lucide-react'
 import { strings } from '@/lib/strings'
+import { Mascot } from '@/components/mascot/Mascot'
+import { SectionCurve } from '@/components/ui/SectionCurve'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: `${strings.about.title} — ${strings.common.siteName}`,
   description: strings.about.metaDesc,
 }
+
+const FACT_ICONS = [Cat, Sprout, Warehouse, HeartPulse]
 
 export default function AboutPage() {
   const content = strings.about
@@ -18,55 +24,93 @@ export default function AboutPage() {
   ]
 
   return (
-    <div className="flex-grow bg-paper py-12">
-      <div className="app-container max-w-3xl bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-start space-y-6">
-        <h1 className="text-3xl font-display font-extrabold text-ink border-b border-border/60 pb-4">
-          {content.title}
-        </h1>
+    <div className="flex-grow">
+      {/* Intro */}
+      <section className="bg-paper pt-12 pb-10">
+        <div className="app-container max-w-3xl flex flex-col items-center text-center gap-4">
+          <Mascot pose="sitting" animateOnScroll={true} />
+          <h1 className="text-4xl md:text-5xl font-display font-extrabold text-ink">
+            {content.title}
+          </h1>
+          <p className="text-xl font-bold text-pine leading-relaxed">{content.welcome}</p>
+          <div className="text-start space-y-4 pt-2">
+            <p className="text-base text-ink leading-relaxed">{content.intro1}</p>
+            <p className="text-base text-ink leading-relaxed">{content.intro2}</p>
+          </div>
+        </div>
+      </section>
 
-        <p className="text-lg font-bold text-pine leading-relaxed">
-          {content.welcome}
-        </p>
+      {/* Facts band */}
+      <SectionCurve className="text-pine-soft" />
+      <section className="bg-pine-soft pt-8 pb-14">
+        <div className="app-container max-w-4xl">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
+              {content.factsTitle}
+            </h2>
+            <p className="text-base text-ink-soft leading-relaxed">{content.factsIntro}</p>
+          </div>
 
-        <p className="text-base text-ink leading-relaxed">
-          {content.intro1}
-        </p>
+          <div className="grid sm:grid-cols-2 gap-5 mt-9">
+            {facts.map((fact, i) => {
+              const Icon = FACT_ICONS[i]
+              return (
+                <div
+                  key={fact.title}
+                  className="bg-surface border border-border rounded-card p-6 shadow-resting space-y-3 text-start"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="p-2.5 rounded-full bg-pine-soft text-pine">
+                      <Icon className="w-5 h-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="text-lg font-display font-bold text-ink leading-snug">
+                      {fact.title}
+                    </h3>
+                  </div>
+                  <p className="text-sm text-ink-soft leading-relaxed">{fact.text}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
 
-        <p className="text-base text-ink leading-relaxed">
-          {content.intro2}
-        </p>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-display font-bold text-pine">{content.factsTitle}</h2>
-          <p className="text-base text-ink leading-relaxed">
-            {content.factsIntro}
-          </p>
-          <ul className="list-disc list-inside ps-4 text-base text-ink-soft space-y-2">
-            {facts.map((fact) => (
-              <li key={fact.title}>
-                <span className="font-bold text-ink">{fact.title}</span>{' '}
-                {fact.text}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-display font-bold text-pine">{content.missionTitle}</h2>
-          <p className="text-base text-ink leading-relaxed">
+      {/* Mission + closing */}
+      <SectionCurve className="text-paper" />
+      <section className="bg-paper pt-8 pb-16">
+        <div className="app-container max-w-3xl text-center">
+          <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
+            {content.missionTitle}
+          </h2>
+          <p className="text-base text-ink leading-relaxed text-start mt-4">
             {content.missionText}
           </p>
-          <p className="text-base font-bold text-ink leading-relaxed">
-            {content.ctaTitle}
-          </p>
-          <p className="text-base text-ink leading-relaxed">
-            {content.ctaText}
-          </p>
-          <p className="text-lg font-display font-bold text-pine pt-2">
+
+          <div className="mt-10 space-y-3">
+            <p className="text-lg font-display font-bold text-ink">{content.ctaTitle}</p>
+            <p className="text-base text-ink-soft leading-relaxed">{content.ctaText}</p>
+          </div>
+
+          <p className="text-3xl md:text-4xl font-display font-extrabold text-pine mt-10">
             {content.closing}
           </p>
-        </section>
-      </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
+            <Link
+              href="/cats"
+              className="inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-12 px-7 text-base bg-marmalade text-ink hover:bg-marmalade-dp transition-all duration-150 active:scale-98 shadow-resting"
+            >
+              {content.ctaBrowseBtn}
+            </Link>
+            <Link
+              href="/publish"
+              className="inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-12 px-7 text-base border-2 border-pine text-pine hover:bg-pine-soft transition-all duration-150 active:scale-98"
+            >
+              {content.ctaPublishBtn}
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

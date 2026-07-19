@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Mascot } from '@/components/mascot/Mascot'
 import { CatGrid } from '@/components/cats/CatGrid'
 import { HeroFilm } from '@/components/ui/HeroFilm'
+import { SectionCurve } from '@/components/ui/SectionCurve'
 import { strings } from '@/lib/strings'
 import { Heart, Sparkles } from 'lucide-react'
 import type { Metadata } from 'next'
@@ -98,8 +99,11 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Paper curve rising over the hero's bottom edge */}
+      <SectionCurve className="text-paper relative z-10 -mt-6 md:-mt-9" />
+
       {/* Latest Cats Section */}
-      <section className="py-16 md:py-24 bg-paper sunbeam-bg relative overflow-hidden">
+      <section className="pb-16 pt-8 md:pb-24 md:pt-10 bg-paper sunbeam-bg relative overflow-hidden">
         <div className="app-container text-start relative z-10">
           <div className="relative flex flex-col gap-2 mb-10 max-w-xl">
             {/* Alive touch: organic background blob shape behind heading */}
@@ -113,8 +117,8 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Dynamic Cat Grid */}
-          <CatGrid cats={displayCats} />
+          {/* Dynamic Cat Grid — JoinCard keeps a sparse launch-phase strip alive */}
+          <CatGrid cats={displayCats} showJoinCard />
 
           <div className="flex justify-center mt-12">
             <Link 
@@ -127,8 +131,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* How it works Section */}
-      <section className="py-16 md:py-24 bg-surface border-t border-border relative overflow-hidden">
+      {/* How it works Section — pine-soft band (DESIGN §5a rhythm) */}
+      <SectionCurve className="text-pine-soft" />
+      <section className="pb-16 pt-10 md:pb-24 md:pt-12 bg-pine-soft relative overflow-hidden">
         <div className="app-container relative z-10">
           <div className="relative flex flex-col items-center text-center gap-2 mb-16 max-w-xl mx-auto">
             {/* Alive touch: organic background blob shape behind section heading */}
@@ -148,7 +153,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
             
             {/* Adopter track */}
-            <div className="bg-paper rounded-card border border-border p-8 space-y-8 shadow-resting">
+            <div className="bg-surface rounded-card border border-border p-8 space-y-8 shadow-resting">
               <div className="flex items-center gap-3 border-b border-border/60 pb-4">
                 <div className="p-2.5 rounded-full bg-marmalade-sf text-marmalade-dp">
                   <Heart className="w-6 h-6" />
@@ -174,7 +179,7 @@ export default async function HomePage() {
             </div>
 
             {/* Publisher track */}
-            <div className="bg-paper rounded-card border border-border p-8 space-y-8 shadow-resting">
+            <div className="bg-surface rounded-card border border-border p-8 space-y-8 shadow-resting">
               <div className="flex items-center gap-3 border-b border-border/60 pb-4">
                 <div className="p-2.5 rounded-full bg-pine-soft text-pine">
                   <Sparkles className="w-6 h-6" />

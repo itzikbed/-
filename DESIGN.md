@@ -35,6 +35,7 @@ sitting, sleeping, celebrating). No other decorative illustration on the site.
   --ink-soft:     oklch(45%   0.020 170);  /* ≈ #55645C secondary text */
   /* Brand — 10% */
   --pine:         oklch(40%   0.080 168);  /* ≈ #1C6650 links, focus, secondary btn */
+  --pine-deep:    oklch(33%   0.060 168);  /* ≈ #154A3C anchor footer bg (paper text) */
   --pine-soft:    oklch(93%   0.030 165);  /* ≈ #DFF0E7 chips, success tint */
   --marmalade:    oklch(75%   0.130 75);   /* ≈ #EBAF56 primary CTA bg (ink text!) */
   --marmalade-dp: oklch(69%   0.140 70);   /* ≈ #DD9C3D CTA hover */
@@ -74,6 +75,24 @@ Suggested landing H1: **"לכל חתול מגיע בית."** Sub: one sentence, 
 - Shadows (warm, never gray-blue): resting `0 1px 2px oklch(25% 0.02 170 / .06), 0 4px 16px oklch(25% 0.02 170 / .06)`; hover raises the second layer to 24px / .10.
 - Spacing rhythm: 4px base; sections 64–96px apart on desktop, 40–56px mobile. Generous whitespace is part of the "calm shelter" feel — don't compress.
 
+### 4a. Page rhythm — bands, curves, anchor (added 2026-07-19)
+
+Pages are no longer one flat paper sheet. The rhythm system:
+
+- **Bands:** long pages alternate `--paper` ↔ `--pine-soft` section bands (e.g. home
+  how-it-works, about facts). Cards inside a band sit on `--surface`.
+- **Curve divider:** the ONLY divider between bands is `SectionCurve` — a zero-byte SVG
+  hill arc filled with the NEXT section's background color, placed immediately before it.
+  No straight border-top dividers between page sections.
+- **Anchor footer:** every page ends with the `--pine-deep` footer band (site name +
+  tagline, two link columns, legal row) with the sleeping Peeking Cat resting on its
+  curve. This is a closing anchor, NOT dark mode — the dark-mode ban stands.
+- **Paper grain:** `body` carries `.paper-grain` — SVG-turbulence noise at 2.5% opacity
+  that makes the paper metaphor literal. Texture, not decoration; never exceed 3%.
+- **Sparse-content rule (launch phase):** unfiltered cat grids append the `JoinCard`
+  (dashed pine border, sitting mascot, publish CTA) while results < 8, so the catalog
+  and the home strip never look abandoned. Zero-result states keep the mascot empty state.
+
 ## 5. Components
 
 - **Primary button:** marmalade bg, `--ink` text, Assistant 600, pill, height 48px (44px min touch target). Hover: `--marmalade-dp` + lift 1px. Example: "רוצה לאמץ את מִיצי".
@@ -82,6 +101,21 @@ Suggested landing H1: **"לכל חתול מגיע בית."** Sub: one sentence, 
 - **Badges:** pill, soft tints — "אומץ! 🎉" pine-soft/pine · "ממתין לאישור" marmalade-sf/deep amber · rejected clay-soft.
 - **Inputs:** surface bg, 1px `--border`, 12px radius, focus = 2px pine ring offset 2px. Error: clay border + message below in clay.
 - **Two-door hero:** two large cards (אני רוצה לאמץ / אני רוצה למסור חתול) — adopt door uses marmalade treatment, publish door pine outline. Peeking Cat rises over the hovered card's top edge (translateY, 200ms).
+- **Wizard step indicator (added 2026-07-19):** every multi-step form uses `WizardSteps` —
+  named labeled circles on a progress track ("שלב X מתוך Y" + step names), check marks on
+  completed steps, `aria-current="step"`, and the Peeking Cat perched over the current
+  circle. Anonymous progress bars are banned in wizards.
+- **Segmented control:** questions with 2–4 short options render as pill segments
+  (`Segmented.tsx`, real radio inputs underneath). Checked = pine fill + white text and
+  must win over hover styling. Selects remain for long/many options.
+- **Save note:** `SavedNote` ("הטיוטה נשמרה" / "התשובות נשמרו") may appear ONLY after a
+  real successful server save — truthfulness over reassurance.
+- **Sticky mobile CTA:** detail pages pin the primary action in an in-flow `sticky
+  bottom-0` bar on mobile (never `fixed` — it must release before the footer), with
+  inline-start clearance for the floating support launcher. Desktop keeps the in-card
+  button; the one-marmalade-per-screen rule holds per viewport.
+- **Whisker accent:** `Whisker` — a single hand-drawn marmalade underline stroke beneath
+  a section heading. At most one per heading; this is the site's "human touch" accent.
 
 ## 6. Photography & imagery
 

@@ -15,6 +15,7 @@ const PhotoCropDialog = dynamic(() => import('./PhotoCropDialog'), { ssr: false 
 
 interface UploadStep4Props {
   catId: string
+  catName?: string
   photos: PhotoItem[]
   setPhotos: (photos: PhotoItem[]) => void
   videoPath: string | null
@@ -25,6 +26,7 @@ interface UploadStep4Props {
 
 export function UploadStep4({
   catId,
+  catName,
   photos,
   setPhotos,
   videoPath,
@@ -33,6 +35,7 @@ export function UploadStep4({
   setIsProcessing
 }: UploadStep4Props) {
   const [editIndex, setEditIndex] = useState<number | null>(null)
+  const trimmedName = (catName || '').trim()
 
   const {
     uploadError,
@@ -72,7 +75,9 @@ export function UploadStep4({
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-display font-extrabold text-ink">
-        {strings.publish.wizardStep.replace('{step}', '4').replace('{total}', '4')} — {strings.publish.wizardStep4Title}
+        {trimmedName
+          ? strings.publish.stepNamed4.replace('{name}', trimmedName)
+          : strings.publish.wizardStep4Title}
       </h3>
 
       <CaptureTipsPanel />

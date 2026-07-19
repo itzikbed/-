@@ -13,6 +13,7 @@ import SuccessState from './SuccessState'
 import ConsentSection from './ConsentSection'
 import { Button } from '@/components/ui/Button'
 import { WizardSteps } from '@/components/ui/WizardSteps'
+import { SavedNote } from '@/components/ui/SavedNote'
 
 interface WizardProps {
   defaultValues: Partial<QuestionnaireInput>
@@ -32,6 +33,8 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
   const [isSaving, setIsSaving] = useState(false)
   const [consentChecked, setConsentChecked] = useState(isCompletedInitially)
   const [consentError, setConsentError] = useState<string | null>(null)
+  // Honest indicator: answers are persisted on every successful step save
+  const [answersSaved, setAnswersSaved] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   const {
@@ -101,6 +104,7 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
         setServerError(res.formError || strings.questionnaire.saveError)
         return
       }
+      setAnswersSaved(true)
       setStep(step + 1)
     } catch {
       setServerError(strings.questionnaire.networkError)
@@ -195,6 +199,8 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
             }}
           />
         )}
+
+        {answersSaved && !isSaving && <SavedNote label={strings.questionnaire.autoSavedNow} />}
 
         {/* Navigation Buttons */}
         <div className="flex justify-between items-center gap-4 pt-4 border-t border-border">

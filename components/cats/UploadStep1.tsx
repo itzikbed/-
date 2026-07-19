@@ -3,6 +3,7 @@
 import { UseFormRegister, FieldErrors } from 'react-hook-form'
 import { strings } from '@/lib/strings'
 import { CatInput } from '@/lib/schemas/cat'
+import { SegmentedField } from '@/components/ui/Segmented'
 
 interface UploadStep1Props {
   register: UseFormRegister<CatInput>
@@ -13,7 +14,7 @@ export function UploadStep1({ register, errors }: UploadStep1Props) {
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-display font-extrabold text-ink mb-4">
-        {strings.publish.wizardStep.replace('{step}', '1').replace('{total}', '4')} — {strings.publish.wizardStep1Title}
+        {strings.publish.wizardStep1Title}
       </h3>
 
       {/* Name */}
@@ -34,25 +35,24 @@ export function UploadStep1({ register, errors }: UploadStep1Props) {
       </div>
 
       {/* Sex */}
-      <div>
-        <label className="block text-sm font-bold text-ink mb-1.5" htmlFor="sex">
+      <fieldset>
+        <legend className="block text-sm font-bold text-ink mb-1.5">
           {strings.publish.catSex}
-        </label>
-        <select
-          {...register('sex')}
-          id="sex"
-          className="w-full bg-surface border border-border rounded-input px-4 py-3 text-base text-ink focus:outline-none focus:ring-2 focus:ring-pine focus:ring-offset-2"
-        >
-          <option value="male">{strings.catalog.genderMale}</option>
-          <option value="female">{strings.catalog.genderFemale}</option>
-          <option value="unknown">{strings.catalog.genderUnknown}</option>
-        </select>
+        </legend>
+        <SegmentedField
+          registration={register('sex')}
+          options={[
+            { value: 'male', label: strings.catalog.genderMale },
+            { value: 'female', label: strings.catalog.genderFemale },
+            { value: 'unknown', label: strings.catalog.genderUnknown }
+          ]}
+        />
         {errors.sex && (
           <p className="text-xs text-danger font-semibold mt-1" role="alert">
             {errors.sex.message}
           </p>
         )}
-      </div>
+      </fieldset>
 
       {/* Age */}
       <div>

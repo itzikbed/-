@@ -12,11 +12,14 @@ interface UploadStep2Props {
 
 export function UploadStep2({ register, errors, watch }: UploadStep2Props) {
   const isSpecial = watch('is_special')
+  const catName = (watch('name') || '').trim()
 
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-display font-extrabold text-ink mb-4">
-        {strings.publish.wizardStep.replace('{step}', '2').replace('{total}', '4')} — {strings.publish.wizardStep2Title}
+        {catName
+          ? strings.publish.stepNamed2.replace('{name}', catName)
+          : strings.publish.wizardStep2Title}
       </h3>
 
       {/* Vaccinations */}

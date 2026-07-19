@@ -2,6 +2,7 @@ import React from 'react'
 import { UseFormRegister, FieldErrors, Control, Controller } from 'react-hook-form'
 import { QuestionnaireInput } from '@/lib/schemas/questionnaire'
 import { Select } from '@/components/ui/Select'
+import { BooleanSegmented } from '@/components/ui/Segmented'
 import { FLOOR_TYPES } from '@/lib/constants'
 import { strings } from '@/lib/strings'
 
@@ -29,29 +30,14 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
           name="has_other_pets"
           control={control}
           render={({ field }) => (
-            <div className="flex gap-6 mt-1">
-              <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
-                <input
-                  type="radio"
-                  name="has_other_pets"
-                  value="true"
-                  checked={field.value === true}
-                  onChange={() => field.onChange(true)}
-                  className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-                />
-                <span>{strings.questionnaire.yes}</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
-                <input
-                  type="radio"
-                  name="has_other_pets"
-                  value="false"
-                  checked={field.value === false}
-                  onChange={() => field.onChange(false)}
-                  className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-                />
-                <span>{strings.questionnaire.no}</span>
-              </label>
+            <div className="mt-1">
+              <BooleanSegmented
+                name="has_other_pets"
+                value={field.value}
+                onChange={field.onChange}
+                yesLabel={strings.questionnaire.yes}
+                noLabel={strings.questionnaire.no}
+              />
             </div>
           )}
         />
@@ -96,29 +82,14 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
           name="has_cat_experience"
           control={control}
           render={({ field }) => (
-            <div className="flex gap-6 mt-1">
-              <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
-                <input
-                  type="radio"
-                  name="has_cat_experience"
-                  value="true"
-                  checked={field.value === true}
-                  onChange={() => field.onChange(true)}
-                  className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-                />
-                <span>{strings.questionnaire.yes}</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
-                <input
-                  type="radio"
-                  name="has_cat_experience"
-                  value="false"
-                  checked={field.value === false}
-                  onChange={() => field.onChange(false)}
-                  className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-                />
-                <span>{strings.questionnaire.no}</span>
-              </label>
+            <div className="mt-1">
+              <BooleanSegmented
+                name="has_cat_experience"
+                value={field.value}
+                onChange={field.onChange}
+                yesLabel={strings.questionnaire.yes}
+                noLabel={strings.questionnaire.no}
+              />
             </div>
           )}
         />
@@ -154,29 +125,14 @@ export default function StepTwoFields({ register, errors, control, watchHasOther
           name="has_window_screens"
           control={control}
           render={({ field }) => (
-            <div className="flex gap-6 mt-1">
-              <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
-                <input
-                  type="radio"
-                  name="has_window_screens"
-                  value="true"
-                  checked={field.value === true}
-                  onChange={() => field.onChange(true)}
-                  className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-                />
-                <span>{strings.questionnaire.yes}</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer select-none text-base text-ink font-sans">
-                <input
-                  type="radio"
-                  name="has_window_screens"
-                  value="false"
-                  checked={field.value === false}
-                  onChange={() => field.onChange(false)}
-                  className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-                />
-                <span>{strings.questionnaire.no}</span>
-              </label>
+            <div className="mt-1">
+              <BooleanSegmented
+                name="has_window_screens"
+                value={field.value}
+                onChange={field.onChange}
+                yesLabel={strings.questionnaire.yes}
+                noLabel={strings.questionnaire.no}
+              />
             </div>
           )}
         />

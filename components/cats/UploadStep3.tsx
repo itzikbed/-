@@ -14,11 +14,14 @@ interface UploadStep3Props {
 export function UploadStep3({ register, errors, watch }: UploadStep3Props) {
   const feeRequired = watch('fee_required')
   const sex = watch('sex') || 'male'
+  const catName = (watch('name') || '').trim()
 
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-display font-extrabold text-ink mb-4">
-        {strings.publish.wizardStep.replace('{step}', '3').replace('{total}', '4')} — {strings.publish.wizardStep3Title}
+        {catName
+          ? strings.publish.stepNamed3.replace('{name}', catName)
+          : strings.publish.wizardStep3Title}
       </h3>
 
       {/* Good with cats */}

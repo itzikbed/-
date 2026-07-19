@@ -5,6 +5,7 @@ import { Filters } from '@/lib/utils/filters'
 import { REGIONS, AGE_BUCKETS } from '@/lib/constants'
 import { strings } from '@/lib/strings'
 import { Checkbox } from '@/components/ui/Checkbox'
+import { Heart } from 'lucide-react'
 
 interface CatalogFiltersProps {
   filters: Filters
@@ -202,13 +203,20 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
           </div>
         </div>
 
-        {/* Special Needs Toggle */}
+        {/* Special Needs Toggle — marmalade highlight (DESIGN: warm accent) */}
         <div className="pt-2 border-t border-border">
-          <Checkbox
-            label={strings.catalog.specialOnly}
-            checked={filters.special}
-            onChange={(e) => handleSingleChange('special', e.target.checked)}
-          />
+          <div className="bg-marmalade-sf/60 border border-marmalade/25 rounded-input p-3">
+            <Checkbox
+              label={
+                <span className="flex items-center gap-1.5 font-semibold">
+                  <Heart className="w-4 h-4 text-marmalade-dp fill-current" aria-hidden="true" />
+                  {strings.catalog.specialOnly}
+                </span>
+              }
+              checked={filters.special}
+              onChange={(e) => handleSingleChange('special', e.target.checked)}
+            />
+          </div>
         </div>
       </div>
 

@@ -126,7 +126,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
     chips.push(
       <span
         key="special"
-        className="inline-flex items-center gap-1 bg-pine-soft text-pine border border-pine/10 text-xs font-bold px-3 py-1.5 rounded-full"
+        className="inline-flex items-center gap-1 bg-marmalade-sf text-warning border border-marmalade/20 text-xs font-bold px-3 py-1.5 rounded-full"
       >
         <Heart className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
         <span>{strings.catalog.specialChip}</span>

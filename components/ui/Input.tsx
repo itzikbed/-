@@ -16,7 +16,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     
     const inputStyles = `w-full bg-surface border rounded-input py-3 text-base text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 transition-all duration-150 ${
       error ? 'border-danger' : 'border-border'
-    } ${isPassword ? 'ps-4 pe-14' : 'px-4'} ${className}`
+    } ${isPassword ? 'ps-14 pe-4 text-end' : 'px-4'} ${className}`
 
     const errorId = `${id}-error`
     const helperId = `${id}-helper`

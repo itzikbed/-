@@ -4,7 +4,7 @@ import React from 'react'
 import { Filters } from '@/lib/utils/filters'
 import { REGIONS, AGE_BUCKETS } from '@/lib/constants'
 import { strings } from '@/lib/strings'
-import { X } from 'lucide-react'
+import { X, Heart } from 'lucide-react'
 
 interface ActiveFilterChipsProps {
   filters: Filters
@@ -128,6 +128,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
         key="special"
         className="inline-flex items-center gap-1 bg-pine-soft text-pine border border-pine/10 text-xs font-bold px-3 py-1.5 rounded-full"
       >
+        <Heart className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
         <span>{strings.catalog.specialChip}</span>
         <button
           onClick={() => onRemoveSingleFilter('special')}

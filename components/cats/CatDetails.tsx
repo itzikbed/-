@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/Badge'
 import { strings, gendered } from '@/lib/strings'
-import { Info, Coins, Stethoscope, Compass, ChevronLeft } from 'lucide-react'
+import { Info, Coins, Stethoscope, Compass, ChevronLeft, Heart } from 'lucide-react'
 import { AdminArchiveControl } from '@/components/admin/AdminArchiveControl'
 import { CatGallery } from '@/components/cats/CatGallery'
 import { ShareButtons } from '@/components/cats/ShareButtons'
@@ -84,6 +84,7 @@ export function CatDetails({
                 
                 {cat.is_special && (
                   <Badge variant="pending" className="flex items-center gap-1 font-bold">
+                    <Heart className="w-3 h-3 fill-current" aria-hidden="true" />
                     <span>{strings.catalog.specialBadge}</span>
                   </Badge>
                 )}

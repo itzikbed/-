@@ -208,7 +208,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
               onClearAll={handleClearAll}
             />
 
-            <CatGrid cats={cats} isFiltered={isFiltered} loading={isPending} />
+            <CatGrid cats={cats} isFiltered={isFiltered} loading={isPending} showJoinCard={!isFiltered} />
 
             {/* Pagination Footer */}
             <CatalogPagination

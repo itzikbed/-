@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/age-bucket'
 import { Badge } from '@/components/ui/Badge'
+import { Heart } from 'lucide-react'
 import { strings } from '@/lib/strings'
 import { shouldDisableVideo, hasExtension } from '@/lib/utils/video-playback'
 import { PlaybackDirector } from '@/lib/utils/playback-director'
@@ -184,6 +185,7 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
           )}
           {cat.is_special && (
             <Badge variant="pending" className="shadow-md flex items-center gap-1 font-bold">
+              <Heart className="w-3 h-3 fill-current" aria-hidden="true" />
               <span>{strings.catalog.specialBadge}</span>
             </Badge>
           )}

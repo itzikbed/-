@@ -12,6 +12,7 @@ import StepThreeFields from './StepThreeFields'
 import SuccessState from './SuccessState'
 import ConsentSection from './ConsentSection'
 import { Button } from '@/components/ui/Button'
+import { WizardSteps } from '@/components/ui/WizardSteps'
 
 interface WizardProps {
   defaultValues: Partial<QuestionnaireInput>
@@ -139,17 +140,14 @@ export default function QuestionnaireWizard({ defaultValues, isCompletedInitiall
   return (
     <div className="bg-surface rounded-card p-6 md:p-10 shadow-resting border border-border max-w-2xl mx-auto">
       {/* Step Indicator Header */}
-      <div className="flex flex-col items-center mb-8">
-        <span className="font-sans text-sm text-ink-soft mb-2">
-          {strings.questionnaire.stepIndicator.replace('{step}', String(step))}
-        </span>
-        {/* Progress Bar */}
-        <div className="w-full bg-border h-2 rounded-full overflow-hidden" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={3}>
-          <div
-            className="bg-pine h-full transition-all duration-300 ease-out"
-            style={{ width: `${(step / 3) * 100}%` }}
-          />
-        </div>
+      <div className="mb-8">
+        <WizardSteps
+          steps={strings.questionnaire.stepNames}
+          current={step}
+          counterLabel={strings.common.stepOf
+            .replace('{step}', String(step))
+            .replace('{total}', String(strings.questionnaire.stepNames.length))}
+        />
       </div>
 
       {/* Form Title & Description */}

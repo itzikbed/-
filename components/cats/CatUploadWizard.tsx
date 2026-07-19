@@ -13,6 +13,7 @@ import { UploadStep3 } from './UploadStep3'
 import { UploadStep4 } from './UploadStep4'
 import { UploadSuccessState } from './UploadSuccessState'
 import { WizardNavigation } from './WizardNavigation'
+import { WizardSteps } from '@/components/ui/WizardSteps'
 import { PhotoItem, InitialCatInput } from './types'
 
 interface CatUploadWizardProps {
@@ -201,6 +202,14 @@ export function CatUploadWizard({ initialCat }: CatUploadWizardProps) {
 
   return (
     <div className="bg-surface border border-border rounded-card p-6 md:p-8 shadow-resting space-y-6">
+      <WizardSteps
+        steps={strings.publish.stepNames}
+        current={step}
+        counterLabel={strings.common.stepOf
+          .replace('{step}', String(step))
+          .replace('{total}', String(strings.publish.stepNames.length))}
+      />
+
       {wizardError && (
         <div className="bg-danger/10 border border-danger/20 text-danger rounded-input p-3 text-sm font-semibold" role="alert">
           {wizardError}

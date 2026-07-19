@@ -8,6 +8,7 @@
   --ink-soft:       oklch(45%   0.020 170);  /* ≈ #55645C secondary text */
   /* Brand — 10% */
   --pine:           oklch(40%   0.080 168);  /* ≈ #1C6650 links, focus, secondary btn */
+  --pine-deep:      oklch(33%   0.060 168);  /* ≈ #154A3C footer anchor bg (paper text) */
   --pine-soft:      oklch(93%   0.030 165);  /* ≈ #DFF0E7 chips, success tint */
   --marmalade:      oklch(75%   0.130 75);   /* ≈ #EBAF56 primary CTA bg (ink text!) */
   --marmalade-dp:   oklch(69%   0.140 70);   /* ≈ #DD9C3D CTA hover */
@@ -29,6 +30,7 @@
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-pine: var(--pine);
+  --color-pine-deep: var(--pine-deep);
   --color-pine-soft: var(--pine-soft);
   --color-marmalade: var(--marmalade);
   --color-marmalade-dp: var(--marmalade-dp);

@@ -39,7 +39,11 @@
     "privacyPolicy": "מדיניות פרטיות",
     "accessibilityDeclaration": "הצהרת נגישות",
     "terms": "תנאי שימוש",
-    "allRightsReserved": "כל הזכויות שמורות לאיציק בורנשטיין — פיתוח האתר."
+    "allRightsReserved": "כל הזכויות שמורות לאיציק בורנשטיין — פיתוח האתר.",
+    "footerTagline": "פלטפורמה מפוקחת לאימוץ ומסירת חתולים בישראל. כל מודעה נבדקת ומאושרת על ידי הצוות.",
+    "footerNavLabel": "ניווט תחתון",
+    "footerSiteLinks": "באתר",
+    "footerLegalLinks": "מידע ומדיניות"
   },
   "auth": {
     "loginTitle": "התחברות לחשבון",

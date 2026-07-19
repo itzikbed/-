@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import { Rubik, Assistant } from "next/font/google"
 import "./globals.css"
-import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { strings } from "@/lib/strings"
 import { Header } from "@/components/nav/Header"
+import { Footer } from "@/components/nav/Footer"
 import { SupportChatLauncher } from "@/components/support/SupportChatLauncher"
 import { initHebrewValidation } from "@/lib/schemas/he-errors"
 import { RouteTransitionTrigger } from "@/lib/utils/view-transition-navigation"
@@ -77,37 +77,7 @@ export default async function RootLayout({
         {/* Support chat: users + guests; admins answer from the dashboard */}
         {profile?.role !== 'admin' && <SupportChatLauncher userId={user?.id ?? null} />}
 
-        {/* Footer */}
-        <footer className="bg-surface border-t border-border py-8 mt-auto select-none">
-          <div className="app-container flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-ink-soft font-sans">
-            <div>
-              &copy; {new Date().getFullYear()} {strings.common.siteName}. {strings.nav.allRightsReserved}
-              {process.env.NEXT_PUBLIC_CONTACT_EMAIL && (
-                <span className="ms-2 select-none">
-                  | {strings.common.support}:{' '}
-                  <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`} className="text-pine font-bold hover:underline">
-                    {process.env.NEXT_PUBLIC_CONTACT_EMAIL}
-                  </a>
-                </span>
-              )}
-            </div>
-            
-            {/* Regulatory Compliance Links */}
-            <div className="flex items-center gap-6">
-              <Link href="/privacy" className="hover:text-pine hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-                {strings.nav.privacyPolicy}
-              </Link>
-              <span className="text-border">|</span>
-              <Link href="/accessibility" className="hover:text-pine hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-                {strings.nav.accessibilityDeclaration}
-              </Link>
-              <span className="text-border">|</span>
-              <Link href="/terms" className="hover:text-pine hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2">
-                {strings.nav.terms}
-              </Link>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   )

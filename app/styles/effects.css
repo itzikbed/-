@@ -42,6 +42,13 @@
   animation: ear-twitch-right 20s infinite ease-in-out;
 }
 
+/* Paper grain — makes the "warm paper" token literal. SVG turbulence noise
+   at 2.5% opacity; static, zero network requests, safe for text contrast. */
+.paper-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
 /* Sunbeam drift on paper sections */
 @keyframes sunbeam-drift {
   0% {

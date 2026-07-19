@@ -4,6 +4,7 @@ import { Cat, Sprout, Warehouse, HeartPulse } from 'lucide-react'
 import { strings } from '@/lib/strings'
 import { Mascot } from '@/components/mascot/Mascot'
 import { SectionCurve } from '@/components/ui/SectionCurve'
+import { Whisker } from '@/components/ui/Whisker'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function AboutPage() {
           <h1 className="text-4xl md:text-5xl font-display font-extrabold text-ink">
             {content.title}
           </h1>
+          <Whisker className="mx-auto" />
           <p className="text-xl font-bold text-pine leading-relaxed">{content.welcome}</p>
           <div className="text-start space-y-4 pt-2">
             <p className="text-base text-ink leading-relaxed">{content.intro1}</p>
@@ -48,6 +50,7 @@ export default function AboutPage() {
             <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
               {content.factsTitle}
             </h2>
+            <Whisker className="mx-auto" />
             <p className="text-base text-ink-soft leading-relaxed">{content.factsIntro}</p>
           </div>
 

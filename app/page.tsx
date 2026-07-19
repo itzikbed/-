@@ -4,6 +4,7 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { CatGrid } from '@/components/cats/CatGrid'
 import { HeroFilm } from '@/components/ui/HeroFilm'
 import { SectionCurve } from '@/components/ui/SectionCurve'
+import { Whisker } from '@/components/ui/Whisker'
 import { strings } from '@/lib/strings'
 import { Heart, Sparkles } from 'lucide-react'
 import type { Metadata } from 'next'
@@ -40,7 +41,7 @@ export default async function HomePage() {
         {/* Hero Content Container */}
         <div className="app-container relative z-10 w-full flex flex-col items-center text-center gap-12 mt-8">
           <div className="space-y-4 max-w-3xl animate-fade-rise">
-            <h1 className="text-4xl md:text-6xl font-display font-extrabold text-surface tracking-tight leading-none drop-shadow-md">
+            <h1 className="text-4xl md:text-7xl font-display font-extrabold text-surface tracking-tight leading-none drop-shadow-md">
               {strings.common.siteSubtitle}.
             </h1>
             <p className="text-lg md:text-xl font-sans text-paper/90 max-w-xl mx-auto drop-shadow-sm leading-relaxed">
@@ -112,6 +113,7 @@ export default async function HomePage() {
             <h2 className="text-3xl font-display font-extrabold text-ink">
               {strings.home.latestTitle}
             </h2>
+            <Whisker />
             <p className="text-ink-soft text-base">
               {strings.home.latestDesc}
             </p>
@@ -145,6 +147,7 @@ export default async function HomePage() {
             <h2 className="text-3xl font-display font-extrabold text-ink">
               {strings.home.howItWorksTitle}
             </h2>
+            <Whisker className="mx-auto" />
             <p className="text-ink-soft text-base leading-relaxed">
               {strings.home.howItWorksDesc}
             </p>

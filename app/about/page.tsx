@@ -85,7 +85,7 @@ export default function AboutPage() {
           <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
             {content.missionTitle}
           </h2>
-          <p className="text-base text-ink leading-relaxed text-start mt-4">
+          <p className="text-base text-ink leading-relaxed mt-4">
             {content.missionText}
           </p>
 

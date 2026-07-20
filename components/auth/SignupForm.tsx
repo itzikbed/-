@@ -15,6 +15,7 @@ import { strings } from '@/lib/strings'
 
 export default function SignupForm() {
   const [success, setSuccess] = useState(false)
+  const [needsConfirmation, setNeedsConfirmation] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -42,10 +43,18 @@ export default function SignupForm() {
           })
         }
       } else {
+        const confirmationPending =
+          (res.data as { needsConfirmation?: boolean } | undefined)?.needsConfirmation === true
         setSuccess(true)
-        setTimeout(() => {
-          router.push(`/login${searchParams.toString() ? '?' + searchParams.toString() : ''}`)
-        }, 2000)
+        if (confirmationPending) {
+          // The account only activates via the email link — keep the notice on
+          // screen instead of bouncing to a login that would reject them.
+          setNeedsConfirmation(true)
+        } else {
+          setTimeout(() => {
+            router.push(`/login${searchParams.toString() ? '?' + searchParams.toString() : ''}`)
+          }, 2000)
+        }
       }
     } catch {
       setError('root.serverError', { message: strings.common.errorOccurred })
@@ -71,8 +80,11 @@ export default function SignupForm() {
           </h2>
 
           {success && (
-            <div className="mb-4 p-4 bg-pine-soft text-pine rounded-input text-sm font-semibold text-center select-none">
-              {strings.auth.signupSuccessMsg}
+            <div
+              role="status"
+              className="mb-4 p-4 bg-pine-soft text-pine rounded-input text-sm font-semibold text-center"
+            >
+              {needsConfirmation ? strings.auth.signupConfirmMsg : strings.auth.signupSuccessMsg}
             </div>
           )}
 

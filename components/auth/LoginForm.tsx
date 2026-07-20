@@ -19,6 +19,7 @@ export default function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = getSafeRedirect(searchParams.get('redirect'))
+  const callbackFailed = searchParams.get('error') === 'auth_callback_failed'
 
   const {
     register,
@@ -67,6 +68,12 @@ export default function LoginForm() {
           <h2 className="text-2xl font-display font-extrabold text-ink mb-6 text-center select-none">
             {strings.auth.loginTitle}
           </h2>
+
+          {callbackFailed && !serverError && (
+            <div role="alert" className="mb-4 p-3 bg-danger/10 text-danger rounded-input text-sm font-semibold">
+              {strings.auth.authCallbackFailed}
+            </div>
+          )}
 
           {serverError && (
             <div role="alert" className="mb-4 p-3 bg-danger/10 text-danger rounded-input text-sm font-semibold">

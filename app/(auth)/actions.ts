@@ -15,6 +15,12 @@ function mapAuthError(message: string): string {
   if (msg.includes('weak password') || msg.includes('should be at least') || msg.includes('password should be')) {
     return uiStrings.auth.weakPassword
   }
+  if (msg.includes('email not confirmed')) {
+    return uiStrings.auth.emailNotConfirmed
+  }
+  if (msg.includes('already registered') || msg.includes('already exists')) {
+    return uiStrings.auth.emailExists
+  }
   return uiStrings.auth.authFailedMsg
 }
 
@@ -51,10 +57,17 @@ export async function signupAction(formData: SignupInput): Promise<ActionResult>
   const { email, password, fullName, phone } = result.data
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signUp({
+  // Land the confirmation link on the code-exchange callback so the user
+  // returns signed in instead of dropping on the homepage with a dead token.
+  const headersList = await headers()
+  const host = headersList.get('host')
+  const protocol = host?.includes('localhost') || host?.includes('127.0.0.1') ? 'http' : 'https'
+
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: `${protocol}://${host}/api/auth/callback?next=/`,
       data: {
         full_name: fullName,
         phone,
@@ -66,7 +79,13 @@ export async function signupAction(formData: SignupInput): Promise<ActionResult>
     return { ok: false, formError: mapAuthError(error.message) }
   }
 
-  return { ok: true, data: { success: true } }
+  // With confirmations on, Supabase obfuscates an existing confirmed email as a
+  // success whose user carries no identities — surface it as a duplicate.
+  if (data.user && data.user.identities && data.user.identities.length === 0) {
+    return { ok: false, formError: uiStrings.auth.emailExists }
+  }
+
+  return { ok: true, data: { success: true, needsConfirmation: !data.session } }
 }
 
 export async function forgotPasswordAction(email: string): Promise<ActionResult> {

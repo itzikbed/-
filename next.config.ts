@@ -66,6 +66,14 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders
+      },
+      {
+        // Hero media is versioned by filename (every swap ships new names),
+        // so browsers and the CDN may cache it indefinitely.
+        source: '/hero/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+        ]
       }
     ]
   }

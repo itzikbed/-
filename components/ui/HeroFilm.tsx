@@ -76,7 +76,12 @@ export const HeroFilm: React.FC = () => {
           try {
             await ref.play()
           } catch (err) {
-            console.error('Hero video playback failed', err)
+            // Autoplay races (pause during play, hidden-tab policy) are
+            // expected and self-heal on the next rotation — don't log them.
+            const name = err instanceof DOMException ? err.name : ''
+            if (name !== 'AbortError' && name !== 'NotAllowedError') {
+              console.error('Hero video playback failed', err)
+            }
           }
         }
         const pause = () => {

@@ -39,6 +39,8 @@ export default function PrivacyPage() {
             <li>{content.infoPublisher}</li>
             <li>{content.infoAdopter}</li>
             <li>{content.infoSupport}</li>
+            <li>{content.infoContent}</li>
+            <li>{content.infoTechnical}</li>
           </ul>
         </section>
 

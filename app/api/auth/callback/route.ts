@@ -2,11 +2,21 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { Database } from '@/lib/supabase/database.types'
+import { getSafeRedirect } from '@/lib/utils/safe-redirect'
+import { getTrustedSiteOrigin } from '@/lib/utils/site-url'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/'
+  const next = getSafeRedirect(searchParams.get('next'))
+
+  let siteOrigin: string
+  try {
+    siteOrigin = getTrustedSiteOrigin()
+  } catch {
+    console.error('Invalid NEXT_PUBLIC_SITE_URL configuration')
+    return new NextResponse(null, { status: 500 })
+  }
 
   if (code) {
     const cookieStore = await cookies()
@@ -33,16 +43,10 @@ export async function GET(request: Request) {
     
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      const forwardedHost = request.headers.get('x-forwarded-host')
-      const protocol = request.headers.get('x-forwarded-proto') || 'https'
-      
-      if (forwardedHost) {
-        return NextResponse.redirect(`${protocol}://${forwardedHost}${next}`)
-      }
-      return NextResponse.redirect(`${origin}${next}`)
+      return NextResponse.redirect(new URL(next, siteOrigin))
     }
   }
 
   // Redirect to login with error
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`)
+  return NextResponse.redirect(new URL('/login?error=auth_callback_failed', siteOrigin))
 }

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { strings } from '@/lib/strings'
 import { Mascot } from '@/components/mascot/Mascot'
 import { PublisherApplicationForm } from '@/components/auth/PublisherApplicationForm'
+import { activateAdminPublisherAccessAction } from './publisher-actions'
 
 export const metadata = {
   title: `${strings.publish.title} — ${strings.common.siteName}`,
@@ -44,36 +45,11 @@ export default async function PublishPage() {
   }
 
   const status = profile.publisher_status || 'none'
+  const adminNeedsAccess = profile.role === 'admin' && (status === 'none' || status === 'pending')
 
   // approved uploader redirects to /publish/my-cats
   if (status === 'approved') {
     redirect('/publish/my-cats')
-  }
-
-  // Admins moderate the queue themselves — grant publisher access on entry
-  // instead of routing them through their own approval. RLS + the profile
-  // guard trigger permit this transition only for admins.
-  if (profile.role === 'admin' && (status === 'none' || status === 'pending')) {
-    const { data: granted } = await supabase
-      .from('profiles')
-      .update({ publisher_status: 'approved' })
-      .eq('id', user.id)
-      .eq('role', 'admin')
-      .in('publisher_status', ['none', 'pending'])
-      .select('id')
-
-    if (granted && granted.length > 0) {
-      const { error: logErr } = await supabase.from('moderation_log').insert({
-        actor_id: user.id,
-        entity_type: 'publisher',
-        entity_id: user.id,
-        action: 'approve'
-      })
-      if (logErr) {
-        console.error('Failed to insert moderation log:', logErr)
-      }
-      redirect('/publish/my-cats')
-    }
   }
 
   let rejectionReason = null
@@ -96,7 +72,25 @@ export default async function PublishPage() {
   return (
     <div className="flex-grow bg-paper py-10 md:py-16 select-none">
       <div className="app-container max-w-lg">
-        {status === 'none' && (
+        {adminNeedsAccess && (
+          <form action={activateAdminPublisherAccessAction} className="bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-center space-y-6">
+            <Mascot pose="sitting" width={120} height={140} />
+            <h2 className="text-2xl font-display font-extrabold text-ink">
+              {strings.publish.adminAccessTitle}
+            </h2>
+            <p className="text-base font-semibold text-ink-soft leading-relaxed max-w-md mx-auto">
+              {strings.publish.adminAccessDesc}
+            </p>
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-pine text-white hover:bg-pine/90 transition-colors shadow-resting active:scale-98 cursor-pointer"
+            >
+              {strings.publish.adminAccessBtn}
+            </button>
+          </form>
+        )}
+
+        {status === 'none' && !adminNeedsAccess && (
           <div className="bg-surface border border-border rounded-card p-6 md:p-8 shadow-resting relative overflow-visible">
             {/* Mascot Peeking */}
             <div className="absolute -top-[45px] start-1/2 -translate-x-1/2 rtl:translate-x-1/2">
@@ -114,7 +108,7 @@ export default async function PublishPage() {
           </div>
         )}
 
-        {status === 'pending' && (
+        {status === 'pending' && !adminNeedsAccess && (
           <div className="bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-center space-y-6">
             <Mascot pose="sleeping" width={140} height={100} animateOnScroll />
             <h2 className="text-2xl font-display font-extrabold text-ink">

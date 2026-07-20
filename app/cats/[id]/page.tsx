@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { REGIONS, RegionId } from '@/lib/constants'
 import { getAgeBucketLabel } from '@/lib/utils/age-bucket'
+import { serializeJsonLd } from '@/lib/utils/json-ld'
 import { strings, gendered } from '@/lib/strings'
 import { CatDetails } from '@/components/cats/CatDetails'
 import type { Metadata } from 'next'
@@ -142,7 +143,7 @@ export default async function CatDetailPage({ params }: CatDetailPageProps) {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
     </>
   )

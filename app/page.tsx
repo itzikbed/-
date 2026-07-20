@@ -6,6 +6,7 @@ import { HeroFilm } from '@/components/ui/HeroFilm'
 import { SectionCurve } from '@/components/ui/SectionCurve'
 import { Whisker } from '@/components/ui/Whisker'
 import { strings } from '@/lib/strings'
+import { serializeJsonLd } from '@/lib/utils/json-ld'
 import { Heart, Sparkles } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -214,7 +215,7 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             '@context': 'https://schema.org',
             '@type': 'WebSite',
             'name': strings.common.siteName,

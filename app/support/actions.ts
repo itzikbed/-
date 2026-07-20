@@ -5,8 +5,22 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { supportMessageSchema } from '@/lib/schemas/support'
 import { sendEmail } from '@/lib/emails/send'
 import SupportChatNew, { getSubject as getSupportChatSubject } from '@/emails/SupportChatNew'
+import SupportChatDigest, { getSubject as getSupportChatDigestSubject } from '@/emails/SupportChatDigest'
 import { strings } from '@/lib/strings'
 import type { SupportMessage } from '@/lib/support/chat'
+
+// Resolve the email addresses of every admin account.
+async function getAdminEmails(admin: ReturnType<typeof createAdminClient>): Promise<string[]> {
+  const { data: adminProfiles } = await admin.from('profiles').select('id').eq('role', 'admin')
+  if (!adminProfiles || adminProfiles.length === 0) return []
+
+  const emails: string[] = []
+  for (const profile of adminProfiles) {
+    const { data } = await admin.auth.admin.getUserById(profile.id)
+    if (data.user?.email) emails.push(data.user.email)
+  }
+  return emails
+}
 
 export type ActionResult<T = unknown> =
   | { ok: true; data: T }
@@ -138,28 +152,49 @@ async function notifyAdminsIfFirstUnread(userId: string, conversationId: string,
     .gt('created_at', oneHourAgo)
   if (recentEmails && recentEmails > 0) return
 
-  // Global flood ceiling: at most 10 admin notifications per hour across ALL
-  // conversations, so a burst of fresh accounts cannot flood the admin inbox.
-  // The check-then-send window is not atomic; the ceiling bounds the damage.
+  // High-traffic behavior: after 6 chat notifications in an hour, switch from
+  // per-conversation emails to a summary at most once per 15 minutes with the
+  // number of waiting conversations — the inbox stays bounded under a flood
+  // (or a legitimate surge), but no inquiry goes silent. Checks are not
+  // atomic; concurrent requests can only add a handful of extra emails.
   const { count: totalRecent } = await admin
     .from('email_log')
     .select('id', { count: 'exact', head: true })
-    .eq('template', 'support_chat_new')
+    .in('template', ['support_chat_new', 'support_chat_digest'])
     .eq('status', 'sent')
     .gt('created_at', oneHourAgo)
-  if (totalRecent && totalRecent >= 10) {
-    console.error('[SUPPORT CHAT EMAIL] global hourly ceiling reached, skipping notification')
+
+  if (totalRecent && totalRecent >= 6) {
+    const quietWindowStart = new Date(Date.now() - 15 * 60 * 1000).toISOString()
+    const { count: inQuietWindow } = await admin
+      .from('email_log')
+      .select('id', { count: 'exact', head: true })
+      .in('template', ['support_chat_new', 'support_chat_digest'])
+      .eq('status', 'sent')
+      .gt('created_at', quietWindowStart)
+    if (inQuietWindow && inQuietWindow > 0) return
+
+    const { data: unreadRows } = await admin
+      .from('support_messages')
+      .select('conversation_id')
+      .is('read_by_admin_at', null)
+      .limit(500)
+    const waitingCount = new Set((unreadRows ?? []).map((r) => r.conversation_id)).size
+    if (waitingCount === 0) return
+
+    const digestRecipients = await getAdminEmails(admin)
+    if (digestRecipients.length === 0) return
+
+    await sendEmail({
+      to: digestRecipients,
+      subject: getSupportChatDigestSubject(waitingCount),
+      react: React.createElement(SupportChatDigest, { waitingCount }),
+      template: 'support_chat_digest'
+    })
     return
   }
 
-  const { data: adminProfiles } = await admin.from('profiles').select('id').eq('role', 'admin')
-  if (!adminProfiles || adminProfiles.length === 0) return
-
-  const adminEmails: string[] = []
-  for (const profile of adminProfiles) {
-    const { data } = await admin.auth.admin.getUserById(profile.id)
-    if (data.user?.email) adminEmails.push(data.user.email)
-  }
+  const adminEmails = await getAdminEmails(admin)
   if (adminEmails.length === 0) return
 
   const { data: senderProfile } = await admin

@@ -12,11 +12,26 @@ import RequestApproved, { getSubject as getRequestApprovedSubject } from './Requ
 import RequestRejected, { getSubject as getRequestRejectedSubject } from './RequestRejected'
 import CatArchivedByAdmin, { getSubject as getCatArchivedByAdminSubject } from './CatArchivedByAdmin'
 import RequestClosedCatAdopted, { getSubject as getRequestClosedCatAdoptedSubject } from './RequestClosedCatAdopted'
+import SupportChatDigest, { getSubject as getSupportChatDigestSubject } from './SupportChatDigest'
 
 describe('Email Templates Validation', () => {
   const catName = 'Mitzi'
   const reason = 'Missing medical details description'
   const adminNote = 'Adoption request rejected due to age check'
+
+  it('checks SupportChatDigest template rules', async () => {
+    const subject = getSupportChatDigestSubject(12)
+    expect(subject.length).toBeLessThanOrEqual(45)
+    expect(subject).toContain('12')
+
+    const element = <SupportChatDigest waitingCount={12} />
+    const html = await render(element)
+    const text = await render(element, { plainText: true })
+
+    expect(html).toContain('dir="rtl"')
+    expect(html).toContain('12')
+    expect(text.length).toBeGreaterThan(0)
+  })
 
   it('checks PublisherApproved template rules', async () => {
     const subject = getPublisherApprovedSubject()

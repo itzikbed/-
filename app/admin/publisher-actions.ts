@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import React from 'react'
 import { sendEmail } from '@/lib/emails/send'
 import PublisherApproved, { getSubject as getPubApprovedSub } from '@/emails/PublisherApproved'
+import PublisherRejected, { getSubject as getPubRejectedSub } from '@/emails/PublisherRejected'
 import { checkAdmin, getUserEmail } from './actions-helper'
 import { ActionResult } from './actions'
 import { strings } from '@/lib/strings'
@@ -81,6 +82,8 @@ export async function rejectPublisherAction(publisherId: string, reason: string)
       return { ok: false, formError: strings.admin.conflictError }
     }
 
+    const publisher = updated[0]
+
     const { error: logErr } = await supabase.from('moderation_log').insert({
       actor_id: adminId,
       entity_type: 'publisher',
@@ -90,6 +93,19 @@ export async function rejectPublisherAction(publisherId: string, reason: string)
     })
     if (logErr) {
       console.error('Failed to insert moderation log:', logErr)
+    }
+
+    try {
+      const email = await getUserEmail(publisherId)
+      await sendEmail({
+        to: email,
+        subject: getPubRejectedSub(),
+        react: React.createElement(PublisherRejected, { fullName: publisher.full_name, reason }),
+        template: 'publisher_rejected',
+        recipientUserId: publisherId
+      })
+    } catch (e) {
+      console.error('Failed to send publisher rejection email:', e)
     }
 
     revalidatePath('/admin')

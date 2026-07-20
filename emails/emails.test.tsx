@@ -5,6 +5,7 @@ import { strings } from '@/lib/strings'
 
 // Import templates
 import PublisherApproved, { getSubject as getPublisherApprovedSubject } from './PublisherApproved'
+import PublisherRejected, { getSubject as getPublisherRejectedSubject } from './PublisherRejected'
 import CatApproved, { getSubject as getCatApprovedSubject } from './CatApproved'
 import CatRejected, { getSubject as getCatRejectedSubject } from './CatRejected'
 import RequestReceived, { getSubject as getRequestReceivedSubject } from './RequestReceived'
@@ -42,6 +43,19 @@ describe('Email Templates Validation', () => {
     const text = await render(element, { plainText: true })
 
     expect(html).toContain('dir="rtl"')
+    expect(text.length).toBeGreaterThan(0)
+  })
+
+  it('checks PublisherRejected template rules', async () => {
+    const subject = getPublisherRejectedSubject()
+    expect(subject.length).toBeLessThanOrEqual(45)
+
+    const element = <PublisherRejected fullName="Israel" reason={reason} />
+    const html = await render(element)
+    const text = await render(element, { plainText: true })
+
+    expect(html).toContain('dir="rtl"')
+    expect(html).toContain(reason)
     expect(text.length).toBeGreaterThan(0)
   })
 

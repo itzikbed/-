@@ -35,8 +35,10 @@ the deployment accounts before launch.
    `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY`, and
    `RESEND_FROM_EMAIL` in the production secret store. Never expose the service key.
 3. In Supabase Auth, require email verification, set the server-side minimum password
-   length to at least 8, enable leaked-password protection, use strict redirect URLs,
-   and review signup/login/email rate limits.
+   length to at least 8 with the letters-and-digits requirement (GoTrue counts ASCII
+   letters only; app copy and validation mirror this), use strict redirect URLs, and
+   review signup/login/email rate limits. Leaked-password protection requires the Pro
+   plan and is a documented, accepted residual on the Free plan.
 4. Add CAPTCHA or Turnstile to signup and other abuse-prone public flows. Require MFA
    for every administrator before real adopter data is stored.
 5. Enable Vercel firewall/rate-limiting rules for authentication, Server Actions, and

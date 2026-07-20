@@ -23,7 +23,12 @@ const TERMS_VERSION = '2026-07-20'
 
 function mapAuthError(message: string): string {
   const msg = message.toLowerCase()
-  if (msg.includes('weak password') || msg.includes('should be at least') || msg.includes('password should be')) {
+  if (
+    msg.includes('weak password') ||
+    msg.includes('should be at least') ||
+    msg.includes('password should be') ||
+    msg.includes('should contain at least one')
+  ) {
     return uiStrings.auth.weakPassword
   }
   if (msg.includes('email not confirmed')) {
@@ -130,8 +135,8 @@ export async function forgotPasswordAction(formData: ForgotPasswordInput): Promi
 }
 
 export async function resetPasswordAction(password: string): Promise<ActionResult> {
-  if (!password || password.length < 8) {
-    return { ok: false, formError: 'הסיסמה חייבת להכיל לפחות 8 תווים' }
+  if (!password || password.length < 8 || !/^(?=.*[A-Za-z])(?=.*[0-9])/.test(password)) {
+    return { ok: false, formError: uiStrings.auth.weakPasswordReset }
   }
 
   const supabase = await createClient()

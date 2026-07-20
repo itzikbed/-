@@ -18,7 +18,7 @@ export const ResetPasswordForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!password || password.length < 8) {
+    if (!password || password.length < 8 || !/^(?=.*[A-Za-z])(?=.*[0-9])/.test(password)) {
       setError(strings.auth.weakPasswordReset)
       return
     }

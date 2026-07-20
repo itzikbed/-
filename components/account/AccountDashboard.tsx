@@ -92,6 +92,7 @@ export function AccountDashboard({ user, profile }: AccountDashboardProps) {
             <li>{strings.account.bullet1}</li>
             <li>{strings.account.bullet2}</li>
             <li>{strings.account.bullet3}</li>
+            <li>{strings.account.bullet4}</li>
           </ul>
 
           {error && (

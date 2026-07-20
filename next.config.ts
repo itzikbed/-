@@ -13,14 +13,18 @@ function getSupabaseUrl(): URL {
 const supabaseUrl = getSupabaseUrl()
 const supabaseOrigin = supabaseUrl.origin
 const supabaseWebsocketOrigin = supabaseOrigin.replace(/^http/, 'ws')
+// Cloudflare Turnstile requires its challenge origin in script-src and
+// frame-src (https://developers.cloudflare.com/turnstile/reference/content-security-policy/)
+const turnstileOrigin = 'https://challenges.cloudflare.com'
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''}`,
+  `script-src 'self' 'unsafe-inline' ${turnstileOrigin}${isDevelopment ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   `img-src 'self' data: blob: ${supabaseOrigin}`,
   `media-src 'self' blob: ${supabaseOrigin}`,
   `connect-src 'self' ${supabaseOrigin} ${supabaseWebsocketOrigin}${isDevelopment ? ' ws://localhost:*' : ''}`,
+  `frame-src 'self' ${turnstileOrigin}`,
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",

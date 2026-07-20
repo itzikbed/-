@@ -34,7 +34,7 @@ export async function sendEmail({
 }: SendEmailOptions) {
   const run = async () => {
     try {
-      if (!isMock && (!resendApiKey || !configuredFromAddress)) {
+      if (!isMock && !resendApiKey) {
         console.error('[EMAIL CONFIG ERROR] Production email configuration is incomplete')
         await logToDb('failed', 'Email service is not configured')
         return { data: null, error: new Error('Email service is not configured') }
@@ -66,10 +66,12 @@ export async function sendEmail({
       }
 
       const resend = new Resend(resendApiKey!)
-      const fromAddress = 'בית לחתול <no-reply@domain>'
-      
+      // RESEND_FROM_EMAIL overrides; the fallback matches the verified Resend
+      // domain so a missing env var degrades gracefully instead of failing.
+      const fromAddress = configuredFromAddress || 'בית לחתול <no-reply@homeforcats.org>'
+
       const res = await resend.emails.send({
-        from: configuredFromAddress || fromAddress,
+        from: fromAddress,
         to,
         subject,
         html,

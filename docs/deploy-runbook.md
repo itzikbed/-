@@ -103,6 +103,7 @@ npm run check:rls
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | מפתח Anon של פרויקט ה-Supabase | `eyJhbGciOiJIUzI1...` |
 | `SUPABASE_SERVICE_ROLE_KEY` | מפתח Service Role סודי (לא נחשף לדפדפן!) | `eyJhbGciOiJIUzI1...` |
 | `RESEND_API_KEY` | מפתח אימות לשליחת מיילים דרך שירות Resend | `re_123456789...` |
+| `RESEND_FROM_EMAIL` | כתובת השולח של מיילי האפליקציה (חייבת להיות בדומיין המאומת ב-Resend; בהיעדרה נעשה שימוש בברירת המחדל שבקוד) | `בית לחתול <no-reply@your-domain.co.il>` |
 | `NEXT_PUBLIC_SITE_URL` | הכתובת הציבורית של האתר שלכם | `https://your-domain.co.il` |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | כתובת אימייל ליצירת קשר ותמיכה משפטית (נגישות/פרטיות) | `contact@your-domain.co.il` |
 

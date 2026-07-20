@@ -5,7 +5,7 @@ import { SleepingPose } from '@/components/mascot/SleepingPose'
 import { SectionCurve } from '@/components/ui/SectionCurve'
 
 const linkClass =
-  'text-paper/80 hover:text-marmalade hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marmalade'
+  'inline-block py-1 text-paper/80 hover:text-marmalade hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marmalade'
 
 function FooterLink({ href, label }: { href: string; label: string }) {
   return (

@@ -62,9 +62,9 @@ export const CatGrid: React.FC<CatGridProps> = ({
         <div className="relative h-20 w-32 mb-4 overflow-visible flex items-end justify-center">
           <Mascot pose="peek" className="translate-y-2" animateOnScroll={true} />
         </div>
-        <h3 className="text-2xl font-display font-extrabold text-ink mb-2">
+        <h2 className="text-2xl font-display font-extrabold text-ink mb-2">
           {isFiltered ? strings.catalog.noCatsFiltered : strings.catalog.noCatsTrue}
-        </h3>
+        </h2>
         <p className="text-ink-soft text-base max-w-sm mb-6 leading-relaxed">
           {isFiltered 
             ? strings.catalog.noCatsFilteredDesc 

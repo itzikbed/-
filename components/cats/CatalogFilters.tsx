@@ -64,9 +64,9 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
     <div className="flex flex-col gap-8 h-full">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border pb-4">
-        <h3 className="text-lg font-display font-bold text-ink">
+        <h2 className="text-lg font-display font-bold text-ink">
           {strings.catalog.filterTitle}
-        </h3>
+        </h2>
         {hasActiveFilters && (
           <button
             onClick={handleClear}
@@ -81,9 +81,9 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
       <div className="flex-grow space-y-6 overflow-y-auto pe-1">
         {/* Sex Filter */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
+          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
             {strings.catalog.genderLabel}
-          </h4>
+          </h3>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-3 cursor-pointer select-none text-base text-ink font-sans">
               <input
@@ -123,9 +123,9 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
         {/* Region Filter */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
+          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
             {strings.catalog.regionLabel}
-          </h4>
+          </h3>
           <div className="flex flex-col gap-2">
             {REGIONS.map((r) => (
               <Checkbox
@@ -140,9 +140,9 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
         {/* Age Filter */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
+          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
             {strings.catalog.ageLabel}
-          </h4>
+          </h3>
           <div className="flex flex-col gap-2">
             {AGE_BUCKETS.map((a) => (
               <Checkbox
@@ -157,9 +157,9 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
         {/* Health Filter */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
+          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
             {strings.catalog.healthLabel}
-          </h4>
+          </h3>
           <div className="flex flex-col gap-2">
             <Checkbox
               label={strings.catalog.filterHealthFull}
@@ -181,9 +181,9 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
         {/* Good With Filter */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
+          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
             {strings.catalog.filterGoodWithLabel}
-          </h4>
+          </h3>
           <div className="flex flex-col gap-2">
             <Checkbox
               label={strings.catalog.filterGoodWithCats}

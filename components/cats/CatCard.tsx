@@ -196,9 +196,9 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
       <div className="p-5 flex flex-col flex-grow justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-display font-bold text-ink leading-tight">
+            <h2 className="text-xl font-display font-bold text-ink leading-tight">
               {cat.name}
-            </h3>
+            </h2>
           </div>
           
           {/* Meta line: Age bucket · Sex */}

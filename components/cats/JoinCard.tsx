@@ -14,9 +14,9 @@ export function JoinCard() {
       className="group rounded-card border-2 border-dashed border-pine/40 bg-surface/60 hover:bg-surface hover:border-pine/70 hover:-translate-y-0.5 transition-all duration-150 flex flex-col items-center justify-center text-center gap-3 p-6 min-h-64 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
     >
       <Mascot pose="sitting" width={64} height={77} />
-      <h3 className="text-lg font-display font-bold text-ink leading-snug">
+      <h2 className="text-lg font-display font-bold text-ink leading-snug">
         {strings.home.joinCardTitle}
-      </h3>
+      </h2>
       <p className="text-sm text-ink-soft leading-relaxed max-w-52">
         {strings.home.joinCardDesc}
       </p>

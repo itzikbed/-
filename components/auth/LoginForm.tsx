@@ -86,6 +86,7 @@ export default function LoginForm() {
               type="email"
               label={strings.auth.emailLabel}
               placeholder={strings.auth.emailPlaceholder}
+              autoComplete="email"
               error={errors.email?.message}
               disabled={loading}
               {...register('email')}

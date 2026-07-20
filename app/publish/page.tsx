@@ -50,6 +50,32 @@ export default async function PublishPage() {
     redirect('/publish/my-cats')
   }
 
+  // Admins moderate the queue themselves — grant publisher access on entry
+  // instead of routing them through their own approval. RLS + the profile
+  // guard trigger permit this transition only for admins.
+  if (profile.role === 'admin' && (status === 'none' || status === 'pending')) {
+    const { data: granted } = await supabase
+      .from('profiles')
+      .update({ publisher_status: 'approved' })
+      .eq('id', user.id)
+      .eq('role', 'admin')
+      .in('publisher_status', ['none', 'pending'])
+      .select('id')
+
+    if (granted && granted.length > 0) {
+      const { error: logErr } = await supabase.from('moderation_log').insert({
+        actor_id: user.id,
+        entity_type: 'publisher',
+        entity_id: user.id,
+        action: 'approve'
+      })
+      if (logErr) {
+        console.error('Failed to insert moderation log:', logErr)
+      }
+      redirect('/publish/my-cats')
+    }
+  }
+
   let rejectionReason = null
   if (status === 'blocked') {
     const { data: latestLog } = await supabase

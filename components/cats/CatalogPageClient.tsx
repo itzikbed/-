@@ -4,6 +4,7 @@ import React, { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Filters, serializeFilters } from '@/lib/utils/filters'
 import { CatalogFilters } from './CatalogFilters'
+import { CatalogFilterDrawer } from './CatalogFilterDrawer'
 import { ActiveFilterChips } from './ActiveFilterChips'
 import { CatalogPagination } from './CatalogPagination'
 import { CatGrid } from './CatGrid'
@@ -130,7 +131,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
     filters.sort !== 'newest'
 
   return (
-    <div className="flex flex-col flex-grow select-none">
+    <div className="flex flex-col flex-grow">
       <div className="app-container py-8 flex flex-col gap-6">
         
         {/* Title and Mobile Filter Button */}
@@ -146,7 +147,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
           
           <button
             onClick={() => setMobileOpen(true)}
-            className="md:hidden inline-flex items-center justify-center gap-2 font-sans font-bold rounded-btn border border-border bg-surface text-ink px-4 py-2 text-sm shadow-resting cursor-pointer active:scale-98"
+            className="md:hidden inline-flex items-center justify-center gap-2 font-sans font-bold rounded-btn border border-border bg-surface text-ink min-h-11 px-4 py-2 text-sm shadow-resting cursor-pointer active:scale-98"
           >
             <Filter className="w-4 h-4" />
             <span>{strings.catalog.openFiltersBtn}</span>
@@ -221,27 +222,13 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
       </div>
 
       {/* Mobile Drawer (Slide up / Bottom panel overlay) */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end bg-ink/50 backdrop-blur-xs">
-          {/* Backdrop Click */}
-          <div className="flex-grow" onClick={() => setMobileOpen(false)} />
-          
-          {/* Drawer Content */}
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={strings.catalog.filterTitle}
-            className="bg-surface rounded-t-card border-t border-border p-6 shadow-hover max-h-[85vh] flex flex-col animate-slide-up"
-          >
-            <CatalogFilters
-              filters={filters}
-              totalCount={totalCount}
-              onFiltersChange={handleFiltersChange}
-              onCloseMobile={() => setMobileOpen(false)}
-            />
-          </div>
-        </div>
-      )}
+      <CatalogFilterDrawer
+        isOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        filters={filters}
+        totalCount={totalCount}
+        onFiltersChange={handleFiltersChange}
+      />
     </div>
   )
 }

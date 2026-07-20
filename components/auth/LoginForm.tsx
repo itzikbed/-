@@ -11,15 +11,23 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { loginAction } from '@/app/(auth)/actions'
 import { loginSchema, LoginInput } from '@/lib/schemas/auth'
 import { strings } from '@/lib/strings'
+import { TurnstileWidget } from './TurnstileWidget'
+import {
+  getCaptchaTokenForSubmission,
+  getConfiguredTurnstileSiteKey,
+} from './turnstile-config'
 
 import { getSafeRedirect } from '@/lib/utils/safe-redirect'
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string>()
+  const [captchaResetKey, setCaptchaResetKey] = useState(0)
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = getSafeRedirect(searchParams.get('redirect'))
   const callbackFailed = searchParams.get('error') === 'auth_callback_failed'
+  const turnstileSiteKey = getConfiguredTurnstileSiteKey()
 
   const {
     register,
@@ -33,8 +41,14 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginInput) => {
     setLoading(true)
     try {
-      const res = await loginAction(data)
+      const verifiedCaptchaToken = getCaptchaTokenForSubmission(turnstileSiteKey, captchaToken)
+      const res = await loginAction({
+        ...data,
+        ...(verifiedCaptchaToken ? { captchaToken: verifiedCaptchaToken } : {}),
+      })
       if (!res.ok) {
+        setCaptchaToken(undefined)
+        setCaptchaResetKey((key) => key + 1)
         if (res.formError) {
           setError('root.serverError', { message: res.formError })
         } else if (res.fieldErrors) {
@@ -47,6 +61,8 @@ export default function LoginForm() {
         router.refresh()
       }
     } catch {
+      setCaptchaToken(undefined)
+      setCaptchaResetKey((key) => key + 1)
       setError('root.serverError', { message: strings.common.errorOccurred })
     } finally {
       setLoading(false)
@@ -110,8 +126,25 @@ export default function LoginForm() {
                 {strings.auth.forgotPasswordLink}
               </Link>
             </div>
+
+            {turnstileSiteKey && (
+              <TurnstileWidget
+                key={captchaResetKey}
+                siteKey={turnstileSiteKey}
+                action="login"
+                label={strings.auth.captchaLabel}
+                errorMessage={strings.auth.captchaError}
+                onTokenChange={setCaptchaToken}
+              />
+            )}
  
-            <Button type="submit" variant="primary" loading={loading} className="w-full mt-2">
+            <Button
+              type="submit"
+              variant="primary"
+              loading={loading}
+              disabled={Boolean(turnstileSiteKey) && !captchaToken}
+              className="w-full mt-2"
+            >
               {strings.auth.loginSubmitBtn}
             </Button>
           </form>

@@ -7,12 +7,20 @@ import { Button } from '@/components/ui/Button'
 import { Mascot } from '@/components/mascot/Mascot'
 import { forgotPasswordAction } from '@/app/(auth)/actions'
 import { strings } from '@/lib/strings'
+import { TurnstileWidget } from './TurnstileWidget'
+import {
+  getCaptchaTokenForSubmission,
+  getConfiguredTurnstileSiteKey,
+} from './turnstile-config'
 
 export const ForgotPasswordForm: React.FC = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string>()
+  const [captchaResetKey, setCaptchaResetKey] = useState(0)
+  const turnstileSiteKey = getConfiguredTurnstileSiteKey()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,13 +32,21 @@ export const ForgotPasswordForm: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await forgotPasswordAction(email)
+      const verifiedCaptchaToken = getCaptchaTokenForSubmission(turnstileSiteKey, captchaToken)
+      const res = await forgotPasswordAction({
+        email,
+        ...(verifiedCaptchaToken ? { captchaToken: verifiedCaptchaToken } : {}),
+      })
       if (res.ok) {
         setSuccess(true)
       } else {
+        setCaptchaToken(undefined)
+        setCaptchaResetKey((key) => key + 1)
         setError(res.formError || strings.auth.forgotPasswordError)
       }
     } catch {
+      setCaptchaToken(undefined)
+      setCaptchaResetKey((key) => key + 1)
       setError(strings.common.errorOccurred)
     } finally {
       setLoading(false)
@@ -86,7 +102,24 @@ export const ForgotPasswordForm: React.FC = () => {
                 required
               />
 
-              <Button type="submit" variant="primary" loading={loading} className="w-full mt-2">
+              {turnstileSiteKey && (
+                <TurnstileWidget
+                  key={captchaResetKey}
+                  siteKey={turnstileSiteKey}
+                  action="password_reset"
+                  label={strings.auth.captchaLabel}
+                  errorMessage={strings.auth.captchaError}
+                  onTokenChange={setCaptchaToken}
+                />
+              )}
+
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+                disabled={Boolean(turnstileSiteKey) && !captchaToken}
+                className="w-full mt-2"
+              >
                 {strings.auth.sendResetLink}
               </Button>
 

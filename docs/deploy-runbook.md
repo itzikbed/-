@@ -106,6 +106,8 @@ npm run check:rls
 | `RESEND_FROM_EMAIL` | כתובת השולח של מיילי האפליקציה (חייבת להיות בדומיין המאומת ב-Resend; בהיעדרה נעשה שימוש בברירת המחדל שבקוד) | `בית לחתול <no-reply@your-domain.co.il>` |
 | `NEXT_PUBLIC_SITE_URL` | הכתובת הציבורית של האתר שלכם | `https://your-domain.co.il` |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | כתובת אימייל ליצירת קשר ותמיכה משפטית (נגישות/פרטיות) | `contact@your-domain.co.il` |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | מפתח האתר הציבורי של Cloudflare Turnstile. ללא ערך, הווידג'ט אינו נטען וזרימת האימות נשארת ללא CAPTCHA | `0x4AAAA...` |
+| `TURNSTILE_SECRET_KEY` | מפתח Turnstile הסודי — שורת תיעוד בלבד; את הערך האמיתי מזינים רק ב-Supabase Dashboard תחת Auth CAPTCHA, ולא במשתני סביבת האחסון או בקוד | `מוגדר ב-Supabase בלבד` |
 
 ### פריסה רציפה באמצעות GitHub
 1. חברו את מאגר הקוד (Repository) ב-GitHub ל-Netlify/Vercel.

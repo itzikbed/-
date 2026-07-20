@@ -1,7 +1,14 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { loginSchema, signupSchema, LoginInput, SignupInput } from '@/lib/schemas/auth'
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  signupSchema,
+  ForgotPasswordInput,
+  LoginInput,
+  SignupInput,
+} from '@/lib/schemas/auth'
 import { getTrustedSiteUrl } from '@/lib/utils/site-url'
 import { revalidatePath } from 'next/cache'
 import uiStrings from '@/content/he/ui.json'
@@ -9,6 +16,10 @@ import uiStrings from '@/content/he/ui.json'
 export type ActionResult<T = unknown> =
   | { ok: true; data: T }
   | { ok: false; formError?: string; fieldErrors?: Record<string, string[]> }
+
+// Version of the terms+privacy pair the signup consent covers — bump this on
+// EVERY change to either document (privacy last updated 2026-07-20).
+const TERMS_VERSION = '2026-07-20'
 
 function mapAuthError(message: string): string {
   const msg = message.toLowerCase()
@@ -28,12 +39,13 @@ export async function loginAction(formData: LoginInput): Promise<ActionResult> {
     return { ok: false, fieldErrors }
   }
 
-  const { email, password } = result.data
+  const { email, password, captchaToken } = result.data
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
+    ...(captchaToken ? { options: { captchaToken } } : {}),
   })
 
   if (error) {
@@ -51,7 +63,7 @@ export async function signupAction(formData: SignupInput): Promise<ActionResult>
     return { ok: false, fieldErrors }
   }
 
-  const { email, password, fullName, phone } = result.data
+  const { email, password, fullName, phone, captchaToken } = result.data
   const supabase = await createClient()
 
   let emailRedirectTo: string
@@ -67,9 +79,12 @@ export async function signupAction(formData: SignupInput): Promise<ActionResult>
     password,
     options: {
       emailRedirectTo,
+      ...(captchaToken ? { captchaToken } : {}),
       data: {
         full_name: fullName,
         phone,
+        terms_version: TERMS_VERSION,
+        consented_at: new Date().toISOString(),
       },
     },
   })
@@ -85,11 +100,13 @@ export async function signupAction(formData: SignupInput): Promise<ActionResult>
   return { ok: true, data: { success: true, needsConfirmation: !data.session } }
 }
 
-export async function forgotPasswordAction(email: string): Promise<ActionResult> {
-  if (!email || !email.includes('@')) {
-    return { ok: false, formError: 'אנא הזן כתובת אימייל תקינה' }
+export async function forgotPasswordAction(formData: ForgotPasswordInput): Promise<ActionResult> {
+  const result = forgotPasswordSchema.safeParse(formData)
+  if (!result.success) {
+    return { ok: false, formError: uiStrings.auth.invalidEmailInput }
   }
 
+  const { email, captchaToken } = result.data
   const supabase = await createClient()
   
   let redirectUrl: string
@@ -101,11 +118,12 @@ export async function forgotPasswordAction(email: string): Promise<ActionResult>
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: redirectUrl
+    redirectTo: redirectUrl,
+    ...(captchaToken ? { captchaToken } : {}),
   })
 
   if (error) {
-    return { ok: false, formError: 'אירעה שגיאה בשליחת קישור השחזור. אנא נסו שנית.' }
+    return { ok: false, formError: uiStrings.auth.forgotPasswordError }
   }
 
   return { ok: true, data: { success: true } }

@@ -12,13 +12,21 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { signupAction } from '@/app/(auth)/actions'
 import { signupSchema, SignupInput } from '@/lib/schemas/auth'
 import { strings } from '@/lib/strings'
+import { TurnstileWidget } from './TurnstileWidget'
+import {
+  getCaptchaTokenForSubmission,
+  getConfiguredTurnstileSiteKey,
+} from './turnstile-config'
 
 export default function SignupForm() {
   const [success, setSuccess] = useState(false)
   const [needsConfirmation, setNeedsConfirmation] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string>()
+  const [captchaResetKey, setCaptchaResetKey] = useState(0)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const turnstileSiteKey = getConfiguredTurnstileSiteKey()
 
   const {
     register,
@@ -33,8 +41,14 @@ export default function SignupForm() {
   const onSubmit = async (data: SignupInput) => {
     setLoading(true)
     try {
-      const res = await signupAction(data)
+      const verifiedCaptchaToken = getCaptchaTokenForSubmission(turnstileSiteKey, captchaToken)
+      const res = await signupAction({
+        ...data,
+        ...(verifiedCaptchaToken ? { captchaToken: verifiedCaptchaToken } : {}),
+      })
       if (!res.ok) {
+        setCaptchaToken(undefined)
+        setCaptchaResetKey((key) => key + 1)
         if (res.formError) {
           setError('root.serverError', { message: res.formError })
         } else if (res.fieldErrors) {
@@ -57,6 +71,8 @@ export default function SignupForm() {
         }
       }
     } catch {
+      setCaptchaToken(undefined)
+      setCaptchaResetKey((key) => key + 1)
       setError('root.serverError', { message: strings.common.errorOccurred })
     } finally {
       setLoading(false)
@@ -136,7 +152,7 @@ export default function SignupForm() {
               <Checkbox
                 label={
                   <span className="text-sm">
-                    {strings.auth.consentPrefix}
+                    {strings.auth.signupConsentPrefix}
                     <Link href="/terms" target="_blank" className="text-pine font-semibold hover:underline">
                       {strings.auth.consentTerms}
                     </Link>
@@ -155,7 +171,24 @@ export default function SignupForm() {
                 {strings.auth.privacyNotice}
               </p>
 
-              <Button type="submit" variant="primary" loading={loading} className="w-full mt-2">
+              {turnstileSiteKey && (
+                <TurnstileWidget
+                  key={captchaResetKey}
+                  siteKey={turnstileSiteKey}
+                  action="signup"
+                  label={strings.auth.captchaLabel}
+                  errorMessage={strings.auth.captchaError}
+                  onTokenChange={setCaptchaToken}
+                />
+              )}
+
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+                disabled={Boolean(turnstileSiteKey) && !captchaToken}
+                className="w-full mt-2"
+              >
                 {strings.auth.signupSubmitBtn}
               </Button>
             </form>

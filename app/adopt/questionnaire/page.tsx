@@ -2,6 +2,7 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { QuestionnaireInput } from '@/lib/schemas/questionnaire'
+import { isUuid } from '@/lib/security/media'
 import QuestionnaireWizard from './QuestionnaireWizard'
 
 export const metadata = {
@@ -11,13 +12,20 @@ export const metadata = {
   }
 }
 
-export default async function QuestionnairePage() {
+export default async function QuestionnairePage({
+  searchParams
+}: {
+  searchParams: Promise<{ cat?: string }>
+}) {
   const supabase = await createClient()
 
   // 1. Recheck authentication on server
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
-    redirect('/login')
+    // Preserve the questionnaire (and its cat) as the post-login destination
+    const { cat } = await searchParams
+    const target = `/adopt/questionnaire${cat && isUuid(cat) ? `?cat=${cat}` : ''}`
+    redirect(`/login?redirect=${encodeURIComponent(target)}`)
   }
 
   // 2. Fetch existing adopter profile

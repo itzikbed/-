@@ -138,6 +138,20 @@ async function notifyAdminsIfFirstUnread(userId: string, conversationId: string,
     .gt('created_at', oneHourAgo)
   if (recentEmails && recentEmails > 0) return
 
+  // Global flood ceiling: at most 10 admin notifications per hour across ALL
+  // conversations, so a burst of fresh accounts cannot flood the admin inbox.
+  // The check-then-send window is not atomic; the ceiling bounds the damage.
+  const { count: totalRecent } = await admin
+    .from('email_log')
+    .select('id', { count: 'exact', head: true })
+    .eq('template', 'support_chat_new')
+    .eq('status', 'sent')
+    .gt('created_at', oneHourAgo)
+  if (totalRecent && totalRecent >= 10) {
+    console.error('[SUPPORT CHAT EMAIL] global hourly ceiling reached, skipping notification')
+    return
+  }
+
   const { data: adminProfiles } = await admin.from('profiles').select('id').eq('role', 'admin')
   if (!adminProfiles || adminProfiles.length === 0) return
 

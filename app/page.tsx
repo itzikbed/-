@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Mascot } from '@/components/mascot/Mascot'
 import { CatGrid } from '@/components/cats/CatGrid'
 import { HeroFilm } from '@/components/ui/HeroFilm'
+import { HeroHeadline } from '@/components/ui/HeroHeadline'
 import { SectionCurve } from '@/components/ui/SectionCurve'
 import { Whisker } from '@/components/ui/Whisker'
 import { strings } from '@/lib/strings'
@@ -42,9 +43,7 @@ export default async function HomePage() {
         {/* Hero Content Container */}
         <div className="app-container relative z-10 w-full flex flex-col items-center text-center gap-12 mt-8">
           <div className="space-y-4 max-w-3xl animate-fade-rise">
-            <h1 className="text-4xl md:text-7xl font-display font-extrabold text-surface tracking-tight leading-none drop-shadow-md">
-              {strings.common.siteSubtitle}.
-            </h1>
+            <HeroHeadline text={`${strings.common.siteSubtitle}.`} />
             <p className="text-lg md:text-xl font-sans text-paper/90 max-w-xl mx-auto drop-shadow-sm leading-relaxed">
               {strings.home.heroDesc}
             </p>

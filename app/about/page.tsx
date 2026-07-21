@@ -60,7 +60,7 @@ export default function AboutPage() {
               return (
                 <div
                   key={fact.title}
-                  className="bg-surface border border-border rounded-card p-6 shadow-resting space-y-3 text-start"
+                  className="bg-surface border border-border rounded-card p-6 shadow-resting space-y-3 text-start reveal-on-scroll"
                 >
                   <div className="flex items-center gap-3">
                     <span className="p-2.5 rounded-full bg-pine-soft text-pine">

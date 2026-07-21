@@ -93,9 +93,15 @@ export const CatGrid: React.FC<CatGridProps> = ({
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
       {cats.map((cat) => (
-        <CatCard key={cat.id} cat={cat} />
+        <div key={cat.id} className="reveal-on-scroll grid">
+          <CatCard cat={cat} />
+        </div>
       ))}
-      {showJoinCard && cats.length < SPARSE_THRESHOLD && <JoinCard />}
+      {showJoinCard && cats.length < SPARSE_THRESHOLD && (
+        <div className="reveal-on-scroll grid">
+          <JoinCard />
+        </div>
+      )}
     </div>
   )
 }

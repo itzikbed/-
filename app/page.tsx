@@ -105,9 +105,11 @@ export default async function HomePage() {
       <SectionCurve className="text-paper relative z-10 -mt-6 md:-mt-9" />
 
       {/* Latest Cats Section */}
-      <section className="pb-16 pt-8 md:pb-24 md:pt-10 bg-paper sunbeam-bg relative overflow-hidden">
+      {/* overflow-clip (not hidden): a hidden box is a scroll container and would
+          hijack the view() timeline of the reveal-on-scroll children */}
+      <section className="pb-16 pt-8 md:pb-24 md:pt-10 bg-paper sunbeam-bg relative overflow-clip">
         <div className="app-container text-start relative z-10">
-          <div className="relative flex flex-col gap-2 mb-10 max-w-xl">
+          <div className="relative flex flex-col gap-2 mb-10 max-w-xl reveal-on-scroll">
             {/* Alive touch: organic background blob shape behind heading */}
             <div className="absolute -z-10 w-36 h-36 bg-pine-soft rounded-full opacity-40 blur-xl pointer-events-none -translate-x-10 -translate-y-6" />
             
@@ -136,9 +138,9 @@ export default async function HomePage() {
 
       {/* How it works Section — pine-soft band (DESIGN §5a rhythm) */}
       <SectionCurve className="text-pine-soft" />
-      <section className="pb-16 pt-10 md:pb-24 md:pt-12 bg-pine-soft relative overflow-hidden">
+      <section className="pb-16 pt-10 md:pb-24 md:pt-12 bg-pine-soft relative overflow-clip">
         <div className="app-container relative z-10">
-          <div className="relative flex flex-col items-center text-center gap-2 mb-16 max-w-xl mx-auto">
+          <div className="relative flex flex-col items-center text-center gap-2 mb-16 max-w-xl mx-auto reveal-on-scroll">
             {/* Alive touch: organic background blob shape behind section heading */}
             <div className="absolute -z-10 w-44 h-44 bg-marmalade-sf rounded-full opacity-40 blur-xl pointer-events-none translate-x-12 -translate-y-6" />
             
@@ -157,7 +159,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
             
             {/* Adopter track */}
-            <div className="bg-surface rounded-card border border-border p-8 space-y-8 shadow-resting">
+            <div className="bg-surface rounded-card border border-border p-8 space-y-8 shadow-resting reveal-on-scroll">
               <div className="flex items-center gap-3 border-b border-border/60 pb-4">
                 <div className="p-2.5 rounded-full bg-marmalade-sf text-marmalade-dp">
                   <Heart className="w-6 h-6" />
@@ -183,7 +185,7 @@ export default async function HomePage() {
             </div>
 
             {/* Publisher track */}
-            <div className="bg-surface rounded-card border border-border p-8 space-y-8 shadow-resting">
+            <div className="bg-surface rounded-card border border-border p-8 space-y-8 shadow-resting reveal-on-scroll">
               <div className="flex items-center gap-3 border-b border-border/60 pb-4">
                 <div className="p-2.5 rounded-full bg-pine-soft text-pine">
                   <Sparkles className="w-6 h-6" />

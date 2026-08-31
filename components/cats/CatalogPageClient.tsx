@@ -155,7 +155,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
         </div>
 
         {/* Search and Sort Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center bg-surface border border-border rounded-card p-4 shadow-resting">
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center rounded-card border border-ink/10 bg-surface/40 backdrop-blur-md backdrop-saturate-125 p-4 shadow-resting">
           {/* Search Input */}
           <div className="relative flex-grow max-w-md">
             <input
@@ -190,7 +190,11 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
         {/* Main Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
           {/* Desktop Sidebar Filters */}
-          <aside className="hidden md:block md:col-span-1 bg-surface border border-border rounded-card p-6 shadow-resting sticky top-20">
+          {/* The filter column holds its own place while the results scroll
+              past it. It carries no panel of its own — each group is its own
+              floating pane — and it scrolls internally only if it ever runs
+              taller than the screen. */}
+          <aside className="hidden md:block md:col-span-1 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pe-1">
             <CatalogFilters 
               filters={filters} 
               totalCount={totalCount} 
@@ -209,7 +213,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
               onClearAll={handleClearAll}
             />
 
-            <CatGrid cats={cats} isFiltered={isFiltered} loading={isPending} showJoinCard={!isFiltered} />
+            <CatGrid cats={cats} isFiltered={isFiltered} loading={isPending} />
 
             {/* Pagination Footer */}
             <CatalogPagination

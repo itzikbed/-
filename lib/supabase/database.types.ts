@@ -337,6 +337,92 @@ export type Database = {
           },
         ]
       }
+      email_outbox: {
+        Row: {
+          attempts: number
+          cat_id: string | null
+          conversation_id: string | null
+          created_at: string
+          dedupe_key: string
+          id: string
+          last_error: string | null
+          max_attempts: number
+          next_attempt_at: string
+          payload: Json
+          provider_message_id: string | null
+          recipient_user_id: string | null
+          request_id: string | null
+          status: string
+          template: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          cat_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          dedupe_key: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string
+          payload?: Json
+          provider_message_id?: string | null
+          recipient_user_id?: string | null
+          request_id?: string | null
+          status?: string
+          template: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          cat_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          dedupe_key?: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string
+          payload?: Json
+          provider_message_id?: string | null
+          recipient_user_id?: string | null
+          request_id?: string | null
+          status?: string
+          template?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_outbox_cat_id_fkey"
+            columns: ["cat_id"]
+            isOneToOne: false
+            referencedRelation: "cats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_outbox_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "support_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_outbox_recipient_user_id_fkey"
+            columns: ["recipient_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_outbox_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "adoption_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       moderation_log: {
         Row: {
           action: string
@@ -499,6 +585,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_email_outbox: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          cat_id: string | null
+          conversation_id: string | null
+          created_at: string
+          dedupe_key: string
+          id: string
+          last_error: string | null
+          max_attempts: number
+          next_attempt_at: string
+          payload: Json
+          provider_message_id: string | null
+          recipient_user_id: string | null
+          request_id: string | null
+          status: string
+          template: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "email_outbox"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_handoff_contact: {
         Args: { request_id: string }
         Returns: {
@@ -507,6 +620,24 @@ export type Database = {
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
+      settle_email_outbox: {
+        Args: {
+          p_accepted: boolean
+          p_error?: string
+          p_id: string
+          p_provider_message_id?: string
+        }
+        Returns: undefined
+      }
+      transition_cat_status: {
+        Args: {
+          p_cat_id: string
+          p_reason?: string
+          p_sibling_note?: string
+          p_to_status: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

@@ -39,7 +39,7 @@ export default async function MyCatsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="flex-grow bg-paper py-10 select-none">
+    <div className="flex-grow py-10 select-none">
       <div className="app-container max-w-4xl space-y-6">
         
         {/* Header / Nav */}

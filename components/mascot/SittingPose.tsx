@@ -37,7 +37,7 @@ export const SittingPose: React.FC<PoseProps> = ({ width, height, className }) =
         cx="50"
         cy="35"
         r="22"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />
@@ -66,7 +66,7 @@ export const SittingPose: React.FC<PoseProps> = ({ width, height, className }) =
         width="14"
         height="20"
         rx="7"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />
@@ -76,7 +76,7 @@ export const SittingPose: React.FC<PoseProps> = ({ width, height, className }) =
         width="14"
         height="20"
         rx="7"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />

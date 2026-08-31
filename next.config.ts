@@ -56,14 +56,15 @@ const nextConfig: NextConfig = {
         pathname: '/api/media'
       }
     ],
-    remotePatterns: [
-      {
-        protocol: supabaseUrl.protocol.replace(':', '') as 'http' | 'https',
-        hostname: supabaseUrl.hostname,
-        port: supabaseUrl.port,
-        pathname: '/storage/v1/object/sign/**',
-      },
-    ],
+    // The optimizer accepts nothing but /api/media. That route serves only paths
+    // that a cat_photos/cats row already references, and those rows are written
+    // only after the stored object passes the mimetype and magic-byte checks in
+    // lib/security/verify-stored-media.ts. Signed storage URLs are deliberately
+    // NOT allowed here: a publisher can put arbitrary bytes in their own storage
+    // folder before that validation runs, and a remote pattern would hand those
+    // bytes straight to the optimizer.
+    formats: ['image/webp'],
+    dangerouslyAllowSVG: false,
   },
   async headers() {
     return [

@@ -73,7 +73,7 @@ describe('Email Templates Validation', () => {
     const text = await render(element, { plainText: true })
 
     expect(html).toContain('dir="rtl"')
-    expect(html).toContain(strings.common.logoLabel.substring(2)) // Assert site name exists in rendered HTML without hardcoded Hebrew
+    expect(html).toContain(strings.common.siteName) // Assert site name exists in rendered HTML without hardcoded Hebrew
     expect(text.length).toBeGreaterThan(0)
   })
 

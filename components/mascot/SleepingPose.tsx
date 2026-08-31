@@ -18,7 +18,7 @@ export const SleepingPose: React.FC<PoseProps> = ({ width, height, className }) 
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Curled Body (with Marmalade spot) */}
-      <circle cx="60" cy="45" r="30" fill="var(--surface)" stroke={STROKE_COLOR} strokeWidth={STROKE_WIDTH} />
+      <circle cx="60" cy="45" r="30" fill="var(--surface-solid)" stroke={STROKE_COLOR} strokeWidth={STROKE_WIDTH} />
       <path d="M50 20C65 15 80 25 80 40C80 55 60 75 40 65Z" fill={MARMALADE_COLOR} opacity="0.8" />
 
       {/* Sleeping Head */}
@@ -26,7 +26,7 @@ export const SleepingPose: React.FC<PoseProps> = ({ width, height, className }) 
         cx="40"
         cy="48"
         r="18"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />

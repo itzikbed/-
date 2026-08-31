@@ -119,7 +119,7 @@ export default async function AdminPage({
   }
 
   return (
-    <div className="flex-grow bg-paper py-10">
+    <div className="flex-grow py-10">
       <div className="app-container max-w-6xl space-y-8">
         
         {/* Header */}

@@ -9,8 +9,9 @@
     "lint": "eslint",
     "check:conventions": "node scripts/checks/check-conventions.mjs",
     "check:rls": "node scripts/rls-smoke.mjs",
+    "check:security": "node scripts/check-security-deps.mjs",
     "test": "vitest run",
-    "gate": "npm run check:conventions && npx tsc --noEmit && npm run lint && npm run test"
+    "gate": "npm run check:conventions && npm run check:security && npx tsc --noEmit && npm run lint && npm run test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -19,7 +20,7 @@
     "@supabase/supabase-js": "^2.110.2",
     "heic2any": "^0.0.4",
     "lucide-react": "^1.24.0",
-    "next": "16.2.10",
+    "next": "16.3.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-easy-crop": "^6.2.2",
@@ -34,7 +35,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.10",
+    "eslint-config-next": "16.3.3",
     "react-email": "^6.8.1",
     "sharp": "^0.35.3",
     "tailwindcss": "^4",
@@ -42,6 +43,6 @@
     "vitest": "^3.2.7"
   },
   "overrides": {
-    "postcss": "8.5.19"
+    "postcss": "8.5.26"
   }
 }

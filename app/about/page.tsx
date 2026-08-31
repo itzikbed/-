@@ -27,7 +27,7 @@ export default function AboutPage() {
   return (
     <div className="flex-grow">
       {/* Intro */}
-      <section className="bg-paper pt-12 pb-10">
+      <section className="pt-12 pb-10">
         <div className="app-container max-w-3xl flex flex-col items-center text-center gap-4">
           <Mascot pose="sitting" animateOnScroll={true} />
           <h1 className="text-4xl md:text-5xl font-display font-extrabold text-ink">
@@ -44,7 +44,7 @@ export default function AboutPage() {
 
       {/* Facts band */}
       <SectionCurve className="text-pine-soft" />
-      <section className="bg-pine-soft pt-8 pb-14">
+      <section className="section-curve-clip bg-pine-soft pt-8 pb-14">
         <div className="app-container max-w-4xl">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
@@ -79,8 +79,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission + closing */}
-      <SectionCurve className="text-paper" />
-      <section className="bg-paper pt-8 pb-16">
+      <section className="pt-8 pb-16">
         <div className="app-container max-w-3xl text-center">
           <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
             {content.missionTitle}

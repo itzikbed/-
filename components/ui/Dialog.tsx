@@ -97,7 +97,7 @@ export const Dialog: React.FC<DialogProps> = ({ isOpen, onClose, title, children
       
       <div 
         ref={containerRef}
-        className="bg-surface rounded-card p-6 shadow-hover w-full max-w-lg relative border border-border animate-fade-rise focus-visible:outline-none"
+        className="bg-surface-solid rounded-card p-6 shadow-hover w-full max-w-lg relative border border-border animate-fade-rise focus-visible:outline-none"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

@@ -46,3 +46,9 @@ next-env.d.ts
 
 # Internal legal/security documents — never commit (public repo)
 private-docs/
+
+# Working notes and agent instructions — never commit (public repo)
+.claude/
+
+# A separate repository that happens to live inside this folder
+Cats-Adoption/

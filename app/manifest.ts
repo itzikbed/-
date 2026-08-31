@@ -4,7 +4,7 @@ import { strings } from '@/lib/strings'
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: strings.common.siteName,
-    short_name: 'מיאו-אימוץ',
+    short_name: strings.common.siteName,
     description: strings.common.metaDesc,
     start_url: '/',
     display: 'standalone',

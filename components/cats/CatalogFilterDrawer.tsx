@@ -104,7 +104,7 @@ export function CatalogFilterDrawer({
         aria-modal="true"
         aria-label={strings.catalog.filterTitle}
         tabIndex={-1}
-        className="bg-surface rounded-t-card border-t border-border p-6 shadow-hover max-h-[85vh] flex flex-col animate-slide-up focus-visible:outline-none"
+        className="bg-surface-solid rounded-card border-t border-border p-6 shadow-hover max-h-[85vh] flex flex-col animate-slide-up focus-visible:outline-none"
       >
         <div className="flex justify-end">
           <button

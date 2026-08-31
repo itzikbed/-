@@ -104,7 +104,7 @@ export function MobileDrawer({ isOpen, onClose, user, profile }: MobileDrawerPro
         aria-modal="true"
         aria-label={strings.common.openMenu}
         tabIndex={-1}
-        className="relative w-72 max-w-full bg-surface h-full shadow-hover border-s border-border flex flex-col justify-between p-6 animate-fade-slide-rtl focus-visible:outline-none"
+        className="relative w-72 max-w-full bg-surface-solid h-full shadow-hover border-s border-border flex flex-col justify-between p-6 animate-fade-slide-rtl focus-visible:outline-none"
       >
         <div className="space-y-6">
           {/* Header inside drawer */}

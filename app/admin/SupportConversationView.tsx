@@ -178,7 +178,8 @@ export default function SupportConversationView({
 
       <SupportMessages
         messages={messages}
-        viewerId={adminId}
+        participantUserId={conversation.user_id}
+        participantLabel={conversation.user?.full_name || strings.supportChat.participantSenderName}
         emptyTitle={strings.supportChat.adminNoMessages}
       />
 

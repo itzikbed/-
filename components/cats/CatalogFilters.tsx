@@ -4,7 +4,7 @@ import React from 'react'
 import { Filters } from '@/lib/utils/filters'
 import { REGIONS, AGE_BUCKETS } from '@/lib/constants'
 import { strings } from '@/lib/strings'
-import { Checkbox } from '@/components/ui/Checkbox'
+import { FilterChip } from './FilterChip'
 import { SpecialFilterToggle } from './SpecialFilterToggle'
 
 interface CatalogFiltersProps {
@@ -14,28 +14,25 @@ interface CatalogFiltersProps {
   onCloseMobile?: () => void
 }
 
+type ArrayKey = 'region' | 'age' | 'health' | 'good_with'
+
+// Each group is its own panel rather than one long block, and its options sit
+// in rows rather than a column. Together that keeps the whole filter on screen
+// while only the results scroll.
+const PANEL = 'filter-panel rounded-card p-4'
+
 export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
   filters,
   totalCount,
   onFiltersChange,
   onCloseMobile
 }) => {
+  const setFilter = (key: keyof Filters, value: unknown) =>
+    onFiltersChange({ ...filters, [key]: value, page: 1 })
 
-  const handleSingleChange = (key: keyof Filters, value: unknown) => {
-    const newFilters = { ...filters, [key]: value, page: 1 }
-    onFiltersChange(newFilters)
-  }
-
-  const handleArrayChange = (
-    key: 'region' | 'age' | 'health' | 'good_with',
-    item: string,
-    checked: boolean
-  ) => {
-    const currentArray = filters[key] as string[]
-    const newArray = checked
-      ? [...currentArray, item]
-      : currentArray.filter((x) => x !== item)
-    handleSingleChange(key, newArray)
+  const toggleInArray = (key: ArrayKey, item: string, checked: boolean) => {
+    const current = filters[key] as string[]
+    setFilter(key, checked ? [...current, item] : current.filter((x) => x !== item))
   }
 
   const hasActiveFilters =
@@ -46,182 +43,101 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
     filters.special ||
     filters.sex !== 'all'
 
-  const handleClear = () => {
+  const handleClear = () =>
     onFiltersChange({
-      region: [],
-      age: [],
-      health: [],
-      good_with: [],
-      special: false,
-      sex: 'all',
-      page: 1,
-      search: '',
-      sort: 'newest'
+      region: [], age: [], health: [], good_with: [],
+      special: false, sex: 'all', page: 1, search: '', sort: 'newest'
     })
-  }
+
+  const groups: { title: string; key: ArrayKey; options: { id: string; label: string }[] }[] = [
+    { title: strings.catalog.regionLabel, key: 'region', options: REGIONS.map((r) => ({ id: r.id, label: r.label })) },
+    { title: strings.catalog.ageLabel, key: 'age', options: AGE_BUCKETS.map((a) => ({ id: a.id, label: a.label })) },
+    {
+      title: strings.catalog.healthLabel,
+      key: 'health',
+      options: [
+        { id: 'full', label: strings.catalog.filterHealthFull },
+        { id: 'partial', label: strings.catalog.filterHealthPartial },
+        { id: 'none', label: strings.catalog.filterHealthNone }
+      ]
+    },
+    {
+      title: strings.catalog.filterGoodWithLabel,
+      key: 'good_with',
+      options: [
+        { id: 'cats', label: strings.catalog.filterGoodWithCats },
+        { id: 'dogs', label: strings.catalog.filterGoodWithDogs },
+        { id: 'neither', label: strings.catalog.filterGoodWithNeither }
+      ]
+    }
+  ]
+
+  const sexOptions = [
+    { id: 'all', label: strings.catalog.genderAll },
+    { id: 'male', label: strings.catalog.genderMale },
+    { id: 'female', label: strings.catalog.genderFemale }
+  ]
 
   return (
-    <div className="flex flex-col gap-8 h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border pb-4">
-        <h2 className="text-lg font-display font-bold text-ink">
+    <div className="flex flex-col gap-3">
+      <div className={`${PANEL} flex items-center justify-between`}>
+        <h2 className="text-base font-display font-bold text-ink">
           {strings.catalog.filterTitle}
         </h2>
         {hasActiveFilters && (
           <button
             onClick={handleClear}
-            className="text-sm font-semibold text-pine hover:underline cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            className="text-sm font-semibold text-pine hover:underline cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
           >
             {strings.catalog.clearAll}
           </button>
         )}
       </div>
 
-      {/* Filter Options */}
-      <div className="flex-grow space-y-6 overflow-y-auto pe-1">
-        {/* Sex Filter */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
-            {strings.catalog.genderLabel}
-          </h3>
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-3 cursor-pointer select-none text-base text-ink font-sans">
-              <input
-                type="radio"
-                name="sex"
-                value="all"
-                checked={filters.sex === 'all'}
-                onChange={() => handleSingleChange('sex', 'all')}
-                className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-              />
-              <span>{strings.catalog.genderAll}</span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer select-none text-base text-ink font-sans">
-              <input
-                type="radio"
-                name="sex"
-                value="male"
-                checked={filters.sex === 'male'}
-                onChange={() => handleSingleChange('sex', 'male')}
-                className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-              />
-              <span>{strings.catalog.genderMale}</span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer select-none text-base text-ink font-sans">
-              <input
-                type="radio"
-                name="sex"
-                value="female"
-                checked={filters.sex === 'female'}
-                onChange={() => handleSingleChange('sex', 'female')}
-                className="w-5 h-5 rounded-full border border-border text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 bg-surface cursor-pointer transition-all"
-              />
-              <span>{strings.catalog.genderFemale}</span>
-            </label>
-          </div>
+      <fieldset className={PANEL}>
+        <legend className="font-display text-sm font-extrabold text-pine px-1">{strings.catalog.genderLabel}</legend>
+        <div className="flex flex-wrap gap-2 pt-2">
+          {sexOptions.map((o) => (
+            <FilterChip
+              key={o.id}
+              type="radio"
+              name="sex"
+              label={o.label}
+              checked={filters.sex === o.id}
+              onChange={() => setFilter('sex', o.id)}
+            />
+          ))}
         </div>
+      </fieldset>
 
-        {/* Region Filter */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
-            {strings.catalog.regionLabel}
-          </h3>
-          <div className="flex flex-col gap-2">
-            {REGIONS.map((r) => (
-              <Checkbox
-                key={r.id}
-                label={r.label}
-                checked={filters.region.includes(r.id)}
-                onChange={(e) => handleArrayChange('region', r.id, e.target.checked)}
+      {groups.map((group) => (
+        <fieldset key={group.key} className={PANEL}>
+          <legend className="font-display text-sm font-extrabold text-pine px-1">{group.title}</legend>
+          <div className="flex flex-wrap gap-2 pt-2">
+            {group.options.map((o) => (
+              <FilterChip
+                key={o.id}
+                label={o.label}
+                checked={(filters[group.key] as string[]).includes(o.id)}
+                onChange={(checked) => toggleInArray(group.key, o.id, checked)}
               />
             ))}
           </div>
-        </div>
+        </fieldset>
+      ))}
 
-        {/* Age Filter */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
-            {strings.catalog.ageLabel}
-          </h3>
-          <div className="flex flex-col gap-2">
-            {AGE_BUCKETS.map((a) => (
-              <Checkbox
-                key={a.id}
-                label={a.label}
-                checked={filters.age.includes(a.id)}
-                onChange={(e) => handleArrayChange('age', a.id, e.target.checked)}
-              />
-            ))}
-          </div>
-        </div>
+      <SpecialFilterToggle
+        checked={filters.special}
+        onChange={(checked) => setFilter('special', checked)}
+      />
 
-        {/* Health Filter */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
-            {strings.catalog.healthLabel}
-          </h3>
-          <div className="flex flex-col gap-2">
-            <Checkbox
-              label={strings.catalog.filterHealthFull}
-              checked={filters.health.includes('full')}
-              onChange={(e) => handleArrayChange('health', 'full', e.target.checked)}
-            />
-            <Checkbox
-              label={strings.catalog.filterHealthPartial}
-              checked={filters.health.includes('partial')}
-              onChange={(e) => handleArrayChange('health', 'partial', e.target.checked)}
-            />
-            <Checkbox
-              label={strings.catalog.filterHealthNone}
-              checked={filters.health.includes('none')}
-              onChange={(e) => handleArrayChange('health', 'none', e.target.checked)}
-            />
-          </div>
-        </div>
-
-        {/* Good With Filter */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-ink border-s-2 border-marmalade ps-2">
-            {strings.catalog.filterGoodWithLabel}
-          </h3>
-          <div className="flex flex-col gap-2">
-            <Checkbox
-              label={strings.catalog.filterGoodWithCats}
-              checked={filters.good_with.includes('cats')}
-              onChange={(e) => handleArrayChange('good_with', 'cats', e.target.checked)}
-            />
-            <Checkbox
-              label={strings.catalog.filterGoodWithDogs}
-              checked={filters.good_with.includes('dogs')}
-              onChange={(e) => handleArrayChange('good_with', 'dogs', e.target.checked)}
-            />
-            <Checkbox
-              label={strings.catalog.filterGoodWithNeither}
-              checked={filters.good_with.includes('neither')}
-              onChange={(e) => handleArrayChange('good_with', 'neither', e.target.checked)}
-            />
-          </div>
-        </div>
-
-        {/* Special Needs Toggle */}
-        <div className="pt-2 border-t border-border">
-          <SpecialFilterToggle
-            checked={filters.special}
-            onChange={(checked) => handleSingleChange('special', checked)}
-          />
-        </div>
-      </div>
-
-      {/* Mobile Sticky Button */}
       {onCloseMobile && (
-        <div className="border-t border-border pt-4 mt-auto">
-          <button
-            onClick={onCloseMobile}
-            className="w-full inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-marmalade text-ink hover:bg-marmalade-dp transition-colors shadow-resting active:scale-98"
-          >
-            {strings.catalog.showResultsBtn.replace('{count}', totalCount.toString())}
-          </button>
-        </div>
+        <button
+          onClick={onCloseMobile}
+          className="w-full inline-flex items-center justify-center font-sans font-bold rounded-btn min-h-[48px] px-6 text-base bg-marmalade text-ink hover:bg-marmalade-dp transition-colors shadow-resting active:scale-98"
+        >
+          {strings.catalog.showResultsBtn.replace('{count}', totalCount.toString())}
+        </button>
       )}
     </div>
   )

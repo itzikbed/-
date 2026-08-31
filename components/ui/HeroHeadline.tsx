@@ -7,7 +7,7 @@ import React from 'react'
  * and is disabled by the global reduced-motion rule.
  */
 export const HeroHeadline: React.FC<{ text: string }> = ({ text }) => (
-  <h1 className="text-4xl md:text-7xl font-display font-extrabold text-surface tracking-tight leading-none drop-shadow-md">
+  <h1 className="text-4xl md:text-7xl font-display font-extrabold text-surface-solid tracking-tight leading-none drop-shadow-md">
     {text.split(' ').map((word, i) => [
       i > 0 && ' ',
       <span

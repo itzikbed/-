@@ -30,7 +30,7 @@ export default async function PublishPage() {
   if (!profile) {
     // Retry UI on profile fetch failure
     return (
-      <div className="flex-grow bg-paper py-16 flex items-center justify-center">
+      <div className="flex-grow py-16 flex items-center justify-center">
         <div className="text-center font-semibold text-ink-soft space-y-4">
           <p>{strings.publish.loadError}</p>
           <a 
@@ -70,7 +70,7 @@ export default async function PublishPage() {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@example.com'
 
   return (
-    <div className="flex-grow bg-paper py-10 md:py-16 select-none">
+    <div className="flex-grow py-10 md:py-16 select-none">
       <div className="app-container max-w-lg">
         {adminNeedsAccess && (
           <form action={activateAdminPublisherAccessAction} className="bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-center space-y-6">

@@ -19,7 +19,7 @@ export default function PublisherApproved({ fullName = '' }: PublisherApprovedPr
       <Body style={mainStyle} dir="rtl">
         <Container style={containerStyle} dir="rtl">
           <Section style={logoSectionStyle} dir="rtl">
-            <Text style={logoStyle}>{strings.common.logoLabel}</Text>
+            <Text style={logoStyle}>{strings.common.siteName}</Text>
           </Section>
           <Heading style={headingStyle}>{strings.emails.publisherApprovedHeading}</Heading>
           <Text style={textStyle}>

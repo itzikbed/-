@@ -37,7 +37,9 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col flex-grow select-none">
       {/* Full-bleed Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center justify-center py-20 overflow-hidden">
+      {/* The hero cuts its own foot on the sweep. Nothing is painted over it,
+          so the page ground below runs on without a seam. */}
+      <section className="section-curve-clip relative min-h-[85vh] flex items-center justify-center py-20 overflow-hidden">
         <HeroFilm />
 
         {/* Hero Content Container */}
@@ -55,7 +57,7 @@ export default async function HomePage() {
             {/* Door 1: Adopt */}
             <Link 
               href="/cats" 
-              className="relative group bg-surface rounded-card border border-border shadow-resting hover:shadow-hover hover:-translate-y-1 transition-all duration-150 p-8 flex flex-col justify-between items-center text-center gap-6 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
+              className="relative group bg-surface-solid/80 backdrop-blur-xl rounded-card border border-border shadow-resting hover:shadow-hover hover:-translate-y-1 transition-all duration-150 p-8 flex flex-col justify-between items-center text-center gap-6 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
             >
               {/* Mascot Peeking on Hover (200ms transform animation) */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 translate-y-3 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 pointer-events-none z-20">
@@ -77,7 +79,7 @@ export default async function HomePage() {
             {/* Door 2: Publish */}
             <Link 
               href="/publish" 
-              className="relative group bg-surface rounded-card border border-border shadow-resting hover:shadow-hover hover:-translate-y-1 transition-all duration-150 p-8 flex flex-col justify-between items-center text-center gap-6 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
+              className="relative group bg-surface-solid/80 backdrop-blur-xl rounded-card border border-border shadow-resting hover:shadow-hover hover:-translate-y-1 transition-all duration-150 p-8 flex flex-col justify-between items-center text-center gap-6 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
             >
               {/* Mascot Peeking on Hover */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 translate-y-3 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 pointer-events-none z-20">
@@ -100,13 +102,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Paper curve rising over the hero's bottom edge */}
-      <SectionCurve className="text-paper relative z-10 -mt-6 md:-mt-9" />
-
       {/* Latest Cats Section */}
       {/* overflow-clip (not hidden): a hidden box is a scroll container and would
           hijack the view() timeline of the reveal-on-scroll children */}
-      <section className="pb-16 pt-8 md:pb-24 md:pt-10 bg-paper sunbeam-bg relative overflow-clip">
+      <section className="pb-16 pt-8 md:pb-24 md:pt-10 sunbeam-bg relative overflow-clip">
         <div className="app-container text-start relative z-10">
           <div className="relative flex flex-col gap-2 mb-10 max-w-xl reveal-on-scroll">
             {/* Alive touch: organic background blob shape behind heading */}
@@ -121,8 +120,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Dynamic Cat Grid — JoinCard keeps a sparse launch-phase strip alive */}
-          <CatGrid cats={displayCats} showJoinCard />
+          <CatGrid cats={displayCats} />
 
           <div className="flex justify-center mt-12">
             <Link 

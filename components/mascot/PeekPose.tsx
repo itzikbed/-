@@ -28,7 +28,7 @@ export const PeekPose: React.FC<PoseProps> = ({ width, height, className }) => {
         strokeWidth={STROKE_WIDTH}
         strokeLinecap="round"
         strokeLinejoin="round"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
       />
 
       {/* Ear Outlines */}
@@ -73,7 +73,7 @@ export const PeekPose: React.FC<PoseProps> = ({ width, height, className }) => {
         width="16"
         height="12"
         rx="8"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />
@@ -83,7 +83,7 @@ export const PeekPose: React.FC<PoseProps> = ({ width, height, className }) => {
         width="16"
         height="12"
         rx="8"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />

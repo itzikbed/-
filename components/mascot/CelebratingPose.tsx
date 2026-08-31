@@ -29,7 +29,7 @@ export const CelebratingPose: React.FC<PoseProps> = ({ width, height, className 
       {/* Body */}
       <path
         d="M35 90C30 90 30 65 35 55C40 45 60 45 65 55C70 65 70 90 65 90Z"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />
@@ -53,7 +53,7 @@ export const CelebratingPose: React.FC<PoseProps> = ({ width, height, className 
         cx="50"
         cy="35"
         r="18"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />
@@ -89,7 +89,7 @@ export const CelebratingPose: React.FC<PoseProps> = ({ width, height, className 
         width="15"
         height="10"
         rx="5"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />
@@ -99,7 +99,7 @@ export const CelebratingPose: React.FC<PoseProps> = ({ width, height, className 
         width="15"
         height="10"
         rx="5"
-        fill="var(--surface)"
+        fill="var(--surface-solid)"
         stroke={STROKE_COLOR}
         strokeWidth={STROKE_WIDTH}
       />

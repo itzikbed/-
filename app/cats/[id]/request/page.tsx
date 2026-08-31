@@ -43,7 +43,7 @@ export default async function RequestPage({ params }: RequestPageProps) {
   const regionLabel = regionObj ? regionObj.label : cat.region
 
   return (
-    <div className='flex-grow bg-paper py-10'>
+    <div className='flex-grow py-10'>
       <div className='app-container max-w-xl'>
         <AdoptionRequestForm
           catId={cat.id}

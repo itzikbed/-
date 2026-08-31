@@ -1,6 +1,5 @@
 import React from 'react'
 import { CatCard } from './CatCard'
-import { JoinCard } from './JoinCard'
 import { Mascot } from '@/components/mascot/Mascot'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { strings } from '@/lib/strings'
@@ -24,17 +23,12 @@ export interface CatGridProps {
   }>
   loading?: boolean
   isFiltered?: boolean
-  /** Append the publisher-recruiting JoinCard when the grid is sparse (launch phase) */
-  showJoinCard?: boolean
 }
-
-const SPARSE_THRESHOLD = 8
 
 export const CatGrid: React.FC<CatGridProps> = ({
   cats,
   loading = false,
-  isFiltered = false,
-  showJoinCard = false
+  isFiltered = false
 }) => {
   if (loading) {
     return (
@@ -97,11 +91,6 @@ export const CatGrid: React.FC<CatGridProps> = ({
           <CatCard cat={cat} />
         </div>
       ))}
-      {showJoinCard && cats.length < SPARSE_THRESHOLD && (
-        <div className="reveal-on-scroll grid">
-          <JoinCard />
-        </div>
-      )}
     </div>
   )
 }

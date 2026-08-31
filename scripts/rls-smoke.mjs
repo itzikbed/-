@@ -939,7 +939,7 @@ async function run() {
   }
   console.log("TEST S7g SUCCESS: RPC returned nothing for null decided_by as expected.")
 
-  console.log("TEST S7h: DB trigger rejects pending requests on cat status transition...")
+  console.log("TEST S7h: a cat cannot leave circulation while a request is pending...")
   const { data: trgCat, error: trgCatErr } = await supabaseAdmin
     .from('cats')
     .insert({
@@ -976,14 +976,50 @@ async function run() {
     throw new Error("Failed to insert trgReq: " + trgReqErr?.message)
   }
 
+  const cleanupS7h = async () => {
+    await supabaseAdmin.from('email_outbox').delete().eq('request_id', trgReq.id)
+    await supabaseAdmin.from('moderation_log').delete().eq('entity_id', trgCat.id)
+    await supabaseAdmin.from('cats').delete().eq('id', trgCat.id)
+  }
+
+  // 1. The blunt path. Since 0018 a bare status update no longer silently
+  //    rejects the siblings: the deferred invariant refuses the whole
+  //    transaction, so a half-finished transition cannot be committed by any
+  //    session — service role included.
   const { error: trgUpdateErr } = await supabaseAdmin
     .from('cats')
     .update({ status: 'adopted' })
     .eq('id', trgCat.id)
-  
-  if (trgUpdateErr) {
-    await supabaseAdmin.from('cats').delete().eq('id', trgCat.id)
-    throw new Error("Failed to update trgCat status: " + trgUpdateErr.message)
+
+  if (!trgUpdateErr) {
+    await cleanupS7h()
+    throw new Error("TEST S7h FAILED: a cat left circulation while a request was still pending")
+  }
+
+  const { data: catAfterBlunt } = await supabaseAdmin
+    .from('cats').select('status').eq('id', trgCat.id).single()
+  if (catAfterBlunt.status !== 'published') {
+    await cleanupS7h()
+    throw new Error(`TEST S7h FAILED: cat is ${catAfterBlunt.status} after a refused transition (expected published)`)
+  }
+
+  // 2. The sanctioned path. transition_cat_status closes the sibling, stamps
+  //    the decision, writes the moderation record and queues the mail in the
+  //    same transaction — and it works from the owner's own session.
+  const { data: trgRpc, error: trgRpcErr } = await supabaseUser
+    .rpc('transition_cat_status', {
+      p_cat_id: trgCat.id,
+      p_to_status: 'adopted',
+      p_sibling_note: 'המודעה כבר אינה זמינה'
+    })
+
+  if (trgRpcErr) {
+    await cleanupS7h()
+    throw new Error("TEST S7h FAILED (RPC error): " + trgRpcErr.message)
+  }
+  if (trgRpc?.ok !== true || trgRpc?.closed_requests !== 1) {
+    await cleanupS7h()
+    throw new Error("TEST S7h FAILED: unexpected RPC result " + JSON.stringify(trgRpc))
   }
 
   const { data: updatedReq, error: updatedReqErr } = await supabaseAdmin
@@ -992,7 +1028,15 @@ async function run() {
     .eq('id', trgReq.id)
     .single()
 
-  await supabaseAdmin.from('cats').delete().eq('id', trgCat.id)
+  const { data: catAfterRpc } = await supabaseAdmin
+    .from('cats').select('status, adopted_at').eq('id', trgCat.id).single()
+
+  const { data: queuedMail } = await supabaseAdmin
+    .from('email_outbox')
+    .select('template, status, recipient_user_id')
+    .eq('request_id', trgReq.id)
+
+  await cleanupS7h()
 
   if (updatedReqErr) {
     throw new Error("Failed to query updatedReq: " + updatedReqErr.message)
@@ -1006,14 +1050,22 @@ async function run() {
   if (!updatedReq.decided_at) {
     throw new Error("TEST S7h FAILED: Request decided_at is null")
   }
-  console.log("TEST S7h SUCCESS: DB trigger auto-rejected pending request on status transition.")
+  if (catAfterRpc.status !== 'adopted' || !catAfterRpc.adopted_at) {
+    throw new Error("TEST S7h FAILED: cat was not marked adopted by the RPC")
+  }
+  if (!queuedMail || queuedMail.length !== 1 || queuedMail[0].status !== 'queued'
+      || queuedMail[0].template !== 'request_closed_cat_adopted'
+      || queuedMail[0].recipient_user_id !== thirdId) {
+    throw new Error("TEST S7h FAILED: the closing notification was not queued: " + JSON.stringify(queuedMail))
+  }
+  console.log("TEST S7h SUCCESS: the invariant holds and the RPC closes, stamps and queues in one transaction.")
 
   console.log("TEST S7i: Owner-session status transition with pending sibling is fail-closed...")
-  // The S5 safety-net trigger rejects siblings via an UPDATE that guard_request_update
-  // blocks for non-admin sessions — so an owner-session transition with a pending
-  // sibling must fail AS A WHOLE (fail-closed), leaving both rows unchanged. App flows
-  // are unaffected: closeSiblings (service role) clears pending requests BEFORE the
-  // status update. This test pins that behavior.
+  // A bare status update from the owner's session leaves the sibling pending, so
+  // the deferred invariant from 0018 refuses the transaction AS A WHOLE
+  // (fail-closed), leaving both rows unchanged. App flows are unaffected: they
+  // go through transition_cat_status, which closes the siblings inside the same
+  // transaction. This test pins the fail-closed behavior of the blunt path.
   const { data: fcCat, error: fcCatErr } = await supabaseAdmin
     .from('cats')
     .insert({

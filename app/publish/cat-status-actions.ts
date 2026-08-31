@@ -3,7 +3,7 @@
 import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { ActionResult } from '@/app/(auth)/actions'
-import { closeSiblings } from '@/lib/requests/close-siblings'
+import { transitionCat } from '@/lib/cats/transition'
 import { strings } from '@/lib/strings'
 import {
   getStoredVideoPaths,
@@ -71,35 +71,8 @@ export async function deleteCatAction(catId: string): Promise<ActionResult> {
 }
 
 export async function markAsAdoptedAction(catId: string): Promise<ActionResult> {
-  if (!isUuid(catId)) return { ok: false, formError: strings.common.errorOccurred }
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { ok: false, formError: 'אנא התחבר תחילה.' }
-
-  const { data: cat } = await supabase.from('cats').select('owner_id').eq('id', catId).single()
-  if (!cat) return { ok: false, formError: 'החתול לא נמצא.' }
-
-  if (cat.owner_id !== user.id) {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    if (!profile || profile.role !== 'admin') {
-      return { ok: false, formError: 'אין לך הרשאה לעדכן מודעה זו.' }
-    }
-  }
-
-  // Auto-close sibling requests first
-  await closeSiblings(catId)
-
-  const { data: updated, error } = await supabase
-    .from('cats')
-    .update({ status: 'adopted', adopted_at: new Date().toISOString() })
-    .eq('id', catId)
-    .eq('status', 'published')
-    .select()
-
-  if (error || !updated || updated.length === 0) {
-    return { ok: false, formError: strings.admin.conflictError }
-  }
+  const result = await transitionCat(catId, 'adopted')
+  if (!result.ok) return { ok: false, formError: result.formError }
 
   revalidatePath('/publish/my-cats')
   revalidatePath('/cats')
@@ -109,32 +82,8 @@ export async function markAsAdoptedAction(catId: string): Promise<ActionResult> 
 }
 
 export async function archiveCatAction(catId: string): Promise<ActionResult> {
-  if (!isUuid(catId)) return { ok: false, formError: strings.common.errorOccurred }
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { ok: false, formError: 'אנא התחבר תחילה.' }
-
-  const { data: cat } = await supabase.from('cats').select('owner_id').eq('id', catId).single()
-  if (!cat) return { ok: false, formError: 'החתול לא נמצא.' }
-
-  if (cat.owner_id !== user.id) {
-    return { ok: false, formError: 'אין לך הרשאה לעדכן מודעה זו.' }
-  }
-
-  // Auto-close sibling requests first
-  await closeSiblings(catId)
-
-  const { data: updated, error } = await supabase
-    .from('cats')
-    .update({ status: 'archived' })
-    .eq('id', catId)
-    .in('status', ['published', 'adopted'])
-    .select()
-
-  if (error || !updated || updated.length === 0) {
-    return { ok: false, formError: strings.admin.conflictError }
-  }
+  const result = await transitionCat(catId, 'archived')
+  if (!result.ok) return { ok: false, formError: result.formError }
 
   revalidatePath('/publish/my-cats')
   revalidatePath('/cats')

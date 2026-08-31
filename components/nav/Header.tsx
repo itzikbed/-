@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import { strings } from '@/lib/strings'
+import { BRAND_MARK_PATH, BRAND_MARK_VIEWBOX, BRAND_MARK_WINDOW } from '@/lib/brand'
 import { MobileDrawer } from './MobileDrawer'
 
 interface UserType {
@@ -34,7 +35,7 @@ export function Header({ user, profile }: HeaderProps) {
   }
 
   return (
-    <header className="bg-surface border-b border-border shadow-resting sticky top-0 z-40 select-none">
+    <header className="bg-surface-solid/80 backdrop-blur-lg border-b border-border shadow-resting sticky top-0 z-40 select-none">
       <div className="app-container h-16 flex items-center justify-between">
         {/* Logo */}
         <Link 
@@ -42,10 +43,18 @@ export function Header({ user, profile }: HeaderProps) {
           className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
           aria-label={`${strings.common.siteName} — ${strings.nav.home}`}
         >
-          <span className="font-display font-extrabold text-2xl text-pine tracking-tight flex items-center select-none" aria-hidden="true">
-            <span>{strings.common.siteName.slice(0, 5)}</span>
-            <span className="inline-flex items-center mx-[0.02em] relative top-[0.03em]">
-              🐾
+          <span className="flex items-center gap-2 select-none" aria-hidden="true">
+            <svg
+              viewBox={BRAND_MARK_VIEWBOX}
+              className="h-6 w-6 shrink-0 text-pine"
+              fill="currentColor"
+              focusable="false"
+            >
+              <path d={BRAND_MARK_PATH} />
+              <path d={BRAND_MARK_WINDOW} className="text-surface-solid" fill="currentColor" />
+            </svg>
+            <span className="font-display font-extrabold text-xl sm:text-2xl text-pine tracking-tight whitespace-nowrap">
+              {strings.common.siteName}
             </span>
           </span>
         </Link>

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import DecisionDialog from './DecisionDialog'
 import { archiveCatAdminAction } from '@/app/admin/cat-actions'
 import { strings } from '@/lib/strings'
@@ -10,6 +11,7 @@ interface AdminArchiveControlProps {
 }
 
 export function AdminArchiveControl({ catId }: AdminArchiveControlProps) {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +25,8 @@ export function AdminArchiveControl({ catId }: AdminArchiveControlProps) {
       if (res.ok) {
         setSuccess(true)
         setIsOpen(false)
-        window.location.href = '/admin?success=archived'
+        router.push('/admin?success=archived')
+        router.refresh()
       } else {
         setError(res.formError || strings.common.errorOccurred)
       }

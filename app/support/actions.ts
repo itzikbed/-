@@ -3,7 +3,7 @@
 import React from 'react'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { supportMessageSchema } from '@/lib/schemas/support'
-import { sendEmail } from '@/lib/emails/send'
+import { sendEmail, DISPATCHED_EMAIL_STATUSES } from '@/lib/emails/send'
 import SupportChatNew, { getSubject as getSupportChatSubject } from '@/emails/SupportChatNew'
 import SupportChatDigest, { getSubject as getSupportChatDigestSubject } from '@/emails/SupportChatDigest'
 import { strings } from '@/lib/strings'
@@ -148,7 +148,7 @@ async function notifyAdminsIfFirstUnread(userId: string, conversationId: string,
     .select('id', { count: 'exact', head: true })
     .eq('template', 'support_chat_new')
     .eq('conversation_id', conversationId)
-    .eq('status', 'sent')
+    .in('status', DISPATCHED_EMAIL_STATUSES)
     .gt('created_at', oneHourAgo)
   if (recentEmails && recentEmails > 0) return
 
@@ -161,7 +161,7 @@ async function notifyAdminsIfFirstUnread(userId: string, conversationId: string,
     .from('email_log')
     .select('id', { count: 'exact', head: true })
     .in('template', ['support_chat_new', 'support_chat_digest'])
-    .eq('status', 'sent')
+    .in('status', DISPATCHED_EMAIL_STATUSES)
     .gt('created_at', oneHourAgo)
 
   if (totalRecent && totalRecent >= 6) {
@@ -170,7 +170,7 @@ async function notifyAdminsIfFirstUnread(userId: string, conversationId: string,
       .from('email_log')
       .select('id', { count: 'exact', head: true })
       .in('template', ['support_chat_new', 'support_chat_digest'])
-      .eq('status', 'sent')
+      .in('status', DISPATCHED_EMAIL_STATUSES)
       .gt('created_at', quietWindowStart)
     if (inQuietWindow && inQuietWindow > 0) return
 

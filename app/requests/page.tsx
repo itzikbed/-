@@ -76,7 +76,7 @@ export default async function RequestsPage() {
   const hasRequests = requests && requests.length > 0
 
   return (
-    <div className='flex-grow bg-paper py-10'>
+    <div className='flex-grow py-10'>
       <div className='app-container max-w-4xl space-y-8'>
         
         {/* Header */}

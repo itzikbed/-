@@ -22,7 +22,7 @@ export default function SupportChatDigest({ waitingCount }: SupportChatDigestPro
       <Body style={mainStyle} dir="rtl">
         <Container style={containerStyle} dir="rtl">
           <Section style={logoSectionStyle} dir="rtl">
-            <Text style={logoStyle}>{strings.common.logoLabel}</Text>
+            <Text style={logoStyle}>{strings.common.siteName}</Text>
           </Section>
           <Heading style={headingStyle}>{strings.supportChat.digestHeading}</Heading>
           <Text style={textStyle}>

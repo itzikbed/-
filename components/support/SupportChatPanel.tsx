@@ -44,7 +44,8 @@ export function SupportChatPanel({ chat, userId, onClose }: SupportChatPanelProp
 
       <SupportMessages
         messages={chat.messages}
-        viewerId={userId}
+        participantUserId={userId}
+        participantLabel={strings.supportChat.selfSenderName}
         emptyTitle={strings.supportChat.emptyTitle}
         emptyDesc={strings.supportChat.emptyDesc}
       />

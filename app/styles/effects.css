@@ -49,6 +49,127 @@
   background-repeat: repeat;
 }
 
+/* ---------------------------------------------------------------------------
+   Page ground
+   A translucent card only reads as glass when there is something varied behind
+   it to refract; over a flat fill it reads as a smudged rectangle. The grain
+   alone was not enough, so each ground below carries real structure and colour,
+   with the grain kept as its last layer — the grain-over-gradient pairing that
+   is the current standard rather than grain on its own.
+   Exactly one ground belongs on <body> at a time. `has-motes` is separate and
+   may be added to any of them.
+   --------------------------------------------------------------------------- */
+
+/* 1 · Topographic — two contour systems radiating from different points, so
+   they interfere and read as a hand-drawn map rather than a repeat. A site
+   about finding a home can afford to look like a place. */
+.ground-topo {
+  background-image:
+    repeating-radial-gradient(circle at 79% 16%,
+      rgba(28, 102, 80, 0.055) 0 1.5px, rgba(28, 102, 80, 0) 1.5px 27px),
+    repeating-radial-gradient(circle at 11% 76%,
+      rgba(235, 175, 86, 0.06) 0 1.5px, rgba(235, 175, 86, 0) 1.5px 34px),
+    radial-gradient(120% 78% at 90% -12%, rgba(235, 175, 86, 0.13), rgba(235, 175, 86, 0) 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-repeat: repeat, repeat, no-repeat, repeat;
+  background-attachment: fixed, fixed, fixed, scroll;
+}
+
+/* 2 · Aurora — four large colour fields from the brand palette, overlapping.
+   This is the mesh-gradient-plus-grain treatment, warmed to paper instead of
+   the usual neon on black. It is the ground that makes the glass work hardest. */
+.ground-aurora {
+  background-image:
+    radial-gradient(48% 40% at 82% 6%, rgba(235, 175, 86, 0.30), rgba(235, 175, 86, 0) 70%),
+    radial-gradient(44% 38% at 16% 24%, rgba(223, 240, 231, 0.95), rgba(223, 240, 231, 0) 72%),
+    radial-gradient(52% 44% at 64% 64%, rgba(251, 239, 216, 0.95), rgba(251, 239, 216, 0) 70%),
+    radial-gradient(42% 36% at 6% 92%, rgba(28, 102, 80, 0.15), rgba(28, 102, 80, 0) 72%),
+    /* The foot of the screen always carries colour, so the dark green of the
+       footer rises out of a tint rather than out of bare paper. Part of the
+       same fixed stack, so it can never show as an edge of its own. */
+    linear-gradient(to top, rgba(223, 240, 231, 0.9) 0%, rgba(223, 240, 231, 0) 26%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+  background-attachment: fixed, fixed, fixed, fixed, fixed, scroll;
+}
+
+/* 3 · Paw trail — the one ground nobody else can use. Two prints per tile at
+   different angles and sizes, so the repeat is hard to catch. Kept faint: it
+   should be noticed on the second look, not the first. */
+.ground-paws {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='%231C6650' opacity='0.055'%3E%3Cg transform='translate(14 22) rotate(-17 60 60)'%3E%3Cellipse cx='60' cy='73' rx='17' ry='13'/%3E%3Cellipse cx='43' cy='51' rx='7' ry='8.5'/%3E%3Cellipse cx='53' cy='41' rx='6.5' ry='8.5'/%3E%3Cellipse cx='67' cy='41' rx='6.5' ry='8.5'/%3E%3Cellipse cx='77' cy='51' rx='7' ry='8.5'/%3E%3C/g%3E%3Cg transform='translate(138 140) rotate(26 60 60) scale(0.8)'%3E%3Cellipse cx='60' cy='73' rx='17' ry='13'/%3E%3Cellipse cx='43' cy='51' rx='7' ry='8.5'/%3E%3Cellipse cx='53' cy='41' rx='6.5' ry='8.5'/%3E%3Cellipse cx='67' cy='41' rx='6.5' ry='8.5'/%3E%3Cellipse cx='77' cy='51' rx='7' ry='8.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(120% 78% at 90% -12%, rgba(235, 175, 86, 0.14), rgba(235, 175, 86, 0) 60%),
+    radial-gradient(90% 60% at 4% 112%, rgba(28, 102, 80, 0.07), rgba(28, 102, 80, 0) 66%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-repeat: repeat, no-repeat, no-repeat, repeat;
+  background-attachment: scroll, fixed, fixed, scroll;
+}
+
+/* 4 · Linen — a cross hatch in both directions, which is what separates woven
+   stock from a flat fill. Texture only: no colour shift, nothing to date. */
+.ground-linen {
+  background-image:
+    repeating-linear-gradient(45deg,
+      rgba(30, 43, 37, 0.032) 0 1px, rgba(30, 43, 37, 0) 1px 6px),
+    repeating-linear-gradient(-45deg,
+      rgba(30, 43, 37, 0.024) 0 1px, rgba(30, 43, 37, 0) 1px 6px),
+    radial-gradient(120% 78% at 90% -12%, rgba(235, 175, 86, 0.11), rgba(235, 175, 86, 0) 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  background-repeat: repeat, repeat, no-repeat, repeat;
+  background-attachment: scroll, scroll, fixed, scroll;
+}
+
+/* A filter group is not a card. It has no frame and no shadow: the wash is
+   strongest under the title and fades out to nothing at the edges, so the group
+   bleeds into the ground instead of sitting on it as another rectangle. What
+   separates one group from the next is the spacing and the title, not a box. */
+.filter-panel {
+  background-image: radial-gradient(
+    130% 105% at 78% 0%,
+    rgba(253, 252, 250, 0.55) 0%,
+    rgba(253, 252, 250, 0.22) 55%,
+    rgba(253, 252, 250, 0) 100%
+  );
+}
+
+/* The sweep that divides a cat's photo from its details, at both card scales.
+   objectBoundingBox units let one definition serve every card size. */
+.card-curve-clip {
+  clip-path: url(#card-curve);
+}
+
+/* A band that ends on a sweep cuts its own foot. The band below it needs no
+   background of its own, so the page ground runs straight through the join and
+   there is nothing for a seam to appear between. */
+.section-curve-clip {
+  clip-path: url(#section-curve);
+}
+
+.card-strip-clip {
+  clip-path: url(#card-strip);
+}
+
+/* The details pane covers the whole card and is cut back to its foot by
+   #card-strip. That is deliberate: a backdrop blur smears the pixels along its
+   own edge, so an element sized to the visible pane would lay a muddy band
+   right where the sweep is. Spanning the card puts that edge at the card's top,
+   where the clip removes it, and the sweep stays clean.
+   The wash is near-opaque at the sweep — real frosted glass catches the light
+   where it meets what is behind it — and opens up below, so the text sits on
+   something see-through. */
+.card-strip-glass {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(253, 252, 250, 0) 0%,
+    rgba(253, 252, 250, 0) 54%,
+    rgba(253, 252, 250, 0.95) 62%,
+    rgba(253, 252, 250, 0.88) 72%,
+    rgba(253, 252, 250, 0.7) 86%,
+    rgba(253, 252, 250, 0.8) 100%
+  );
+}
+
 /* Sunbeam drift on paper sections */
 @keyframes sunbeam-drift {
   0% {

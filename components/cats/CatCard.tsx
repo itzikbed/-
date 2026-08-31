@@ -125,19 +125,21 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
       onBlur={() => {
         if (hasAutoplayVideo && !disableVideo) PlaybackDirector.pauseSingle(cat.id)
       }}
-      className={`group bg-surface rounded-card border border-border shadow-resting hover:shadow-hover hover:-translate-y-0.5 transition-all duration-150 flex flex-col overflow-hidden select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 ${
+      className={`group relative block w-full aspect-[4/5] overflow-hidden select-none border border-ink/10 bg-surface/45 backdrop-blur-lg backdrop-saturate-125 rounded-card shadow-resting hover:shadow-hover hover:-translate-y-0.5 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 ${
         isAdopted ? 'opacity-90' : ''
       }`}
     >
-      {/* 4:3 Aspect Ratio Image Container */}
-      <div className="relative w-full aspect-[4/3] bg-paper overflow-hidden">
+      {/* The photo is the card, cut at its foot on the sweep. Below the cut the
+          card's own glass carries the details — one continuous surface, so
+          there is no second edge to show a seam. */}
+      <div className="card-curve-clip absolute inset-0">
         <Image
           src={imageUrl}
           alt={`${cat.name}, ${cat.sex === 'female' ? strings.catalog.genderFemaleNoun : strings.catalog.genderMaleNoun} ${strings.catalog.forAdoption}`}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           style={{ viewTransitionName: `cat-photo-${cat.id}` }}
-          className={`object-cover object-center transition-all duration-200 group-hover:scale-102 ${
+          className={`object-cover object-center transition-all duration-500 group-hover:scale-105 ${
             isAdopted ? 'grayscale-[30%]' : ''
           }`}
         />
@@ -163,7 +165,7 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
         {/* Video Affordance Badge */}
         {hasAutoplayVideo && (
           <div 
-            className={`absolute bottom-3 start-3 z-10 bg-surface/85 backdrop-blur-sm text-ink rounded-full px-2.5 py-1 text-xs font-semibold flex items-center gap-1 shadow-sm transition-opacity duration-150 ${
+            className={`absolute top-3 end-3 z-10 bg-surface/85 backdrop-blur-sm text-ink rounded-full px-2.5 py-1 text-xs font-semibold flex items-center gap-1 shadow-sm transition-opacity duration-150 ${
               (disableVideo || !isActive) ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
             aria-label={strings.catalog.videoAriaLabel.replace('{name}', cat.name)}
@@ -192,27 +194,18 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
         </div>
       </div>
 
-      {/* Info Content */}
-      <div className="p-5 flex flex-col flex-grow justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-display font-bold text-ink leading-tight">
-              {cat.name}
-            </h2>
-          </div>
-          
-          {/* Meta line: Age bucket · Sex */}
-          <p className="text-sm font-semibold text-ink-soft">
-            {ageLabel} &middot; {sexLabel}
-          </p>
-        </div>
-
-        {/* Location chip */}
-        <div className="flex items-center justify-between mt-auto">
-          <span className="inline-flex items-center justify-center font-sans font-semibold rounded-full bg-pine-soft text-pine text-xs px-3 py-1.5 border border-pine/10">
-            {regionLabel} {cat.city ? `(${cat.city})` : ''}
-          </span>
-        </div>
+      {/* The glass pane. Its top edge is the same sweep used between page bands,
+          and it is opaque enough to hold ink at AA over any photo underneath. */}
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 px-4 pb-4">
+        <h2 className="text-lg font-display font-bold text-ink leading-tight">
+          {cat.name}
+        </h2>
+        <p className="text-[13px] font-semibold text-ink-soft leading-snug">
+          {ageLabel} &middot; {sexLabel}
+        </p>
+        <p className="text-[13px] font-semibold text-pine leading-snug">
+          {regionLabel} {cat.city ? `(${cat.city})` : ''}
+        </p>
       </div>
     </Link>
   )

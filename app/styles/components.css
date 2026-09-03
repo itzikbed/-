@@ -23,4 +23,96 @@
   .btn-active-press:active {
     transform: scale(0.98);
   }
+
+  /* -------------------------------------------------------------------------
+     Facts rotator — the "numbers and facts" band above the footer.
+     The facts share one grid cell, so the block is as tall as the longest of
+     them and the ground under the text never jumps when one replaces another.
+     There is no frame and no shadow around the group: what holds it together
+     is the wash, the same move .filter-panel makes, not a rectangle.
+     Under reduced motion the stack unfolds into a plain list — every fact
+     readable at once, nothing changing on its own.
+     ------------------------------------------------------------------------- */
+  .facts-wash {
+    /* The wash has to reach nothing well inside the block. A gradient that is
+       still tinted at the edge draws a rectangle, which is the one thing this
+       treatment exists to avoid. */
+    background-image: radial-gradient(
+      68% 76% at 50% 42%,
+      rgba(253, 252, 250, 0.78) 0%,
+      rgba(253, 252, 250, 0.34) 46%,
+      rgba(253, 252, 250, 0) 76%
+    );
+  }
+
+  .facts-stack {
+    display: grid;
+  }
+
+  /* Seven dots at a 44px target are wider than the container on a 320px
+     screen. Reaching past the page padding keeps them one unbroken row; the
+     pause control wraps above them instead of orphaning a single dot. */
+  .facts-controls {
+    margin-inline: -1rem;
+  }
+
+  .facts-slide {
+    grid-area: 1 / 1;
+    /* Every fact shares the cell, so the cell is as tall as the longest one.
+       Centring keeps the shorter facts from hanging off the top of it. */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    /* Out first, then in. A straight cross-fade puts two facts on the same
+       spot at half opacity each, which reads as a glitch rather than a
+       change; 90ms out and 110ms in keeps the swap clean inside 200ms. */
+    transition: opacity 90ms ease-out, transform 90ms ease-out,
+      visibility 0s linear 90ms;
+  }
+
+  .facts-slide[data-active='true'] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 110ms ease-out 90ms, transform 140ms ease-out 90ms,
+      visibility 0s;
+  }
+
+  .facts-dot > span {
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--pine);
+    /* 0.72 keeps an inactive dot at 3.1:1 against the pine-soft band, so the
+       control is identifiable (WCAG 1.4.11). What marks the current one is
+       the width, not the tint alone. */
+    opacity: 0.72;
+    transition: width 150ms ease-out, opacity 150ms ease-out;
+  }
+
+  .facts-dot[aria-current='true'] > span {
+    width: 22px;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .facts-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .facts-slide {
+      grid-area: auto;
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+  }
 }

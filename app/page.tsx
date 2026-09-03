@@ -4,6 +4,7 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { CatGrid } from '@/components/cats/CatGrid'
 import { HeroFilm } from '@/components/ui/HeroFilm'
 import { HeroHeadline } from '@/components/ui/HeroHeadline'
+import { FactsSection } from '@/components/ui/FactsSection'
 import { SectionCurve } from '@/components/ui/SectionCurve'
 import { Whisker } from '@/components/ui/Whisker'
 import { strings } from '@/lib/strings'
@@ -209,6 +210,12 @@ export default async function HomePage() {
 
           </div>
         </div>
+      </section>
+
+      {/* Numbers and facts — the same pine-soft band carries on, so the page
+          closes on something that moves rather than on a static grid. */}
+      <section className="bg-pine-soft pb-14 md:pb-20">
+        <FactsSection moving />
       </section>
 
       <script

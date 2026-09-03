@@ -1,37 +1,14 @@
 'use client'
 
 import React from 'react'
-import {
-  Cat,
-  HandHeart,
-  HeartPulse,
-  House,
-  Pause,
-  Play,
-  Sprout,
-  Stethoscope,
-  Target,
-} from 'lucide-react'
+import { Pause, Play } from 'lucide-react'
+import { FACT_ICONS, type Fact, type FactsLabels } from './facts'
 
-const FACT_ICONS = [Cat, Sprout, HeartPulse, House, Stethoscope, Target, HandHeart]
 const ROTATE_MS = 7000
-
-export interface Fact {
-  figure: string
-  title: string
-  text: string
-}
-
-export interface FactsRotatorLabels {
-  region: string
-  pause: string
-  play: string
-  goTo: string
-}
 
 interface FactsRotatorProps {
   facts: Fact[]
-  labels: FactsRotatorLabels
+  labels: FactsLabels
 }
 
 const controlClass =

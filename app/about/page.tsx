@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { strings } from '@/lib/strings'
 import { Mascot } from '@/components/mascot/Mascot'
-import { FactsRotator } from '@/components/ui/FactsRotator'
+import { FactsSection } from '@/components/ui/FactsSection'
 import { SectionCurve } from '@/components/ui/SectionCurve'
 import { Whisker } from '@/components/ui/Whisker'
 import type { Metadata } from 'next'
@@ -18,7 +18,7 @@ export default function AboutPage() {
   return (
     <div className="flex-grow">
       {/* Intro */}
-      <section className="pt-12 pb-8">
+      <section className="pt-12 pb-10">
         <div className="app-container max-w-3xl flex flex-col items-center text-center gap-4">
           <Mascot pose="sitting" animateOnScroll={true} />
           <h1 className="text-4xl md:text-5xl font-display font-extrabold text-ink">
@@ -33,8 +33,14 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Facts band — the quiet list. The moving one is on the home page. */}
+      <SectionCurve className="text-pine-soft" />
+      <section className="section-curve-clip bg-pine-soft pt-8 pb-14">
+        <FactsSection />
+      </section>
+
       {/* Mission + closing */}
-      <section className="pt-6 pb-14">
+      <section className="pt-8 pb-16">
         <div className="app-container max-w-3xl text-center">
           <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
             {content.missionTitle}
@@ -66,43 +72,6 @@ export default function AboutPage() {
               {content.ctaPublishBtn}
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Facts band — the last thing before the footer anchor */}
-      <SectionCurve className="text-pine-soft" />
-      <section className="bg-pine-soft paper-grain pt-8 pb-14 md:pb-16">
-        <div className="app-container max-w-4xl">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="text-2xl md:text-3xl font-display font-extrabold text-ink">
-              {content.factsTitle}
-            </h2>
-            <Whisker className="mx-auto" />
-            <p className="text-base text-ink-soft leading-relaxed">{content.factsIntro}</p>
-          </div>
-
-          <FactsRotator
-            facts={content.facts}
-            labels={{
-              region: content.factsRegionLabel,
-              pause: content.factsPauseLabel,
-              play: content.factsPlayLabel,
-              goTo: content.factsGoToLabel,
-            }}
-          />
-
-          <p className="mt-6 text-center text-sm text-ink-soft leading-relaxed">
-            {content.factsSourceText}{' '}
-            <a
-              href={content.factsSourceHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={content.factsSourceLinkA11y}
-              className="text-pine font-semibold underline underline-offset-2 hover:text-pine-deep rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
-            >
-              {content.factsSourceLink}
-            </a>
-          </p>
         </div>
       </section>
     </div>

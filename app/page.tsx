@@ -66,7 +66,7 @@ export default async function HomePage() {
               </div>
               
               <div className="space-y-3">
-                <h3 className="text-2xl font-display font-bold text-ink">{strings.home.adoptTitle}</h3>
+                <h2 className="text-2xl font-display font-bold text-ink">{strings.home.adoptTitle}</h2>
                 <p className="text-base text-ink-soft leading-relaxed max-w-xs">
                   {strings.home.adoptDesc}
                 </p>
@@ -88,7 +88,7 @@ export default async function HomePage() {
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-2xl font-display font-bold text-ink">{strings.home.publishTitle}</h3>
+                <h2 className="text-2xl font-display font-bold text-ink">{strings.home.publishTitle}</h2>
                 <p className="text-base text-ink-soft leading-relaxed max-w-xs">
                   {strings.home.publishDesc}
                 </p>

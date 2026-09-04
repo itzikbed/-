@@ -114,10 +114,10 @@ export function CatDetails({
 
             {/* Attributes List */}
             <div className="space-y-4">
-              <h3 className="text-lg font-display font-bold text-ink flex items-center gap-2">
+              <h2 className="text-lg font-display font-bold text-ink flex items-center gap-2">
                 <Info className="w-5 h-5 text-pine" />
                 {strings.catalog.attributes}
-              </h3>
+              </h2>
               
               <div className="flex flex-wrap gap-2">
                 <Badge variant={cat.neutered ? 'adopted' : 'draft'} className="text-sm py-1.5 px-3">
@@ -170,7 +170,7 @@ export function CatDetails({
 
             {/* Description */}
             <div className="space-y-3 pt-4 border-t border-border/40">
-              <h3 className="text-lg font-display font-bold text-ink">{strings.catalog.aboutCat}</h3>
+              <h2 className="text-lg font-display font-bold text-ink">{strings.catalog.aboutCat}</h2>
               <p className="text-base text-ink leading-relaxed whitespace-pre-line font-medium">
                 {cat.description}
               </p>
@@ -179,10 +179,10 @@ export function CatDetails({
             {/* Health & Special Needs details */}
             {(cat.health_notes || (cat.is_special && cat.special_needs)) && (
               <div className="space-y-4 pt-4 border-t border-border/40">
-                <h3 className="text-lg font-display font-bold text-ink flex items-center gap-2">
+                <h2 className="text-lg font-display font-bold text-ink flex items-center gap-2">
                   <Stethoscope className="w-5 h-5 text-pine" />
                   {strings.catalog.healthAndNeeds}
-                </h3>
+                </h2>
                 
                 {cat.is_special && cat.special_needs && (
                   <div className="bg-marmalade-sf/40 border-s-4 border-marmalade p-3.5 rounded text-sm text-ink font-semibold">

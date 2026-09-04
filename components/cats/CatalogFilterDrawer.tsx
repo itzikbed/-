@@ -113,18 +113,23 @@ export function CatalogFilterDrawer({
               type="button"
               onClick={onClose}
               aria-label={strings.common.closeDialog}
-              className="p-2 -mt-2 -me-2 text-ink-soft hover:text-ink cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+              className="inline-flex items-center justify-center min-w-11 min-h-11 -mt-2 -me-2 text-ink-soft hover:text-ink cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
             >
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
 
-          <CatalogFilters
-            filters={filters}
-            totalCount={totalCount}
-            onFiltersChange={onFiltersChange}
-            onCloseMobile={onClose}
-          />
+          {/* The sheet is capped at 85vh. Without a scroll container of its
+              own this list simply ran past the foot of the screen and the
+              filters below the fold could not be reached at all. */}
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+            <CatalogFilters
+              filters={filters}
+              totalCount={totalCount}
+              onFiltersChange={onFiltersChange}
+              onCloseMobile={onClose}
+            />
+          </div>
         </div>
       </div>
     </Portal>

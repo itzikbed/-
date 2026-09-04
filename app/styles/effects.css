@@ -170,6 +170,21 @@
   );
 }
 
+/* The cat card's details sit on the card's own glass — but only below the
+   sweep that cuts the photo. A long name or a long region grows the block
+   upward, and above the sweep there is no glass left, just the photograph.
+   This wash rises out of the details and fades to nothing over the picture,
+   so the text is legible wherever it lands. Legibility, not decoration —
+   the same reason .card-strip-glass exists. */
+.card-details-wash {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(253, 252, 250, 0) 0%,
+    rgba(253, 252, 250, 0.88) 40%,
+    rgba(253, 252, 250, 0.93) 100%
+  );
+}
+
 /* Sunbeam drift on paper sections */
 @keyframes sunbeam-drift {
   0% {

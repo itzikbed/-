@@ -33,9 +33,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Facts band — the quiet list. The moving one is on the home page. */}
+      {/* Facts band — the quiet list. The moving one is on the home page.
+          The foot padding is deliberately large: this band cuts its own foot on
+          the page sweep, and the sweep takes a share of the band HEIGHT, so on a
+          narrow screen — where the list is long — it was swallowing the source
+          line whole. The padding keeps the last line clear of the cut. */}
       <SectionCurve className="text-pine-soft" />
-      <section className="section-curve-clip bg-pine-soft pt-8 pb-14">
+      <section className="section-curve-clip bg-pine-soft pt-8 pb-40 md:pb-28">
         <FactsSection />
       </section>
 

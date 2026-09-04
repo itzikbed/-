@@ -196,14 +196,14 @@ export const CatCard: React.FC<CatCardProps> = ({ cat }) => {
 
       {/* The glass pane. Its top edge is the same sweep used between page bands,
           and it is opaque enough to hold ink at AA over any photo underneath. */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 px-4 pb-4">
-        <h2 className="text-lg font-display font-bold text-ink leading-tight">
+      <div className="card-details-wash absolute inset-x-0 bottom-0 flex flex-col gap-0.5 px-4 pt-9 pb-4">
+        <h2 className="text-lg font-display font-bold text-ink leading-tight line-clamp-1">
           {cat.name}
         </h2>
-        <p className="text-[13px] font-semibold text-ink-soft leading-snug">
+        <p className="text-[13px] font-semibold text-ink-soft leading-snug truncate">
           {ageLabel} &middot; {sexLabel}
         </p>
-        <p className="text-[13px] font-semibold text-pine leading-snug">
+        <p className="text-[13px] font-semibold text-pine leading-snug truncate">
           {regionLabel} {cat.city ? `(${cat.city})` : ''}
         </p>
       </div>

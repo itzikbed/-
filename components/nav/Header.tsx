@@ -153,7 +153,7 @@ export function Header({ user, profile }: HeaderProps) {
             onClick={() => setIsOpen(true)}
             aria-expanded={isOpen}
             aria-label={strings.common.openMenu}
-            className="md:hidden p-2 text-ink-soft hover:text-pine hover:bg-ink-light/10 rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
+            className="md:hidden inline-flex items-center justify-center min-w-11 min-h-11 text-ink-soft hover:text-pine hover:bg-ink-light/10 rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2"
           >
             <Menu className="w-6 h-6" />
           </button>

@@ -75,9 +75,9 @@ export default async function PublishPage() {
         {adminNeedsAccess && (
           <form action={activateAdminPublisherAccessAction} className="bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-center space-y-6">
             <Mascot pose="sitting" width={120} height={140} />
-            <h2 className="text-2xl font-display font-extrabold text-ink">
+            <h1 className="text-2xl font-display font-extrabold text-ink">
               {strings.publish.adminAccessTitle}
-            </h2>
+            </h1>
             <p className="text-base font-semibold text-ink-soft leading-relaxed max-w-md mx-auto">
               {strings.publish.adminAccessDesc}
             </p>
@@ -111,9 +111,9 @@ export default async function PublishPage() {
         {status === 'pending' && !adminNeedsAccess && (
           <div className="bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-center space-y-6">
             <Mascot pose="sleeping" width={140} height={100} animateOnScroll />
-            <h2 className="text-2xl font-display font-extrabold text-ink">
+            <h1 className="text-2xl font-display font-extrabold text-ink">
               {strings.publish.pendingTitle}
-            </h2>
+            </h1>
             <p className="text-base font-semibold text-ink-soft leading-relaxed max-w-md mx-auto">
               {strings.publish.pendingDesc}
             </p>
@@ -123,9 +123,9 @@ export default async function PublishPage() {
         {status === 'blocked' && (
           <div className="bg-surface border border-border rounded-card p-8 md:p-12 shadow-resting text-center space-y-6">
             <Mascot pose="sitting" width={120} height={140} className="grayscale" />
-            <h2 className="text-2xl font-display font-extrabold text-danger">
+            <h1 className="text-2xl font-display font-extrabold text-danger">
               {strings.publish.blockedTitle}
-            </h2>
+            </h1>
             <p className="text-base font-semibold text-ink-soft leading-relaxed max-w-md mx-auto mb-2">
               {strings.publish.blockedDesc}
             </p>

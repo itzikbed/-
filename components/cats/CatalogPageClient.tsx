@@ -164,7 +164,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
               value={searchVal}
               onChange={handleSearchChange}
               aria-label={strings.catalog.searchPlaceholder}
-              className="w-full bg-paper border border-border rounded-input py-2.5 ps-10 pe-4 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+              className="w-full min-h-11 bg-paper border border-border rounded-input py-2.5 ps-10 pe-4 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
             />
             <span className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-ink-soft">
               <Search className="w-4 h-4" />
@@ -178,7 +178,7 @@ export const CatalogPageClient: React.FC<CatalogPageClientProps> = ({
               id="catalog-sort"
               value={filters.sort}
               onChange={(e) => handleSortChange(e.target.value as 'newest' | 'youngest' | 'oldest')}
-              className="bg-paper border border-border rounded-input py-2 px-3 text-sm font-bold text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine min-w-[120px]"
+              className="bg-paper border border-border rounded-input min-h-11 py-2 px-3 text-sm font-bold text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine min-w-[120px]"
             >
               <option value="newest">{strings.catalog.sortNewest}</option>
               <option value="youngest">{strings.catalog.sortYoungest}</option>

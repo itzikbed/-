@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { Filters } from '@/lib/utils/filters'
 import { CatalogFilters } from './CatalogFilters'
 import { strings } from '@/lib/strings'
+import { Portal } from '@/components/ui/Portal'
 
 interface CatalogFilterDrawerProps {
   isOpen: boolean
@@ -93,37 +94,39 @@ export function CatalogFilterDrawer({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end bg-ink/50 backdrop-blur-xs">
-      {/* Backdrop Click */}
-      <div className="flex-grow" onClick={onClose} aria-hidden="true" />
+    <Portal>
+      <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end bg-ink/50 backdrop-blur-xs">
+        {/* Backdrop Click */}
+        <div className="flex-grow" onClick={onClose} aria-hidden="true" />
 
-      {/* Drawer Content */}
-      <div
-        ref={drawerRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={strings.catalog.filterTitle}
-        tabIndex={-1}
-        className="bg-surface-solid rounded-card border-t border-border p-6 shadow-hover max-h-[85vh] flex flex-col animate-slide-up focus-visible:outline-none"
-      >
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={strings.common.closeDialog}
-            className="p-2 -mt-2 -me-2 text-ink-soft hover:text-ink cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
-          >
-            <X className="w-5 h-5" aria-hidden="true" />
-          </button>
+        {/* Drawer Content */}
+        <div
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={strings.catalog.filterTitle}
+          tabIndex={-1}
+          className="bg-surface-solid rounded-card border-t border-border p-6 shadow-hover max-h-[85vh] flex flex-col animate-slide-up focus-visible:outline-none"
+        >
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={strings.common.closeDialog}
+              className="p-2 -mt-2 -me-2 text-ink-soft hover:text-ink cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </div>
+
+          <CatalogFilters
+            filters={filters}
+            totalCount={totalCount}
+            onFiltersChange={onFiltersChange}
+            onCloseMobile={onClose}
+          />
         </div>
-
-        <CatalogFilters
-          filters={filters}
-          totalCount={totalCount}
-          onFiltersChange={onFiltersChange}
-          onCloseMobile={onClose}
-        />
       </div>
-    </div>
+    </Portal>
   )
 }

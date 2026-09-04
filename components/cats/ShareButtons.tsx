@@ -19,7 +19,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 const buttonClass =
-  'inline-flex items-center justify-center gap-2 font-sans font-bold rounded-btn min-h-[42px] px-4 text-sm bg-surface border border-border text-ink hover:bg-pine-soft hover:border-pine/30 transition-all duration-150 active:scale-98 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2'
+  'inline-flex items-center justify-center gap-2 font-sans font-bold rounded-btn min-h-11 px-4 text-sm bg-surface border border-border text-ink hover:bg-pine-soft hover:border-pine/30 transition-all duration-150 active:scale-98 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2'
 
 // Hydration-safe capability check: false on the server, real value after mount.
 const emptySubscribe = () => () => {}

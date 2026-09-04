@@ -246,6 +246,83 @@
   animation: hero-word-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ---------------------------------------------------------------------------
+   Overlay entrances.
+   These four classes were already in the markup and had nothing behind them,
+   so every drawer, dialog and queue item simply appeared. All of them stay
+   inside the §7 budget — 150–200ms, ease-out, transform and opacity only — and
+   the reduced-motion block at the foot of this file switches them all off.
+   --------------------------------------------------------------------------- */
+
+/* The nav drawer, entering from the inline end. The document is RTL, so that
+   is the left edge; the custom property keeps the rule honest either way. */
+@keyframes drawer-in-inline-end {
+  from {
+    opacity: 0;
+    transform: translateX(var(--drawer-from, -100%));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-slide-rtl {
+  animation: drawer-in-inline-end 200ms ease-out both;
+}
+
+[dir='ltr'] .animate-fade-slide-rtl {
+  --drawer-from: 100%;
+}
+
+/* The filter sheet, rising from the foot of the screen. */
+@keyframes sheet-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-slide-up {
+  animation: sheet-in-up 200ms ease-out both;
+}
+
+/* Queue rows in the admin dashboard, and anything else that should arrive
+   without moving. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 150ms ease-out both;
+}
+
+/* The confirmation after an upload — the one moment on the site that is
+   allowed to feel like an arrival. */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-scale {
+  animation: scale-in 200ms ease-out both;
+}
+
 /* Reduced motion adjustments */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-rise {

@@ -62,9 +62,9 @@ export function PublisherApplicationForm({ initialData }: PublisherApplicationFo
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <h2 className="text-2xl font-display font-extrabold text-ink mb-2">
+      <h1 className="text-2xl font-display font-extrabold text-ink mb-2">
         {strings.publish.applyTitle}
-      </h2>
+      </h1>
       <p className="text-sm font-semibold text-ink-soft leading-relaxed">
         {strings.publish.applyDesc}
       </p>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useId } from 'react'
 import { strings } from '@/lib/strings'
+import { Portal } from '@/components/ui/Portal'
 
 export interface DialogProps {
   isOpen: boolean
@@ -91,40 +92,42 @@ export const Dialog: React.FC<DialogProps> = ({ isOpen, onClose, title, children
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-xs">
-      {/* Click outside to close */}
-      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
+    <Portal>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-xs">
+        {/* Click outside to close */}
+        <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
       
-      <div 
-        ref={containerRef}
-        className="bg-surface-solid rounded-card p-6 shadow-hover w-full max-w-lg relative border border-border animate-fade-rise focus-visible:outline-none"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h3 id={titleId} className="text-xl font-display font-bold text-ink">{title}</h3>
-          <button 
-            type="button"
-            onClick={onClose}
-            aria-label={strings.common.closeDialog}
-            className="text-ink-soft hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine rounded-sm p-1"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div className="mb-6 font-sans text-base text-ink-soft leading-relaxed text-start">
-          {children}
-        </div>
-        {actions && (
-          <div className="flex justify-end gap-3 mt-6">
-            {actions}
+        <div 
+          ref={containerRef}
+          className="bg-surface-solid rounded-card p-6 shadow-hover w-full max-w-lg relative border border-border animate-fade-rise focus-visible:outline-none"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 id={titleId} className="text-xl font-display font-bold text-ink">{title}</h3>
+            <button 
+              type="button"
+              onClick={onClose}
+              aria-label={strings.common.closeDialog}
+              className="text-ink-soft hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine rounded-sm p-1"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-        )}
+          <div className="mb-6 font-sans text-base text-ink-soft leading-relaxed text-start">
+            {children}
+          </div>
+          {actions && (
+            <div className="flex justify-end gap-3 mt-6">
+              {actions}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Portal>
   )
 }

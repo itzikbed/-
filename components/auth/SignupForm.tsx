@@ -91,9 +91,9 @@ export default function SignupForm() {
 
         {/* Card */}
         <div className="bg-surface rounded-card border border-border shadow-resting p-8 relative z-10">
-          <h2 className="text-2xl font-display font-extrabold text-ink mb-6 text-center select-none">
+          <h1 className="text-2xl font-display font-extrabold text-ink mb-6 text-center select-none">
             {strings.auth.signupTitle}
-          </h2>
+          </h1>
 
           {success && (
             <div
@@ -114,6 +114,7 @@ export default function SignupForm() {
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
               <Input
                 type="text"
+                autoComplete="name"
                 label={strings.auth.fullNameLabel}
                 placeholder={strings.auth.fullNamePlaceholder}
                 error={errors.fullName?.message}
@@ -123,6 +124,7 @@ export default function SignupForm() {
 
               <Input
                 type="tel"
+                autoComplete="tel"
                 label={strings.auth.phoneLabel}
                 placeholder={strings.auth.phonePlaceholder}
                 error={errors.phone?.message}
@@ -132,6 +134,7 @@ export default function SignupForm() {
 
               <Input
                 type="email"
+                autoComplete="email"
                 label={strings.auth.emailLabel}
                 placeholder={strings.auth.emailPlaceholder}
                 error={errors.email?.message}

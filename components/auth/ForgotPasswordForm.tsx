@@ -64,9 +64,9 @@ export const ForgotPasswordForm: React.FC = () => {
 
         {/* Card */}
         <div className="bg-surface rounded-card border border-border shadow-resting p-8 relative z-10 text-start">
-          <h2 className="text-2xl font-display font-extrabold text-ink mb-6 text-center">
+          <h1 className="text-2xl font-display font-extrabold text-ink mb-6 text-center">
             {strings.auth.forgotPasswordTitle}
-          </h2>
+          </h1>
 
           {success ? (
             <div className="space-y-6 text-center">

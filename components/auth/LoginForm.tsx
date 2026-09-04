@@ -81,9 +81,9 @@ export default function LoginForm() {
 
         {/* Card */}
         <div className="bg-surface rounded-card border border-border shadow-resting p-8 relative z-10">
-          <h2 className="text-2xl font-display font-extrabold text-ink mb-6 text-center select-none">
+          <h1 className="text-2xl font-display font-extrabold text-ink mb-6 text-center select-none">
             {strings.auth.loginTitle}
-          </h2>
+          </h1>
 
           {callbackFailed && !serverError && (
             <div role="alert" className="mb-4 p-3 bg-danger/10 text-danger rounded-input text-sm font-semibold">

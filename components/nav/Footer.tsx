@@ -26,7 +26,14 @@ export function Footer() {
 
   return (
     <footer className="mt-auto">
-      <div className="relative">
+      {/* The crest rides UP onto the section above it instead of sitting in a
+          band of its own. The arc is drawn on a transparent box, so a band of
+          its own showed the page ground between the section and the footer —
+          a cream stripe wherever the aurora happened to be warm there, and a
+          seam on every page that ends on a colour. Pulled up by its own height,
+          the transparent part of the box reveals whatever is directly above,
+          so the dark green always rises straight out of it. */}
+      <div className="relative -mt-6 md:-mt-9">
         <div className="absolute bottom-0 end-10 md:end-24 text-ink select-none pointer-events-none">
           <SleepingPose width={96} height={64} />
         </div>

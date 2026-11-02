@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { processImageFile } from '@/lib/utils/image-processing'
+import { processImageFile, type VariantFormat } from '@/lib/utils/image-processing'
 import { processEditedImage } from '@/lib/utils/edited-image'
 import { CropAreaPixels, Rotation } from '@/lib/utils/crop-math'
 import { getAllowedVideoExtension } from '@/lib/security/media'
@@ -39,22 +39,26 @@ export function useCatMediaUpload({
 
   const supabase = createClient()
 
+  // The extension has to name the container that was actually encoded: storage
+  // reads the mime type off the blob itself, and the stored-media grammar, the
+  // cat_photos CHECK constraint and the magic-byte check all compare the two.
   const uploadVariantPair = async (
     cardBlob: Blob,
-    fullBlob: Blob
+    fullBlob: Blob,
+    format: VariantFormat
   ): Promise<{ cardPath: string; fullPath: string }> => {
     const uuid = crypto.randomUUID()
-    const cardPath = `${catId}/${uuid}-card.webp`
-    const fullPath = `${catId}/${uuid}-full.webp`
+    const cardPath = `${catId}/${uuid}-card.${format}`
+    const fullPath = `${catId}/${uuid}-full.${format}`
 
     const { error: cardErr } = await supabase.storage
       .from('cat-photos')
-      .upload(cardPath, cardBlob, { contentType: 'image/webp' })
+      .upload(cardPath, cardBlob, { contentType: cardBlob.type })
     if (cardErr) throw new Error(cardErr.message)
 
     const { error: fullErr } = await supabase.storage
       .from('cat-photos')
-      .upload(fullPath, fullBlob, { contentType: 'image/webp' })
+      .upload(fullPath, fullBlob, { contentType: fullBlob.type })
     if (fullErr) {
       await supabase.storage.from('cat-photos').remove([cardPath])
       throw new Error(fullErr.message)
@@ -89,8 +93,8 @@ export function useCatMediaUpload({
       }
 
       try {
-        const { cardBlob, fullBlob } = await processImageFile(file)
-        const { cardPath, fullPath } = await uploadVariantPair(cardBlob, fullBlob)
+        const { cardBlob, fullBlob, format } = await processImageFile(file)
+        const { cardPath, fullPath } = await uploadVariantPair(cardBlob, fullBlob, format)
 
         updatedPhotos.push({
           path_card: cardPath,
@@ -121,8 +125,8 @@ export function useCatMediaUpload({
     if (!photo) return false
 
     try {
-      const { cardBlob, fullBlob } = await processEditedImage(sourceBlob, cropArea, rotation)
-      const { cardPath, fullPath } = await uploadVariantPair(cardBlob, fullBlob)
+      const { cardBlob, fullBlob, format } = await processEditedImage(sourceBlob, cropArea, rotation)
+      const { cardPath, fullPath } = await uploadVariantPair(cardBlob, fullBlob, format)
 
       if (photo.localUrl) {
         // Uploaded this session — no cat_photos row references the old pair yet.

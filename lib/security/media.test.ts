@@ -4,6 +4,7 @@ import {
   getMediaUrl,
   getStoredVideoPaths,
   isPhotoReferenceForCat,
+  isStoredImagePath,
   isStoredMediaPath,
   isVideoReferenceForCat
 } from './media'
@@ -19,6 +20,19 @@ describe('media security helpers', () => {
     expect(isStoredMediaPath(`${catId}/${mediaId}-image.svg`)).toBe(false)
   })
 
+  it('accepts the jpeg fallback variants iOS produces', () => {
+    expect(isStoredMediaPath(`${catId}/${mediaId}-card.jpg`)).toBe(true)
+    expect(isStoredMediaPath(`${catId}/${mediaId}-full.jpg`)).toBe(true)
+    expect(isStoredMediaPath(`${catId}/${mediaId}-card.jpeg`)).toBe(false)
+  })
+
+  it('tells stored images apart from stored video', () => {
+    expect(isStoredImagePath(`${catId}/${mediaId}-card.webp`)).toBe(true)
+    expect(isStoredImagePath(`${catId}/${mediaId}-full.jpg`)).toBe(true)
+    expect(isStoredImagePath(`${catId}/${mediaId}-video.mp4`)).toBe(false)
+    expect(isStoredImagePath(`${catId}/../../secret.webp`)).toBe(false)
+  })
+
   it('requires matching card and full variants in the same cat folder', () => {
     expect(isPhotoReferenceForCat({
       path_card: `${catId}/${mediaId}-card.webp`,
@@ -29,6 +43,20 @@ describe('media security helpers', () => {
     expect(isPhotoReferenceForCat({
       path_card: `${catId}/${mediaId}-card.webp`,
       path_full: `33333333-3333-4333-8333-333333333333/${mediaId}-full.webp`,
+      sort_order: 0
+    }, catId)).toBe(false)
+
+    expect(isPhotoReferenceForCat({
+      path_card: `${catId}/${mediaId}-card.jpg`,
+      path_full: `${catId}/${mediaId}-full.jpg`,
+      sort_order: 0
+    }, catId)).toBe(true)
+
+    // One photo lives in one container: the cat_photos_path_format constraint
+    // says the same thing about the row.
+    expect(isPhotoReferenceForCat({
+      path_card: `${catId}/${mediaId}-card.jpg`,
+      path_full: `${catId}/${mediaId}-full.webp`,
       sort_order: 0
     }, catId)).toBe(false)
   })

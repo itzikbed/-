@@ -5,6 +5,12 @@ import { getServiceRoleKey } from '@/lib/supabase/server'
 
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024
 const MAX_VIDEO_BYTES = 25 * 1024 * 1024
+// The extension a variant is stored under has to name its real container, so
+// the pair is checked together: mime type, then magic bytes.
+const IMAGE_CONTAINERS = [
+  { extension: '.webp', mimetype: 'image/webp', magic: 'webp' },
+  { extension: '.jpg', mimetype: 'image/jpeg', magic: 'jpeg' }
+] as const
 const ALLOWED_VIDEO_MIME = new Set(['video/mp4', 'video/webm', 'video/quicktime'])
 
 // Full server-side media validation before persisting cat_photos/video_path:
@@ -51,11 +57,16 @@ async function verifyStoredMedia(
     const filename = fullPath.slice(prefix.length)
     const info = meta.get(filename)
     if (!info) return false // must exist in storage
-    if (info.mimetype !== 'image/webp') return false
+    const container = IMAGE_CONTAINERS.find(
+      (candidate) =>
+        candidate.mimetype === info.mimetype &&
+        filename.toLowerCase().endsWith(candidate.extension)
+    )
+    if (!container) return false
     if (info.size < 1 || info.size > MAX_IMAGE_BYTES) return false
 
     // Ranged signature validation
-    return await verifyMagicBytes(fullPath, 'webp')
+    return await verifyMagicBytes(fullPath, container.magic)
   }
 
   for (const p of photos) {
@@ -85,7 +96,7 @@ async function verifyStoredMedia(
 
 async function verifyMagicBytes(
   path: string,
-  expectedType: 'webp' | 'mp4' | 'webm' | 'quicktime'
+  expectedType: 'webp' | 'jpeg' | 'mp4' | 'webm' | 'quicktime'
 ): Promise<boolean> {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -116,6 +127,11 @@ async function verifyMagicBytes(
       const isRiff = bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46
       const isWebp = bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
       return isRiff && isWebp
+    }
+
+    // JPEG magic bytes: SOI marker (FF D8) followed by the first marker (FF)
+    if (expectedType === 'jpeg') {
+      return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
     }
 
     // WebM magic bytes: EBML header (1A 45 DF A3)

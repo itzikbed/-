@@ -1,8 +1,19 @@
 const UUID_SOURCE =
   '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 
+// WebP is the house format. JPEG is here because WebKit cannot encode WebP
+// from a canvas, so every browser on iOS falls back to it
+// (lib/utils/image-processing.ts).
+const IMAGE_EXTENSIONS = 'webp|jpg'
+const IMAGE_EXTENSION = `(?:${IMAGE_EXTENSIONS})`
+
 const STORED_MEDIA_PATH = new RegExp(
-  `^${UUID_SOURCE}/${UUID_SOURCE}-(?:card\\.webp|full\\.webp|video\\.(?:mp4|webm|mov))$`,
+  `^${UUID_SOURCE}/${UUID_SOURCE}-(?:card\\.${IMAGE_EXTENSION}|full\\.${IMAGE_EXTENSION}|video\\.(?:mp4|webm|mov))$`,
+  'i'
+)
+
+const STORED_IMAGE_PATH = new RegExp(
+  `^${UUID_SOURCE}/${UUID_SOURCE}-(?:card|full)\\.${IMAGE_EXTENSION}$`,
   'i'
 )
 
@@ -32,6 +43,10 @@ export function isStoredMediaPath(path: string): boolean {
   return path.length <= 180 && STORED_MEDIA_PATH.test(path)
 }
 
+export function isStoredImagePath(path: string): boolean {
+  return isStoredMediaPath(path) && STORED_IMAGE_PATH.test(path)
+}
+
 export function isUuid(value: string): boolean {
   return UUID.test(value)
 }
@@ -41,12 +56,16 @@ export function isPhotoReferenceForCat(
   catId: string
 ): boolean {
   const escapedCatId = catId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const cardPattern = new RegExp(`^${escapedCatId}/(${UUID_SOURCE})-card\\.webp$`, 'i')
-  const fullPattern = new RegExp(`^${escapedCatId}/(${UUID_SOURCE})-full\\.webp$`, 'i')
+  const cardPattern = new RegExp(`^${escapedCatId}/(${UUID_SOURCE})-card\\.(${IMAGE_EXTENSIONS})$`, 'i')
+  const fullPattern = new RegExp(`^${escapedCatId}/(${UUID_SOURCE})-full\\.(${IMAGE_EXTENSIONS})$`, 'i')
   const cardMatch = cardPattern.exec(photo.path_card)
   const fullMatch = fullPattern.exec(photo.path_full)
+  if (!cardMatch || !fullMatch) return false
 
-  return Boolean(cardMatch && fullMatch && cardMatch[1].toLowerCase() === fullMatch[1].toLowerCase())
+  // The pair is one photo in one container, which is what the
+  // cat_photos_path_format constraint enforces on the row as well.
+  return cardMatch[1].toLowerCase() === fullMatch[1].toLowerCase()
+    && cardMatch[2].toLowerCase() === fullMatch[2].toLowerCase()
 }
 
 export function isVideoReferenceForCat(path: string, catId: string): boolean {

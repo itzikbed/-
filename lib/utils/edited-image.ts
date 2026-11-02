@@ -1,13 +1,13 @@
 import { CropAreaPixels, Rotation, cropGeometry } from './crop-math'
-import { generateImageVariants } from './image-processing'
+import { generateImageVariants, type VariantFormat } from './image-processing'
 
-// The source is an already-stored webp variant, so EXIF (incl. GPS) was already
+// The source is an already-stored image variant, so EXIF (incl. GPS) was already
 // stripped on first upload and there is no HEIC path here.
 export async function processEditedImage(
   source: Blob,
   crop: CropAreaPixels,
   rotation: Rotation
-): Promise<{ cardBlob: Blob; fullBlob: Blob }> {
+): Promise<{ cardBlob: Blob; fullBlob: Blob; format: VariantFormat }> {
   let bitmap: ImageBitmap
   try {
     bitmap = await createImageBitmap(source)

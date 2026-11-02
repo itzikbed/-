@@ -31,12 +31,12 @@ describe('image optimizer source allowlist', () => {
   })
 })
 
-describe('stored media grammar keeps non-webp containers out of the optimizer', () => {
+describe('stored media grammar keeps unexpected containers out of the optimizer', () => {
   const accepts = (name: string) => isStoredMediaPath(`${catId}/${mediaId}-${name}`)
 
-  it('rejects every image container except webp', () => {
+  it('rejects every image container outside the stored pair', () => {
     const containers = [
-      'card.avif', 'full.avif', 'card.svg', 'full.svg', 'card.jpg', 'card.jpeg',
+      'card.avif', 'full.avif', 'card.svg', 'full.svg', 'card.jpeg',
       'card.png', 'card.gif', 'card.heic', 'card.heif', 'card.tiff', 'card.bmp',
       'card.ico', 'card.jxl'
     ]
@@ -45,23 +45,30 @@ describe('stored media grammar keeps non-webp containers out of the optimizer', 
     }
   })
 
-  it('rejects a double extension that merely ends in webp', () => {
+  it('rejects a double extension that merely ends in an allowed one', () => {
     expect(accepts('card.avif.webp')).toBe(false)
     expect(accepts('card.svg.webp')).toBe(false)
+    expect(accepts('card.svg.jpg')).toBe(false)
   })
 
-  it('rejects a webp extension carrying a query, fragment or null byte', () => {
+  it('rejects an allowed extension carrying a query, fragment or null byte', () => {
     expect(accepts('card.webp?format=avif')).toBe(false)
     expect(accepts('card.webp#.avif')).toBe(false)
     expect(accepts('card.webp%00.avif')).toBe(false)
+    expect(accepts('card.jpg%00.svg')).toBe(false)
   })
 
-  it('rejects a webp name that escapes the cat folder', () => {
+  it('rejects a stored name that escapes the cat folder', () => {
     expect(isStoredMediaPath(`${catId}/../${catId}/${mediaId}-card.webp`)).toBe(false)
   })
 
-  it('accepts the two canonical webp variants', () => {
+  // JPEG is the fallback container for browsers that cannot encode WebP from a
+  // canvas, which is every browser on iOS. Both are fixed raster formats the
+  // optimizer can decode without being handed anything scriptable.
+  it('accepts the canonical variants in either allowed container', () => {
     expect(accepts('card.webp')).toBe(true)
     expect(accepts('full.webp')).toBe(true)
+    expect(accepts('card.jpg')).toBe(true)
+    expect(accepts('full.jpg')).toBe(true)
   })
 })

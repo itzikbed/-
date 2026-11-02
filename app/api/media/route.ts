@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { isStoredMediaPath } from '@/lib/security/media'
+import { isStoredImagePath, isStoredMediaPath } from '@/lib/security/media'
 
 export const dynamic = 'force-dynamic'
 
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 
   // 5. Videos keep the redirect: <video> follows it fine, and Supabase handles
   // Range requests (seeking) which a plain proxy would not.
-  if (!path.toLowerCase().endsWith('.webp')) {
+  if (!isStoredImagePath(path)) {
     const response = NextResponse.redirect(signedUrl, 307)
     response.headers.set('Cache-Control', 'private, no-store')
     return response
